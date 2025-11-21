@@ -4,14 +4,17 @@
 #include "ModuleGame.h"
 #include "ModuleAudio.h"
 #include "ModulePhysics.h"
+#include <iostream> 
+#include <string> 
 
 class PhysicEntity
 {
 protected:
 
-	PhysicEntity(PhysBody* _body, ModulePhysics* _physics, Module* _listener, EntityType type)
+	PhysicEntity(PhysBody* _body, ModulePhysics* _physics, ModuleGame* _game, Module* _listener, EntityType type)
 		: body(_body)
 		, physics(_physics)
+		, game(_game)
 		, listener(_listener)
 		, type(type)
 	{
@@ -31,13 +34,14 @@ public:
 	Module* listener;
 	EntityType type;
 	ModulePhysics* physics;
+	ModuleGame* game;
 };
 
 class Circle : public PhysicEntity
 {
 public:
-	Circle(ModulePhysics* physics, int _x, int _y, Module* _listener, Texture2D _texture, EntityType type, float angle = 0.f, bool dynamic = true, float restitution = 0.f)
-		: PhysicEntity(physics->CreateCircle(_x, _y, _texture.height / 2, angle, dynamic, restitution), physics, _listener, type)
+	Circle(ModulePhysics* physics, ModuleGame* game, int _x, int _y, Module* _listener, Texture2D _texture, EntityType type, float angle = 0.f, bool dynamic = true, float restitution = 0.f)
+		: PhysicEntity(physics->CreateCircle(_x, _y, _texture.height / 2, angle, dynamic, restitution), physics, game, _listener, type)
 		, texture(_texture)
 	{
 		body->type = type;
@@ -63,8 +67,8 @@ public:
 class Box : public PhysicEntity
 {
 public:
-	Box(ModulePhysics* physics, int _x, int _y, Module* _listener, Texture2D _texture, EntityType type, float angle = 0.f, bool dynamic = true, float restitution = 0.f)
-		: PhysicEntity(physics->CreateRectangle(_x, _y, _texture.width, _texture.height, angle, dynamic, restitution), physics, _listener, type)
+	Box(ModulePhysics* physics, ModuleGame* game, int _x, int _y, Module* _listener, Texture2D _texture, EntityType type, float angle = 0.f, bool dynamic = true, float restitution = 0.f)
+		: PhysicEntity(physics->CreateRectangle(_x, _y, _texture.width, _texture.height, angle, dynamic, restitution), physics, game, _listener, type)
 		, texture(_texture)
 	{
 		body->type = type;
@@ -91,8 +95,8 @@ public:
 class Chain : public PhysicEntity
 {
 public:
-	Chain(ModulePhysics* physics, int _x, int _y, int* points, int size, Module* _listener, Texture2D _texture, EntityType type, float angle = 0.f, bool dynamic = true, float restitution = 0.f, bool reverse = false)
-		: PhysicEntity(physics->CreateChain(_x - _texture.width / 2, _y - _texture.height / 2, points, size, angle, dynamic, restitution, reverse), physics, _listener, type)
+	Chain(ModulePhysics* physics, ModuleGame* game, int _x, int _y, int* points, int size, Module* _listener, Texture2D _texture, EntityType type, float angle = 0.f, bool dynamic = true, float restitution = 0.f, bool reverse = false)
+		: PhysicEntity(physics->CreateChain(_x - _texture.width / 2, _y - _texture.height / 2, points, size, angle, dynamic, restitution, reverse), physics, game, _listener, type)
 		, texture(_texture)
 	{
 		body->type = type;
@@ -119,8 +123,8 @@ public:
 class BoxSensor : public PhysicEntity
 {
 public:
-	BoxSensor(ModulePhysics* physics, int _x, int _y, int width, int height, Module* _listener, EntityType type, float angle = 0.f, bool dynamic = true)
-		: PhysicEntity(physics->CreateRectangleSensor(_x, _y, width, height, angle, dynamic), physics, _listener, type)
+	BoxSensor(ModulePhysics* physics, ModuleGame* game, int _x, int _y, int width, int height, Module* _listener, EntityType type, float angle = 0.f, bool dynamic = true)
+		: PhysicEntity(physics->CreateRectangleSensor(_x, _y, width, height, angle, dynamic), physics, game, _listener, type)
 	{
 		body->type = type;
 	}
@@ -140,10 +144,10 @@ public:
 class Car : public Box
 {
 public:
-	Car(ModulePhysics* physics, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman)
-		: Box(physics, _x, _y, _listener, _texture, CAR, angle), carNum(carNum), isHumanControlled(isHuman), currrentPosition(carNum), currentLap(0)
+	Car(ModulePhysics* physics, ModuleGame* game, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman)
+		: Box(physics, game, _x, _y, _listener, _texture, CAR, angle), carNum(carNum), isHumanControlled(isHuman), currrentPosition(carNum), currentLap(0), nitro(false), active(false)
 	{
-
+		
 	}
 
 	~Car() {
@@ -151,27 +155,41 @@ public:
 		physics->DestroyBody(pbody);
 	}
 
-	Vector2 GetInput() {
-		// get input from ModuleGame
+	void GetInput() {
+		nitro = game->nitroActive;
+		targetDirection = game->movementInput;
 	}
 
-	Vector2 AI() {
+	void AI() {
 		// find direction with AI
+		// targetDirection = direction from AI;
+		// nitro ?
 	}
 
 	void GetTargetDirection() {
-		if (isHumanControlled) targetDirection = GetInput();
-		else targetDirection = AI();
+		if (isHumanControlled) GetInput();
+		else AI();
 	}
 
 	void Move() {
 		// use target direction to move car
 	}
 
+	void Enable() {
+		active = true;
+	}
+
+	void Disable() {
+		active = false;
+	}
+
 	void Update() override
 	{
-		GetTargetDirection();
-		Move();
+		if (active)
+		{
+			GetTargetDirection();
+			Move();
+		}
 
 		int x, y;
 		body->GetPhysicPosition(x, y);
@@ -180,9 +198,10 @@ public:
 			Vector2{ (float)texture.width / 2.0f, (float)texture.height / 2.0f }, body->GetRotation() * RAD2DEG, WHITE);
 	}
 
-	Vector2 targetDirection;
+	Vector2* targetDirection;
+	bool active;
 	bool nitro;
-	int isHumanControlled;
+	bool isHumanControlled;
 	int carNum;
 	int currrentPosition;
 	int currentLap;
@@ -192,8 +211,8 @@ public:
 class Checkpoint : public BoxSensor
 {
 public:
-	Checkpoint(ModulePhysics* physics, int _x, int _y, int width, int height, float angle, Module* _listener, Texture2D _texture, int carNum)
-		: BoxSensor(physics, _x, _y, width, height, _listener, CHECKPOINT, angle, false)
+	Checkpoint(ModulePhysics* physics, ModuleGame* game, int _x, int _y, int width, int height, float angle, Module* _listener, Texture2D _texture, int carNum)
+		: BoxSensor(physics, game, _x, _y, width, height, _listener, CHECKPOINT, angle, false)
 	{
 
 	}
@@ -207,8 +226,8 @@ public:
 class Finishline : public BoxSensor
 {
 public:
-	Finishline(ModulePhysics* physics, int _x, int _y, int width, int height, float angle, Module* _listener, Texture2D _texture, int carNum)
-		: BoxSensor(physics, _x, _y, width, height, _listener, FINISHLINE, angle, false)
+	Finishline(ModulePhysics* physics, ModuleGame* game, int _x, int _y, int width, int height, float angle, Module* _listener, Texture2D _texture, int carNum)
+		: BoxSensor(physics, game, _x, _y, width, height, _listener, FINISHLINE, angle, false)
 	{
 
 	}
@@ -233,6 +252,9 @@ bool ModuleGame::Start()
 	LOG("Loading Intro assets");
 	bool ret = true;
 
+	CreateMap();
+	AddCars();
+
 	return ret;
 }
 
@@ -244,12 +266,87 @@ bool ModuleGame::CleanUp()
 	return true;
 }
 
+void ModuleGame::CreateMap()
+{
+	// add circuit, checkpoints and finishline
+}
+
+void ModuleGame::AddCars()
+{
+	// add cars
+}
+
+void ModuleGame::PerformCountdown()
+{
+	if (raceActive) return;
+	if (!countdownStarted)
+	{
+		countdownTimer.Start();
+		countdownStarted = true;
+	}
+	int currentNumber = 3 - floor(countdownTimer.ReadSec());
+	std::string countdownText = "";
+	if (currentNumber == 0)
+	{
+		StartRace();
+		countdownText = "Start";
+	}
+	else countdownText = std::to_string(currentNumber);
+	App->renderer->DrawText(countdownText.c_str(), GetScreenWidth() / 2, GetScreenHeight() / 2, { 20 }, 5, { 255, 0, 0, 0 });
+}
+
+void ModuleGame::StartRace()
+{
+	raceActive = true;
+	for (Car* c : cars) c->Enable();
+}
+
+void ModuleGame::EndRace()
+{
+	raceActive = false;
+	for (Car* c : cars) c->Disable();
+}
+
+void ModuleGame::GetInput()
+{
+	movementInput = new Vector2();
+	nitroInput = false;
+	if (IsKeyPressed(KEY_RIGHT)) movementInput->x = 1;
+	if (IsKeyPressed(KEY_LEFT)) movementInput->x = -1;
+	if (IsKeyPressed(KEY_UP)) movementInput->y = 1;
+	if (IsKeyPressed(KEY_DOWN)) movementInput->y = -1;
+	if (IsKeyPressed(KEY_SPACE)) nitroInput = true;
+}
+
+void ModuleGame::PerformNitro()
+{
+	if (nitroInput && availableNitros > 0 && !nitroActive) {
+		nitroActive = true;
+		nitroTimer.Start();
+	}
+	if (nitroActive && nitroTimer.ReadSec() > maxNitroTime) {
+		nitroActive = false;
+	}
+}
+
+void ModuleGame::AdjustCamera()
+{
+	// adjust position and rotation of the camera to have the players car in the center
+	// App->renderer->camera
+}
+
 // Update: draw background
 update_status ModuleGame::Update()
 {
-	for (PhysicEntity* entity : entities) entity->Update();
+	PerformCountdown();
+	if (raceActive) {
+		GetInput();
+		PerformNitro();
+	}
 
 	for (Car* c : cars) c->Update();
+
+	for (PhysicEntity* entity : entities) entity->Update();
 
 	return UPDATE_CONTINUE;
 }

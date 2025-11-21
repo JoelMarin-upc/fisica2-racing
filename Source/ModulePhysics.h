@@ -43,7 +43,6 @@ public:
 	b2Body* body;
 	Module* listener;
 	EntityType type;
-	char letter = NULL;
 };
 
 // Module --------------------------------------

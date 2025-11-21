@@ -32,6 +32,7 @@ public:
 	void EndRace();
 	void GetInput();
 	void PerformNitro();
+	void AdjustCamera();
 
 	Timer countdownTimer;
 	const double countdownTime = 3.f;
@@ -40,19 +41,25 @@ public:
 	double lapTime;
 	double raceTime;
 
+	bool raceActive = false;
+	bool countdownStarted = false;
+
 	const int totalLaps = 3;
 	const int totalCars = 8;
 
 	std::vector<PhysicEntity*> entities;
 	std::vector<Car*> cars;
-	Car* car;
+	Car* car; // should be in cars list
 	std::vector<Checkpoint*> checkpoints;
 	Finishline* finishline;
 
 	Vector2* movementInput;
-	bool nitro;
+	bool nitroInput;
 
 	Timer nitroTimer;
 	const double maxNitroTime = 2.f;
+	const int maxAvailableNitros = 3;
+	int availableNitros = maxAvailableNitros;
+	bool nitroActive;
 
 };
