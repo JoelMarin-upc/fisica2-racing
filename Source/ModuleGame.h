@@ -22,7 +22,7 @@ public:
 	~ModuleGame();
 
 	bool Start();
-	update_status Update();
+	update_status Update(float dt);
 	bool CleanUp();
 
 	void CreateMap();
@@ -61,5 +61,7 @@ public:
 	const int maxAvailableNitros = 3;
 	int availableNitros = maxAvailableNitros;
 	bool nitroActive;
+
+	Texture2D carTex;
 
 };

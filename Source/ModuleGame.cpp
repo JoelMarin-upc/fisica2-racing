@@ -23,7 +23,7 @@ protected:
 
 public:
 	virtual ~PhysicEntity() = default;
-	virtual void Update() = 0;
+	virtual void Update(float dt) = 0;
 
 	virtual int RayHit(vec2<int> ray, vec2<int> mouse, vec2<float>& normal)
 	{
@@ -47,7 +47,7 @@ public:
 		body->type = type;
 	}
 
-	void Update() override
+	void Update(float dt) override
 	{
 		int x, y;
 		body->GetPhysicPosition(x, y);
@@ -74,7 +74,7 @@ public:
 		body->type = type;
 	}
 
-	void Update() override
+	void Update(float dt) override
 	{
 		int x, y;
 		body->GetPhysicPosition(x, y);
@@ -102,7 +102,7 @@ public:
 		body->type = type;
 	}
 
-	void Update() override
+	void Update(float dt) override
 	{
 		int x, y;
 		body->GetPhysicPosition(x, y);
@@ -129,7 +129,7 @@ public:
 		body->type = type;
 	}
 
-	void Update() override
+	void Update(float dt) override
 	{
 
 	}
@@ -145,9 +145,11 @@ class Car : public Box
 {
 public:
 	Car(ModulePhysics* physics, ModuleGame* game, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman)
-		: Box(physics, game, _x, _y, _listener, _texture, CAR, angle), carNum(carNum), isHumanControlled(isHuman), currrentPosition(carNum), currentLap(0), nitro(false), active(false)
+		: Box(physics, game, _x, _y, _listener, _texture, CAR, angle), 
+		carNum(carNum), isHumanControlled(isHuman), currentPosition(carNum), targetDirection(new Vector2{ 0, 0 }), currentLap(0), nitro(false), active(false)
 	{
-		
+		body->SetLinearDamping(1.0f);
+		body->SetAngularDamping(2.0f);
 	}
 
 	~Car() {
@@ -171,8 +173,29 @@ public:
 		else AI();
 	}
 
-	void Move() {
-		// use target direction to move car
+	void Move(float dt) {
+		float maxSteerAngle = 3.0f;
+		float speedFactor = body->GetLinearVelocity().Length() / engineForce;
+		speedFactor = std::min(speedFactor, 1.0f);
+
+		float targetAngularVelocity = targetDirection->x * maxSteerAngle * speedFactor;
+
+		float currentW = body->GetAngularVelocity();
+
+		float newW = currentW + (targetAngularVelocity - currentW) * (dt * steerStrength);
+		body->SetAngularVelocity(newW);
+
+		b2Vec2 right = body->GetWorldVector(b2Vec2(1, 0));
+		float lateralVel = b2Dot(right, body->GetLinearVelocity());
+
+		float sideFriction = 8.0f;
+		b2Vec2 killLateral = -lateralVel * sideFriction * right;
+
+		body->ApplyForce(killLateral.x, killLateral.y);
+
+		b2Vec2 forward = body->GetWorldVector(b2Vec2(0, targetDirection->y));
+		auto force = engineForce * forward;
+		body->ApplyForce(force.x, force.y);
 	}
 
 	void Enable() {
@@ -183,12 +206,12 @@ public:
 		active = false;
 	}
 
-	void Update() override
+	void Update(float dt) override
 	{
 		if (active)
 		{
 			GetTargetDirection();
-			Move();
+			Move(dt);
 		}
 
 		int x, y;
@@ -203,8 +226,10 @@ public:
 	bool nitro;
 	bool isHumanControlled;
 	int carNum;
-	int currrentPosition;
+	int currentPosition;
 	int currentLap;
+	const float engineForce = 10.f;
+	const float steerStrength = 12.f;
 
 };
 
@@ -274,6 +299,10 @@ void ModuleGame::CreateMap()
 void ModuleGame::AddCars()
 {
 	// add cars
+	carTex = LoadTexture("Assets/car1.png");
+	car = new Car(App->physics, this, 300, 300, 0, this, carTex, 1, true);
+	cars.push_back(car);
+	entities.push_back(new Circle(App->physics, this, 600, 600, this, carTex, EntityType::CAR, 0, true, 0));
 }
 
 void ModuleGame::PerformCountdown()
@@ -286,13 +315,10 @@ void ModuleGame::PerformCountdown()
 	}
 	int currentNumber = 3 - floor(countdownTimer.ReadSec());
 	std::string countdownText = "";
-	if (currentNumber == 0)
-	{
-		StartRace();
-		countdownText = "Start";
-	}
+	if (currentNumber == 0) countdownText = "Start";
+	else if (currentNumber == -1) StartRace();
 	else countdownText = std::to_string(currentNumber);
-	App->renderer->DrawText(countdownText.c_str(), GetScreenWidth() / 2, GetScreenHeight() / 2, { 20 }, 5, { 255, 0, 0, 0 });
+	App->renderer->DrawText(countdownText.c_str(), GetScreenWidth() / 2, GetScreenHeight() / 2, { 20 }, 5, { 255, 0, 0, 255 });
 }
 
 void ModuleGame::StartRace()
@@ -311,11 +337,11 @@ void ModuleGame::GetInput()
 {
 	movementInput = new Vector2();
 	nitroInput = false;
-	if (IsKeyPressed(KEY_RIGHT)) movementInput->x = 1;
-	if (IsKeyPressed(KEY_LEFT)) movementInput->x = -1;
-	if (IsKeyPressed(KEY_UP)) movementInput->y = 1;
-	if (IsKeyPressed(KEY_DOWN)) movementInput->y = -1;
-	if (IsKeyPressed(KEY_SPACE)) nitroInput = true;
+	if (IsKeyDown(KEY_RIGHT)) movementInput->x = 1;
+	if (IsKeyDown(KEY_LEFT)) movementInput->x = -1;
+	if (IsKeyDown(KEY_UP)) movementInput->y = -1;
+	if (IsKeyDown(KEY_DOWN)) movementInput->y = 1;
+	if (IsKeyDown(KEY_SPACE)) nitroInput = true;
 }
 
 void ModuleGame::PerformNitro()
@@ -336,7 +362,7 @@ void ModuleGame::AdjustCamera()
 }
 
 // Update: draw background
-update_status ModuleGame::Update()
+update_status ModuleGame::Update(float dt)
 {
 	PerformCountdown();
 	if (raceActive) {
@@ -344,9 +370,11 @@ update_status ModuleGame::Update()
 		PerformNitro();
 	}
 
-	for (Car* c : cars) c->Update();
+	for (Car* c : cars) c->Update(dt);
 
-	for (PhysicEntity* entity : entities) entity->Update();
+	for (PhysicEntity* entity : entities) entity->Update(dt);
+
+	App->physics->Step(dt);
 
 	return UPDATE_CONTINUE;
 }

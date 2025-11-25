@@ -8,7 +8,7 @@
 #include <vector>
 
 #define GRAVITY_X 0.0f
-#define GRAVITY_Y -7.0f
+#define GRAVITY_Y 0.0f
 #define PI 3.14159265359f
 
 #define PIXELS_PER_METER 50.0f // if touched change METER_PER_PIXEL too
@@ -37,6 +37,13 @@ public:
 	bool Contains(int x, int y) const;
 	int RayCast(int x1, int y1, int x2, int y2, float& normal_x, float& normal_y) const;
 	void ApplyImpulse(float xNewtonSec, float yNewtonSec);
+	void ApplyForce(float xNewton, float yNewton);
+	b2Vec2 GetWorldVector(b2Vec2 direction);
+	void SetLinearDamping(float linearDamping);
+	void SetAngularDamping(float angularDamping);
+	void SetAngularVelocity(float velocity);
+	b2Vec2 GetLinearVelocity();
+	float GetAngularVelocity();
 
 public:
 	int width, height;

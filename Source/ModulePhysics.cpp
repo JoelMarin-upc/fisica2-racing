@@ -288,10 +288,10 @@ update_status ModulePhysics::PostUpdate()
 {
 
 
-	/*if (IsKeyPressed(KEY_F1))
+	if (IsKeyPressed(KEY_F1))
 	{
 		debug = !debug;
-	}*/
+	}
 
 	if (!debug)
 	{
@@ -477,4 +477,40 @@ void PhysBody::ApplyImpulse(float xNewtonSec, float yNewtonSec)
 {
 	b2Vec2 impulse(xNewtonSec, yNewtonSec);
 	body->ApplyLinearImpulseToCenter(impulse, true);
+}
+
+void PhysBody::ApplyForce(float xNewton, float yNewton)
+{
+	b2Vec2 force(xNewton, yNewton);
+	body->ApplyForceToCenter(force, true);
+}
+
+b2Vec2 PhysBody::GetWorldVector(b2Vec2 direction)
+{
+	return body->GetWorldVector(direction);
+}
+
+void PhysBody::SetLinearDamping(float linearDamping)
+{
+	body->SetLinearDamping(linearDamping);
+}
+
+void PhysBody::SetAngularDamping(float angularDamping)
+{
+	body->SetAngularDamping(angularDamping);
+}
+
+void PhysBody::SetAngularVelocity(float velocity)
+{
+	body->SetAngularVelocity(velocity);
+}
+
+b2Vec2 PhysBody::GetLinearVelocity()
+{
+	return body->GetLinearVelocity();
+}
+
+float PhysBody::GetAngularVelocity()
+{
+	return body->GetAngularVelocity();
 }

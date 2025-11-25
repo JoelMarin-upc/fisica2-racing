@@ -62,6 +62,11 @@ public:
 		return UPDATE_CONTINUE;
 	}
 
+	virtual update_status Update(float dt)
+	{
+		return UPDATE_CONTINUE;
+	}
+
 	virtual update_status PostUpdate()
 	{
 		return UPDATE_CONTINUE;

@@ -71,6 +71,30 @@ update_status Application::Update()
 {
 	update_status ret = UPDATE_CONTINUE;
 
+	// --- T-key toggle FPS ---
+	if (IsKeyPressed(KEY_T))
+	{
+		targetFPS = (targetFPS == 60) ? 30 : 60;
+		SetTargetFPS(targetFPS); // raylib caps FPS automatically
+		LOG("Target FPS switched to %d", targetFPS);
+	}
+
+	// --- Delta time ---
+	static double lastTime = GetTime(); // seconds
+	double currentTime = GetTime();
+	double dt = currentTime - lastTime; // seconds since last frame
+	lastTime = currentTime;
+
+	// --- Fixed timestep physics ---
+	static double accumulator = 0.0;
+	const float physicsStep = 1.0f / 60.0f; // 60 Hz fixed physics step
+	accumulator += dt;
+	while (accumulator >= physicsStep)
+	{
+		physics->Step(physicsStep);
+		accumulator -= physicsStep;
+	}
+
 	for (auto it = list_modules.begin(); it != list_modules.end() && ret == UPDATE_CONTINUE; ++it)
 	{
 		Module* module = *it;
@@ -85,7 +109,11 @@ update_status Application::Update()
 		Module* module = *it;
 		if (module->IsEnabled())
 		{
-			ret = module->Update();
+			// Only pass dt to game module
+			if (module == scene_intro)
+				ret = module->Update(dt);
+			else
+				ret = module->Update();
 		}
 	}
 
