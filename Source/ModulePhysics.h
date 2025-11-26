@@ -69,7 +69,7 @@ public:
 	PhysBody* CreateCircle(int x, int y, int radius, float angle = 0.f, bool dynamic = true, float restitution = 0.f);
 	PhysBody* CreateRectangle(int x, int y, int width, int height, float angle = 0.f, bool dynamic = true, float restitution = 0.f);
 	PhysBody* CreateRectangleSensor(int x, int y, int width, int height, float angle = 0.f, bool dynamic = true);
-	PhysBody* CreateChain(int x, int y, const int* points, int size, float angle = 0.f, bool dynamic = true, float restitution = 0.f, bool reverse = false);
+	PhysBody* CreateChain(int x, int y, const int* points, unsigned int size, float angle = 0.f, bool dynamic = true, float restitution = 0.f, bool reverse = false);
 	void CreateRevoluteJoint(b2Body* b1, b2Body* b2, int xAnchor, int yAnchor, float lowerAngle, float upperAngle);
 	void CreateMouseJoint(b2Body* body, b2Vec2 target);
 

@@ -154,7 +154,7 @@ PhysBody* ModulePhysics::CreateRectangleSensor(int x, int y, int width, int heig
 	return pbody;
 }
 
-PhysBody* ModulePhysics::CreateChain(int x, int y, const int* points, int size, float angle, bool dynamic, float restitution, bool reverse)
+PhysBody* ModulePhysics::CreateChain(int x, int y, const int* points, unsigned int size, float angle, bool dynamic, float restitution, bool reverse)
 {
 	b2BodyDef body;
 	body.type = dynamic ? b2_dynamicBody : b2_staticBody;

@@ -9,11 +9,10 @@
 #include "raylib.h"
 #include <vector>
 
-class PhysBody;
-class PhysicEntity;
-class Car;
-class Checkpoint;
-class Finishline;
+#include "Car.cpp"
+#include "Finishline.cpp"
+#include "Checkpoint.cpp"
+#include "Map.cpp"
 
 class ModuleGame : public Module
 {
@@ -31,7 +30,6 @@ public:
 	void StartRace();
 	void EndRace();
 	void GetInput();
-	void PerformNitro();
 	void AdjustCamera();
 
 	Timer countdownTimer;
@@ -47,21 +45,12 @@ public:
 	const int totalLaps = 3;
 	const int totalCars = 8;
 
-	std::vector<PhysicEntity*> entities;
+	//std::vector<PhysicEntity*> entities;
 	std::vector<Car*> cars;
 	Car* car; // should be in cars list
-	std::vector<Checkpoint*> checkpoints;
-	Finishline* finishline;
+	Map* map;
 
 	Vector2* movementInput;
 	bool nitroInput;
-
-	Timer nitroTimer;
-	const double maxNitroTime = 2.f;
-	const int maxAvailableNitros = 3;
-	int availableNitros = maxAvailableNitros;
-	bool nitroActive;
-
-	Texture2D carTex;
 
 };
