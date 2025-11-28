@@ -23,7 +23,7 @@ bool ModuleGame::Start()
 
 	//CreateMap();
 	//AddCars();
-	car = new Car(App, 300, 300, 0, this, LoadTexture("Assets/car1.png"), 1, true);
+	car = new Car(App, 100, 400, 90, this, LoadTexture("Assets/car1.png"), 1, true);
 	cars.push_back(car);
 
 	return ret;
@@ -40,7 +40,7 @@ bool ModuleGame::CleanUp()
 void ModuleGame::CreateMap()
 {
 	// add circuit, checkpoints and finishline
-	map = new Map(App, 0, 0, 0, this, LoadTexture("Assets/map.png"));
+	map = new Map(App, 0, 0, 0, this, LoadTexture("Assets/road.png"));
 	//map->checkpoints ...
 	//map->finishline ...
 	//map->playerStartPositions ...
@@ -57,7 +57,6 @@ void ModuleGame::AddCars()
 	Vector2 playerPos = map->playerStartPositions[totalCars-1];
 	car = new Car(App, playerPos.x, playerPos.y, 0, this, LoadTexture("Assets/carPlayer.png"), totalCars, true);
 	cars.push_back(car);
-	car->Disable();
 }
 
 void ModuleGame::PerformCountdown()
