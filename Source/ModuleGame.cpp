@@ -21,7 +21,7 @@ bool ModuleGame::Start()
 	LOG("Loading Intro assets");
 	bool ret = true;
 
-	//CreateMap();
+	CreateMap();
 	//AddCars();
 	car = new Car(App, 100, 400, 90, this, LoadTexture("Assets/car1.png"), 1, true);
 	cars.push_back(car);
@@ -40,10 +40,12 @@ bool ModuleGame::CleanUp()
 void ModuleGame::CreateMap()
 {
 	// add circuit, checkpoints and finishline
-	map = new Map(App, 0, 0, 0, this, LoadTexture("Assets/road.png"));
-	//map->checkpoints ...
-	//map->finishline ...
+	map = MapLoader::LoadMap(1, App, this);
+	map->AddCheckPoint(new Checkpoint(App, 400, 400, 50, 800, 0, this, 1));
+	map->AddCheckPoint(new Checkpoint(App, 700, 400, 50, 800, 0, this, 2));
+	map->AddFinishLine(new Finishline(App, 1000, 400, 50, 800, 0, this));
 	//map->playerStartPositions ...
+	//map->obstacles ...
 }
 
 void ModuleGame::AddCars()
@@ -107,14 +109,16 @@ void ModuleGame::AdjustCamera()
 // Update: draw background
 update_status ModuleGame::Update(float dt)
 {
+	map->Update(dt);
 	
 	if (raceActive) GetInput();
 	else PerformCountdown();
 
-	//map->Update(dt);
 	for (Car* c : cars) c->Update(dt);
 
 	AdjustCamera();
+	App->renderer->DrawText(std::to_string(car->currentCheckpointNum).c_str(), 0, 0, { 20 }, 5, { 255, 0, 0, 255 });
+	App->renderer->DrawText(std::to_string(car->currentLap).c_str(), 0, 20, {20}, 5, {255, 0, 0, 255});
 
 	//for (PhysicEntity* entity : entities) entity->Update(dt);
 
@@ -131,7 +135,7 @@ void ModuleGame::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 		if (c->body == bodyB) entityB = c;
 	}
 
-	/*if (map->body == bodyA) entityA = map;
+	if (map->body == bodyA) entityA = map;
 	if (map->body == bodyB) entityB = map;
 
 	if (map->finishline->body == bodyA) entityA = map->finishline;
@@ -145,10 +149,10 @@ void ModuleGame::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 	for (auto& o : map->obstacles) {
 		if (o->body == bodyA) entityA = o;
 		if (o->body == bodyB) entityB = o;
-	}*/
+	}
 
-	if (entityA && entityB) {
+	if (entityA/* && entityB*/) {
 		entityA->OnCollision(entityB);
-		entityB->OnCollision(entityA);
+		//entityB->OnCollision(entityA);
 	}
 }

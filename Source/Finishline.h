@@ -22,4 +22,6 @@ public:
 		auto pbody = body->body;
 		physics->DestroyBody(pbody);
 	}
+
+	int requiredCheckpoint;
 };

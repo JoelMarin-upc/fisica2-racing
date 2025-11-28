@@ -10,8 +10,8 @@
 class Map : public Chain
 {
 public:
-	Map(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture)
-		: Chain(app->physics, _x, _y, points, sizeof(points) / sizeof(points[0]), _listener, _texture, FINISHLINE, angle, false)
+	Map(Application* app, int _x, int _y, float _angle, int* _points, unsigned int _size, Module* _listener, Texture2D _texture)
+		: Chain(app->physics, _x, _y, _points, _size, _listener, _texture, CIRCUIT, _angle, false)
 	{
 
 	}
@@ -21,7 +21,7 @@ public:
 		int x, y;
 		body->GetPhysicPosition(x, y);
 		DrawTexturePro(texture, Rectangle{ 0, 0, (float)texture.width, (float)texture.height },
-			Rectangle{ (float)x, (float)y, (float)texture.width, (float)texture.height },
+			Rectangle{ (float)x + texture.width / 2, (float)y + texture.height / 2, (float)texture.width, (float)texture.height },
 			Vector2{ (float)texture.width / 2.0f, (float)texture.height / 2.0f }, body->GetRotation() * RAD2DEG, WHITE);
 		
 		for (PhysicEntity* obstacle : obstacles) obstacle->Update(dt);
@@ -29,6 +29,29 @@ public:
 
 	void OnCollision(PhysicEntity* other) {
 
+	}
+
+	int getLastCheckpointOrder() {
+		int max = -1;
+		for (auto& c : checkpoints) if (c->order > max) max = c->order;
+		return max;
+	}
+
+	void AddStartPosition(Vector2 p) {
+		playerStartPositions.push_back(p);
+	}
+
+	void AddObstacle(PhysicEntity* o) {
+		obstacles.push_back(o);
+	}
+	
+	void AddCheckPoint(Checkpoint* c) {
+		checkpoints.push_back(c);
+	}
+
+	void AddFinishLine(Finishline* f) {
+		finishline = f;
+		f->requiredCheckpoint = getLastCheckpointOrder();
 	}
 
 	~Map() {
@@ -41,5 +64,22 @@ public:
 	std::vector<Checkpoint*> checkpoints;
 	Finishline* finishline;
 
-	const int points[1] = { 1 };
+	
+};
+
+class MapLoader
+{
+public:
+	static Map* LoadMap(int mapNumber, Application* app, Module* listener) {
+		if (mapNumber == 1)
+		{
+			int points[8] = {
+				12, 65,
+				847, 65,
+				846, 775,
+				11, 775
+			};
+			return new Map(app, 0, 0, 0, points, 8, listener, LoadTexture("Assets/road.png"));
+		}
+	}
 };

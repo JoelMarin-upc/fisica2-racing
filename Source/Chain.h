@@ -6,8 +6,8 @@
 class Chain : public PhysicEntity
 {
 public:
-	Chain(ModulePhysics* physics, int _x, int _y, const int* points, unsigned int size, Module* _listener, Texture2D _texture, EntityType type, float angle = 0.f, bool dynamic = true, float restitution = 0.f, bool reverse = false)
-		: PhysicEntity(physics->CreateChain(_x - _texture.width / 2, _y - _texture.height / 2, points, size, angle, dynamic, restitution, reverse), physics, _listener, type)
+	Chain(ModulePhysics* physics, int _x, int _y, int* points, unsigned int size, Module* _listener, Texture2D _texture, EntityType type, float angle = 0.f, bool dynamic = true, float restitution = 0.f, bool reverse = false)
+		: PhysicEntity(physics->CreateChain(_x, _y, points, size, angle, dynamic, restitution, reverse), physics, _listener, type)
 		, texture(_texture)
 	{
 		body->type = type;

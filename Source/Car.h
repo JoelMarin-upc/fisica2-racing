@@ -41,7 +41,7 @@ public:
 	int carNum;
 	int currentPosition;
 	int currentLap;
-	int maxCheckpointNum;
+	int currentCheckpointNum;
 
 	ModuleGame* game;
 	ModuleAudio* audio;

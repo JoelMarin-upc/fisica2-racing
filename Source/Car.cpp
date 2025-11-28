@@ -3,7 +3,7 @@
 
 Car::Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman)
 	: Box(app->physics, _x, _y, _listener, _texture, CAR, angle),
-	carNum(carNum), isHumanControlled(isHuman), currentPosition(carNum), targetDirection(new Vector2{ 0, 0 }), currentLap(0), nitroInput(false), nitroActive(false), active(false), game(app->scene_intro), audio(app->audio), maxCheckpointNum(0)
+	carNum(carNum), isHumanControlled(isHuman), currentPosition(carNum), targetDirection(new Vector2{ 0, 0 }), currentLap(0), nitroInput(false), nitroActive(false), active(false), game(app->scene_intro), audio(app->audio), currentCheckpointNum(0)
 {
 	body->SetLinearDamping(1.0f);
 	body->SetAngularDamping(2.0f);
@@ -91,7 +91,7 @@ void Car::Update(float dt)
 		CheckNitro();
 		Move(dt);
 	}
-	if (nitroActive) game->App->renderer->DrawText("Nitro", GetScreenWidth() / 2, GetScreenHeight() / 2, {20}, 5, {255, 0, 0, 255});
+	//if (nitroActive) game->App->renderer->DrawText("Nitro", GetScreenWidth() / 2, GetScreenHeight() / 2, {20}, 5, {255, 0, 0, 255});
 
 	int x, y;
 	body->GetPhysicPosition(x, y);
@@ -102,5 +102,11 @@ void Car::Update(float dt)
 
 void Car::OnCollision(PhysicEntity* other)
 {
-
+	if (other->type == CHECKPOINT) {
+		currentCheckpointNum = dynamic_cast<Checkpoint*>(other)->order;
+	}
+	if (other->type == FINISHLINE) {
+		currentLap++;
+		currentCheckpointNum = 0;
+	}
 }
