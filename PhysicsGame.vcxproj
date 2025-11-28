@@ -199,16 +199,17 @@
     <ClCompile Include="Source/ModulePhysics.cpp" />
     <ClCompile Include="Source/ModuleRender.cpp" />
     <ClCompile Include="Source/ModuleWindow.cpp" />
-    <ClCompile Include="Source\Box.cpp" />
-    <ClCompile Include="Source\BoxSensor.cpp" />
+    <ClCompile Include="Source\Box.h" />
+    <ClCompile Include="Source\BoxSensor.h" />
     <ClCompile Include="Source\Car.cpp" />
-    <ClCompile Include="Source\Chain.cpp" />
-    <ClCompile Include="Source\Checkpoint.cpp" />
-    <ClCompile Include="Source\Circle.cpp" />
-    <ClCompile Include="Source\Finishline.cpp" />
-    <ClCompile Include="Source\Map.cpp" />
+    <ClCompile Include="Source\Car.h" />
+    <ClCompile Include="Source\Chain.h" />
+    <ClCompile Include="Source\Checkpoint.h" />
+    <ClCompile Include="Source\Circle.h" />
+    <ClCompile Include="Source\Finishline.h" />
+    <ClCompile Include="Source\Map.h" />
     <ClCompile Include="Source\ModuleGame.cpp" />
-    <ClCompile Include="Source\PhysicEntity.cpp" />
+    <ClCompile Include="Source\PhysicEntity.h" />
     <ClCompile Include="Source\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>

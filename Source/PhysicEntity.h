@@ -1,5 +1,8 @@
-#include "ModuleGame.h"
+#pragma once
+
+#include "Module.h"
 #include "ModulePhysics.h"
+#include "p2Point.h"
 
 class PhysicEntity
 {
@@ -17,7 +20,7 @@ protected:
 public:
 	virtual ~PhysicEntity() = default;
 	virtual void Update(float dt) = 0;
-
+	virtual void OnCollision(PhysicEntity* other) = 0;
 	virtual int RayHit(vec2<int> ray, vec2<int> mouse, vec2<float>& normal)
 	{
 		return 0;

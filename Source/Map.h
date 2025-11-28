@@ -1,7 +1,11 @@
+#pragma once
+
 #include "Application.h"
-#include "Chain.cpp"
-#include "Checkpoint.cpp"
-#include "Finishline.cpp"
+#include "Chain.h"
+#include "Checkpoint.h"
+#include "Finishline.h"
+#include "PhysicEntity.h"
+#include "ModulePhysics.h"
 
 class Map : public Chain
 {
@@ -23,12 +27,16 @@ public:
 		for (PhysicEntity* obstacle : obstacles) obstacle->Update(dt);
 	}
 
+	void OnCollision(PhysicEntity* other) {
+
+	}
+
 	~Map() {
 		auto pbody = body->body;
 		physics->DestroyBody(pbody);
 	}
 
-	std::vector<b2Vec2> playerStartPositions;
+	std::vector<Vector2> playerStartPositions;
 	std::vector<PhysicEntity*> obstacles;
 	std::vector<Checkpoint*> checkpoints;
 	Finishline* finishline;

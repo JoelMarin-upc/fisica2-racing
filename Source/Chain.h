@@ -1,4 +1,7 @@
-#include "PhysicEntity.cpp"
+#pragma once
+
+#include "PhysicEntity.h"
+#include "ModulePhysics.h"
 
 class Chain : public PhysicEntity
 {
@@ -17,6 +20,10 @@ public:
 		DrawTexturePro(texture, Rectangle{ 0, 0, (float)texture.width, (float)texture.height },
 			Rectangle{ (float)x + texture.width / 2, (float)y + texture.height / 2, (float)texture.width, (float)texture.height },
 			Vector2{ (float)texture.width / 2.0f, (float)texture.height / 2.0f }, body->GetRotation() * RAD2DEG, WHITE);
+	}
+
+	void OnCollision(PhysicEntity* other) {
+
 	}
 
 	int RayHit(vec2<int> ray, vec2<int> mouse, vec2<float>& normal) override

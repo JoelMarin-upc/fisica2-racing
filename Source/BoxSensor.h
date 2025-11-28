@@ -1,4 +1,7 @@
-#include "PhysicEntity.cpp"
+#pragma once
+
+#include "PhysicEntity.h"
+#include "ModulePhysics.h"
 
 class BoxSensor : public PhysicEntity
 {
@@ -11,6 +14,10 @@ public:
 
 	void Update(float dt) override
 	{
+
+	}
+
+	void OnCollision(PhysicEntity* other) {
 
 	}
 

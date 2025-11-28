@@ -1,4 +1,7 @@
-#include "PhysicEntity.cpp"
+#pragma once
+
+#include "PhysicEntity.h"
+#include "ModulePhysics.h"
 
 class Circle : public PhysicEntity
 {
@@ -21,6 +24,10 @@ public:
 		Vector2 origin = { (float)texture.width / 2.0f, (float)texture.height / 2.0f };
 		float rotation = body->GetRotation() * RAD2DEG;
 		DrawTexturePro(texture, source, dest, origin, rotation, WHITE);
+	}
+
+	void OnCollision(PhysicEntity* other) {
+
 	}
 
 	Texture2D texture;

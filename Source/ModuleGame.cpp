@@ -21,8 +21,10 @@ bool ModuleGame::Start()
 	LOG("Loading Intro assets");
 	bool ret = true;
 
-	CreateMap();
-	AddCars();
+	//CreateMap();
+	//AddCars();
+	car = new Car(App, 300, 300, 0, this, LoadTexture("Assets/car1.png"), 1, true);
+	cars.push_back(car);
 
 	return ret;
 }
@@ -46,15 +48,16 @@ void ModuleGame::CreateMap()
 
 void ModuleGame::AddCars()
 {
-	for (int i = 0; i < totalCars; i++)
+	for (int i = 0; i < totalCars - 1; i++)
 	{
-		b2Vec2 pos = map->playerStartPositions[i];
+		Vector2 pos = map->playerStartPositions[i];
 		const std::string tex = "Assets/car" + std::to_string(i + 1) + ".png";
 		cars.push_back(new Car(App, pos.x, pos.y, 0, this, LoadTexture(tex.c_str()), i++, false));
 	}
-	b2Vec2 playerPos = map->playerStartPositions[totalCars];
+	Vector2 playerPos = map->playerStartPositions[totalCars-1];
 	car = new Car(App, playerPos.x, playerPos.y, 0, this, LoadTexture("Assets/carPlayer.png"), totalCars, true);
 	cars.push_back(car);
+	car->Disable();
 }
 
 void ModuleGame::PerformCountdown()
@@ -109,7 +112,7 @@ update_status ModuleGame::Update(float dt)
 	if (raceActive) GetInput();
 	else PerformCountdown();
 
-	map->Update(dt);
+	//map->Update(dt);
 	for (Car* c : cars) c->Update(dt);
 
 	AdjustCamera();
@@ -117,4 +120,36 @@ update_status ModuleGame::Update(float dt)
 	//for (PhysicEntity* entity : entities) entity->Update(dt);
 
 	return UPDATE_CONTINUE;
+}
+
+void ModuleGame::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
+{
+	PhysicEntity* entityA = nullptr;
+	PhysicEntity* entityB = nullptr;
+
+	for (auto& c : cars) {
+		if (c->body == bodyA) entityA = c;
+		if (c->body == bodyB) entityB = c;
+	}
+
+	/*if (map->body == bodyA) entityA = map;
+	if (map->body == bodyB) entityB = map;
+
+	if (map->finishline->body == bodyA) entityA = map->finishline;
+	if (map->finishline->body == bodyB) entityB = map->finishline;
+
+	for (auto& c : map->checkpoints) {
+		if (c->body == bodyA) entityA = c;
+		if (c->body == bodyB) entityB = c;
+	}
+
+	for (auto& o : map->obstacles) {
+		if (o->body == bodyA) entityA = o;
+		if (o->body == bodyB) entityB = o;
+	}*/
+
+	if (entityA && entityB) {
+		entityA->OnCollision(entityB);
+		entityB->OnCollision(entityA);
+	}
 }

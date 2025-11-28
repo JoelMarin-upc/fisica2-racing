@@ -9,10 +9,13 @@
 #include "raylib.h"
 #include <vector>
 
-#include "Car.cpp"
-#include "Finishline.cpp"
-#include "Checkpoint.cpp"
-#include "Map.cpp"
+#include "Car.h"
+#include "Finishline.h"
+#include "Checkpoint.h"
+#include "Map.h"
+#include "PhysicEntity.h"
+
+class Car;
 
 class ModuleGame : public Module
 {
@@ -31,6 +34,8 @@ public:
 	void EndRace();
 	void GetInput();
 	void AdjustCamera();
+
+	void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
 
 	Timer countdownTimer;
 	const double countdownTime = 3.f;
