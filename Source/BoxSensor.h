@@ -6,8 +6,8 @@
 class BoxSensor : public PhysicEntity
 {
 public:
-	BoxSensor(ModulePhysics* physics, int _x, int _y, int width, int height, Module* _listener, EntityType type, float angle = 0.f, bool dynamic = true)
-		: PhysicEntity(physics->CreateRectangleSensor(_x, _y, width, height, angle, dynamic), physics, _listener, type)
+	BoxSensor(ModulePhysics* physics, ModuleRender* render, int _x, int _y, int width, int height, Module* _listener, EntityType type, float angle = 0.f, bool dynamic = true)
+		: PhysicEntity(physics->CreateRectangleSensor(_x, _y, width, height, angle, dynamic), physics, render, _listener, type)
 	{
 		body->type = type;
 	}

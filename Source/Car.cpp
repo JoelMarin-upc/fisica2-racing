@@ -2,7 +2,7 @@
 #include "ModuleRender.h"
 
 Car::Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman)
-	: Box(app->physics, _x, _y, _listener, _texture, CAR, angle),
+	: Box(app->physics, app->renderer, _x, _y, _listener, _texture, CAR, angle),
 	carNum(carNum), isHumanControlled(isHuman), currentPosition(carNum), targetDirection(new Vector2{ 0, 0 }), currentLap(0), nitroInput(false), nitroActive(false), active(false), game(app->scene_intro), audio(app->audio), currentCheckpointNum(0)
 {
 	body->SetLinearDamping(1.0f);
@@ -95,7 +95,7 @@ void Car::Update(float dt)
 
 	int x, y;
 	body->GetPhysicPosition(x, y);
-	DrawTexturePro(texture, Rectangle{ 0, 0, (float)texture.width, (float)texture.height },
+	render->DrawTexturePRO(texture, Rectangle{ 0, 0, (float)texture.width, (float)texture.height },
 		Rectangle{ (float)x, (float)y, (float)texture.width, (float)texture.height },
 		Vector2{ (float)texture.width / 2.0f, (float)texture.height / 2.0f }, body->GetRotation() * RAD2DEG, WHITE);
 }
@@ -106,6 +106,7 @@ void Car::OnCollision(PhysicEntity* other)
 		currentCheckpointNum = dynamic_cast<Checkpoint*>(other)->order;
 	}
 	if (other->type == FINISHLINE) {
+		if (currentLap != 0 && dynamic_cast<Finishline*>(other)->requiredCheckpoint != currentCheckpointNum) return;
 		currentLap++;
 		currentCheckpointNum = 0;
 	}

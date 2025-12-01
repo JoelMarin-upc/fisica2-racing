@@ -108,6 +108,11 @@ void ModuleGame::AdjustCamera()
 {
 	// adjust position and rotation of the camera to have the players car in the center
 	// App->renderer->camera
+	int x, y;
+	car->body->GetPhysicPosition(x, y);
+	App->renderer->camera.x = -x + GetScreenWidth() / 2;
+	App->renderer->camera.y = -y + GetScreenHeight() / 2;
+	//car->body->GetRotation();
 }
 
 void ModuleGame::CalculatePositions()
@@ -135,14 +140,14 @@ void ModuleGame::CreateMouseJoint()
 {
 	bool jointDone = false;
 	Vector2 mouse = GetMousePosition();
-	b2Vec2 mouseb2 = { mouse.x, mouse.y };
+	b2Vec2 mouseb2 = { mouse.x - App->renderer->camera.x, mouse.y - App->renderer->camera.y };
 	for (auto& c : cars) {
 		if (c->TestPoint(mouseb2)) {
 			mouseJoint = App->physics->CreateMouseJoint(c->body->body, mouseb2);
 			jointDone = true;
 		}
 	}
-	if (!jointDone) mouseJoint = App->physics->CreateMouseJoint(car->body->body, mouseb2);
+	//if (!jointDone) mouseJoint = App->physics->CreateMouseJoint(car->body->body, mouseb2);
 }
 
 void ModuleGame::DestroyMouseJoint()
@@ -155,9 +160,11 @@ void ModuleGame::UpdateMouseJoint()
 {
 	if (mouseJoint) {
 		Vector2 mouse = GetMousePosition();
-		b2Vec2 mouseb2 = { PIXEL_TO_METERS(mouse.x), PIXEL_TO_METERS(mouse.y) };
+		float x = mouse.x - App->renderer->camera.x;
+		float y = mouse.y - App->renderer->camera.y;
+		b2Vec2 mouseb2 = { PIXEL_TO_METERS(x), PIXEL_TO_METERS(y) };
 		mouseJoint->SetTarget(mouseb2);
-		DrawLine(METERS_TO_PIXELS(mouseb2.x),
+		App->renderer->rDrawLine(METERS_TO_PIXELS(mouseb2.x),
 			METERS_TO_PIXELS(mouseb2.y),
 			METERS_TO_PIXELS(mouseJoint->GetBodyB()->GetPosition().x),
 			METERS_TO_PIXELS(mouseJoint->GetBodyB()->GetPosition().y),
@@ -173,10 +180,9 @@ update_status ModuleGame::Update(float dt)
 		else CreateMouseJoint();
 	}
 
-	map->Update(dt);
-	
 	if (raceActive) GetInput();
-	else PerformCountdown();
+
+	map->Update(dt);
 
 	for (Car* c : cars) c->Update(dt);
 
@@ -188,6 +194,8 @@ update_status ModuleGame::Update(float dt)
 	App->renderer->DrawText(TextFormat("Position: %d", car->currentPosition), 10, 70, { 20 }, 5, { 255, 0, 0, 255 });
 
 	UpdateMouseJoint();
+
+	if (!raceActive) PerformCountdown();
 
 	//for (PhysicEntity* entity : entities) entity->Update(dt);
 

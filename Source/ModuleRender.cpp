@@ -85,6 +85,17 @@ bool ModuleRender::Draw(Texture2D texture, int x, int y, const Rectangle* sectio
 	return ret;
 }
 
+bool ModuleRender::DrawTexturePRO(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color color) const
+{
+    bool ret = true;
+
+    dest.x += camera.x;
+    dest.y += camera.y;
+    DrawTexturePro(texture, source, dest, origin, rotation, color);
+
+    return ret;
+}
+
 bool ModuleRender::DrawText(const char * text, int x, int y, Font font, int spacing, Color tint) const
 {
     bool ret = true;
@@ -93,5 +104,19 @@ bool ModuleRender::DrawText(const char * text, int x, int y, Font font, int spac
 
     DrawTextEx(font, text, position, (float)font.baseSize, (float)spacing, tint);
 
+    return ret;
+}
+
+bool ModuleRender::rDrawCircle(int x, int y, float radius, Color color) const
+{
+    bool ret = true;
+    DrawCircle(x + camera.x, y + camera.y, radius, color);
+    return ret;
+}
+
+bool ModuleRender::rDrawLine(int x1, int y1, int x2, int y2, Color color) const
+{
+    bool ret = true;
+    DrawLine(x1 + camera.x, y1 + camera.y, x2 + camera.x, y2 + camera.y, color);
     return ret;
 }

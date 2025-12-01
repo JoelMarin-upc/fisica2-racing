@@ -2,15 +2,17 @@
 
 #include "Module.h"
 #include "ModulePhysics.h"
+#include "ModuleRender.h"
 #include "p2Point.h"
 
 class PhysicEntity
 {
 protected:
 
-	PhysicEntity(PhysBody* _body, ModulePhysics* _physics, Module* _listener, EntityType type)
+	PhysicEntity(PhysBody* _body, ModulePhysics* _physics, ModuleRender* _render, Module* _listener, EntityType type)
 		: body(_body)
 		, physics(_physics)
+		, render(_render)
 		, listener(_listener)
 		, type(type)
 	{
@@ -34,5 +36,6 @@ public:
 	Module* listener;
 	EntityType type;
 	ModulePhysics* physics;
+	ModuleRender* render;
 
 };

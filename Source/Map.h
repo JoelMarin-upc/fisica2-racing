@@ -11,7 +11,7 @@ class Map : public Chain
 {
 public:
 	Map(Application* app, int _x, int _y, float _angle, int* _points, unsigned int _size, Module* _listener, Texture2D _texture)
-		: Chain(app->physics, _x, _y, _points, _size, _listener, _texture, CIRCUIT, _angle, false)
+		: Chain(app->physics, app->renderer, _x, _y, _points, _size, _listener, _texture, CIRCUIT, _angle, false)
 	{
 
 	}
@@ -20,7 +20,7 @@ public:
 	{
 		int x, y;
 		body->GetPhysicPosition(x, y);
-		DrawTexturePro(texture, Rectangle{ 0, 0, (float)texture.width, (float)texture.height },
+		render->DrawTexturePRO(texture, Rectangle{ 0, 0, (float)texture.width, (float)texture.height },
 			Rectangle{ (float)x + texture.width / 2, (float)y + texture.height / 2, (float)texture.width, (float)texture.height },
 			Vector2{ (float)texture.width / 2.0f, (float)texture.height / 2.0f }, body->GetRotation() * RAD2DEG, WHITE);
 		

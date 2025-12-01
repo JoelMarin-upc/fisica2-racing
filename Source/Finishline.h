@@ -9,7 +9,7 @@ class Finishline : public BoxSensor
 {
 public:
 	Finishline(Application* app, int _x, int _y, int width, int height, float angle, Module* _listener)
-		: BoxSensor(app->physics, _x, _y, width, height, _listener, FINISHLINE, angle, false)
+		: BoxSensor(app->physics, app->renderer, _x, _y, width, height, _listener, FINISHLINE, angle, false)
 	{
 
 	}
