@@ -25,6 +25,10 @@ public:
 	{
 		return 0;
 	}
+	bool TestPoint(b2Vec2 point)
+	{
+		return physics->TestPoint(body->body, point);
+	}
 
 	PhysBody* body;
 	Module* listener;

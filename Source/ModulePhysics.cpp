@@ -13,7 +13,6 @@ ModulePhysics::ModulePhysics(Application* app, bool start_enabled) : Module(app,
 {
 	world = NULL;
 	ground = NULL;
-	mouseJoint = NULL;
 	debug = false;
 	gravityOn = true;
 }
@@ -54,8 +53,6 @@ update_status ModulePhysics::PreUpdate()
 				pb1->listener->OnCollision(pb1, pb2);
 		}
 	}
-
-	CleanUpDestructionQueue();
 
 	return UPDATE_CONTINUE;
 }
@@ -203,28 +200,17 @@ void ModulePhysics::Step(float dt)
 	if (gravityOn) world->Step(dt, velocityIterations, positionIterations);
 }
 
-void ModulePhysics::CreateRevoluteJoint(b2Body* b1, b2Body* b2, int xAnchor, int yAnchor, float lowerAngle, float upperAngle)
-{
-	b2RevoluteJointDef jointDef;
-	jointDef.Initialize(b1, b2, b2Vec2(PIXEL_TO_METERS(xAnchor), PIXEL_TO_METERS(yAnchor)));
-	jointDef.enableLimit = true;
-	jointDef.lowerAngle = DEGREES_TO_RADIANS(lowerAngle);
-	jointDef.upperAngle = DEGREES_TO_RADIANS(upperAngle);
-	jointDef.collideConnected = false;
-	world->CreateJoint(&jointDef);
-}
-
-void ModulePhysics::CreateMouseJoint(b2Body* body, b2Vec2 target)
+b2MouseJoint* ModulePhysics::CreateMouseJoint(b2Body* body, b2Vec2 target)
 {
 	b2MouseJointDef mouseJointDef;
 
 	mouseJointDef.bodyA = ground;
 	mouseJointDef.bodyB = body;
-	mouseJointDef.target = target;
+	mouseJointDef.target = { PIXEL_TO_METERS(target.x), PIXEL_TO_METERS(target.y) };
 	mouseJointDef.damping = 10.f;
-	mouseJointDef.stiffness = 100.f;
-	mouseJointDef.maxForce = 500.0f * body->GetMass();
-	mouseJoint = (b2MouseJoint*)world->CreateJoint(&mouseJointDef);
+	mouseJointDef.stiffness = 150.f;
+	mouseJointDef.maxForce = 2000.0f * body->GetMass();
+	return (b2MouseJoint*)world->CreateJoint(&mouseJointDef);
 }
 
 float ModulePhysics::GetDistance(b2Body* bodyA, b2Body* bodyB)
@@ -232,38 +218,43 @@ float ModulePhysics::GetDistance(b2Body* bodyA, b2Body* bodyB)
 	return b2Distance(bodyA->GetPosition(), bodyB->GetPosition());
 }
 
+bool ModulePhysics::TestPoint(b2Body* body, b2Vec2 point)
+{
+	return body->GetFixtureList()->TestPoint({ PIXEL_TO_METERS(point.x), PIXEL_TO_METERS(point.y) });
+}
+
 void ModulePhysics::DestroyBody(b2Body* body)
 {
 	if (body) bodiesToDestroy.push_back(body);
+}
+
+void ModulePhysics::DestroyJoint(b2Joint* joint) 
+{
+	if (joint) jointsToDestroy.push_back(joint);
 }
 
 void ModulePhysics::CleanUpDestructionQueue()
 {
 	for (b2Body* body : bodiesToDestroy) {
 		if (body) {
-			if (mouseJoint && mouseJoint->GetBodyB() == body) {
-				world->DestroyJoint(mouseJoint);
-				mouseJoint = nullptr;
-			}
 			auto pbody = (PhysBody*)body->GetUserData().pointer;
 			delete pbody;
 			body->GetUserData().pointer = 0;
 			world->DestroyBody(body);
 		}
 	}
+	for (b2Joint* joint : jointsToDestroy) {
+		if (joint) {
+			world->DestroyJoint(joint);
+		}
+	}
 	bodiesToDestroy.clear();
+	jointsToDestroy.clear();
 }
 
 void ModulePhysics::ToggleDebug(b2Body* car)
 {
 	debug = !debug;
-	if (debug && car) {
-		CreateMouseJoint(car, mousePos);
-	}
-	else if (mouseJoint) {
-		world->DestroyJoint(mouseJoint);
-		mouseJoint = nullptr;
-	}
 }
 
 void ModulePhysics::TogglePhysics()
@@ -291,7 +282,7 @@ void ModulePhysics::ChangeRestitution(b2Body* body, bool add)
 // 
 update_status ModulePhysics::PostUpdate()
 {
-
+	CleanUpDestructionQueue();
 
 	if (IsKeyPressed(KEY_F1))
 	{
@@ -374,15 +365,6 @@ update_status ModulePhysics::PostUpdate()
 				break;
 				}
 			}
-		}
-
-		if (mouseJoint) {
-			mouseJoint->SetTarget(mousePos);
-			DrawLine(METERS_TO_PIXELS(mousePos.x),
-				METERS_TO_PIXELS(mousePos.y),
-				METERS_TO_PIXELS(mouseJoint->GetBodyB()->GetPosition().x),
-				METERS_TO_PIXELS(mouseJoint->GetBodyB()->GetPosition().y),
-				RED);
 		}
 	}
 

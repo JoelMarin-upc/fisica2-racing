@@ -35,6 +35,9 @@ public:
 	void GetInput();
 	void AdjustCamera();
 	void CalculatePositions();
+	void CreateMouseJoint();
+	void DestroyMouseJoint();
+	void UpdateMouseJoint();
 
 	void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
 
@@ -58,5 +61,7 @@ public:
 
 	Vector2* movementInput;
 	bool nitroInput;
+
+	b2MouseJoint* mouseJoint = nullptr;
 
 };

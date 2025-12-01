@@ -124,16 +124,55 @@ void ModuleGame::CalculatePositions()
 		[](const Car* c1, const Car* c2) {
 			if (c1->currentLap != c2->currentLap) return c1->currentLap > c2->currentLap;
 			if (c1->currentCheckpointNum != c2->currentCheckpointNum) return c1->currentCheckpointNum > c2->currentCheckpointNum;
-			return c1->distanceToLastCheckpoint < c2->distanceToLastCheckpoint;
+			return c1->distanceToLastCheckpoint > c2->distanceToLastCheckpoint;
 		}
 	);
 
 	for (int i = 0; i < cars.size(); i++) cars[i]->currentPosition = i + 1;
 }
 
+void ModuleGame::CreateMouseJoint()
+{
+	bool jointDone = false;
+	Vector2 mouse = GetMousePosition();
+	b2Vec2 mouseb2 = { mouse.x, mouse.y };
+	for (auto& c : cars) {
+		if (c->TestPoint(mouseb2)) {
+			mouseJoint = App->physics->CreateMouseJoint(c->body->body, mouseb2);
+			jointDone = true;
+		}
+	}
+	if (!jointDone) mouseJoint = App->physics->CreateMouseJoint(car->body->body, mouseb2);
+}
+
+void ModuleGame::DestroyMouseJoint()
+{
+	App->physics->DestroyJoint(mouseJoint);
+	mouseJoint = nullptr;
+}
+
+void ModuleGame::UpdateMouseJoint()
+{
+	if (mouseJoint) {
+		Vector2 mouse = GetMousePosition();
+		b2Vec2 mouseb2 = { PIXEL_TO_METERS(mouse.x), PIXEL_TO_METERS(mouse.y) };
+		mouseJoint->SetTarget(mouseb2);
+		DrawLine(METERS_TO_PIXELS(mouseb2.x),
+			METERS_TO_PIXELS(mouseb2.y),
+			METERS_TO_PIXELS(mouseJoint->GetBodyB()->GetPosition().x),
+			METERS_TO_PIXELS(mouseJoint->GetBodyB()->GetPosition().y),
+			RED);
+	}
+}
+
 // Update: draw background
 update_status ModuleGame::Update(float dt)
 {
+	if (IsKeyPressed(KEY_F1)) {
+		if (mouseJoint) DestroyMouseJoint();
+		else CreateMouseJoint();
+	}
+
 	map->Update(dt);
 	
 	if (raceActive) GetInput();
@@ -147,6 +186,8 @@ update_status ModuleGame::Update(float dt)
 
 	CalculatePositions();
 	App->renderer->DrawText(TextFormat("Position: %d", car->currentPosition), 10, 70, { 20 }, 5, { 255, 0, 0, 255 });
+
+	UpdateMouseJoint();
 
 	//for (PhysicEntity* entity : entities) entity->Update(dt);
 

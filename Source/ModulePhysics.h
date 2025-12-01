@@ -71,12 +71,13 @@ public:
 	PhysBody* CreateRectangle(int x, int y, int width, int height, float angle = 0.f, bool dynamic = true, float restitution = 0.f);
 	PhysBody* CreateRectangleSensor(int x, int y, int width, int height, float angle = 0.f, bool dynamic = true);
 	PhysBody* CreateChain(int x, int y, int* points, unsigned int size, float angle = 0.f, bool dynamic = true, float restitution = 0.f, bool reverse = false);
-	void CreateRevoluteJoint(b2Body* b1, b2Body* b2, int xAnchor, int yAnchor, float lowerAngle, float upperAngle);
-	void CreateMouseJoint(b2Body* body, b2Vec2 target);
+	b2MouseJoint* CreateMouseJoint(b2Body* body, b2Vec2 target);
 
 	float GetDistance(b2Body* bodyA, b2Body* bodyB);
+	bool TestPoint(b2Body* body, b2Vec2 point);
 
 	void DestroyBody(b2Body* body);
+	void DestroyJoint(b2Joint* joint);
 
 	// b2ContactListener ---
 	void BeginContact(b2Contact* contact);
@@ -88,14 +89,12 @@ public:
 	void ChangeGravity(bool add);
 	void ChangeRestitution(b2Body* body, bool add);
 
-	b2Vec2 mousePos;
-
 private:
 
 	bool debug;
 	bool gravityOn;
 	b2World* world;
 	b2Body* ground;
-	b2MouseJoint* mouseJoint;
 	std::vector<b2Body*> bodiesToDestroy;
+	std::vector<b2Joint*> jointsToDestroy;
 };
