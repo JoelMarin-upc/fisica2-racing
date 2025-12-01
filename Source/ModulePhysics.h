@@ -74,6 +74,8 @@ public:
 	void CreateRevoluteJoint(b2Body* b1, b2Body* b2, int xAnchor, int yAnchor, float lowerAngle, float upperAngle);
 	void CreateMouseJoint(b2Body* body, b2Vec2 target);
 
+	float GetDistance(b2Body* bodyA, b2Body* bodyB);
+
 	void DestroyBody(b2Body* body);
 
 	// b2ContactListener ---

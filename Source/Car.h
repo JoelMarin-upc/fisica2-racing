@@ -42,6 +42,7 @@ public:
 	int currentPosition;
 	int currentLap;
 	int currentCheckpointNum;
+	int distanceToLastCheckpoint;
 
 	ModuleGame* game;
 	ModuleAudio* audio;

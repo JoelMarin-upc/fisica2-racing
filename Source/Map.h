@@ -37,21 +37,26 @@ public:
 		return max;
 	}
 
-	void AddStartPosition(Vector2 p) {
+	void addStartPosition(Vector2 p) {
 		playerStartPositions.push_back(p);
 	}
 
-	void AddObstacle(PhysicEntity* o) {
+	void addObstacle(PhysicEntity* o) {
 		obstacles.push_back(o);
 	}
 	
-	void AddCheckPoint(Checkpoint* c) {
+	void addCheckPoint(Checkpoint* c) {
 		checkpoints.push_back(c);
 	}
 
-	void AddFinishLine(Finishline* f) {
+	void addFinishLine(Finishline* f) {
 		finishline = f;
 		f->requiredCheckpoint = getLastCheckpointOrder();
+	}
+
+	Checkpoint* getCheckPoint(int checkpointNumber) {
+		for (auto& c : checkpoints) if (c->order == checkpointNumber) return c;
+		return nullptr;
 	}
 
 	~Map() {
@@ -73,12 +78,13 @@ public:
 	static Map* LoadMap(int mapNumber, Application* app, Module* listener) {
 		if (mapNumber == 1)
 		{
-			int points[8] = {
+			/*int points[8] = {
 				12, 65,
 				847, 65,
 				846, 775,
 				11, 775
-			};
+			};*/
+			int points[3] = { 1, 2, 3 };
 			return new Map(app, 0, 0, 0, points, 8, listener, LoadTexture("Assets/road.png"));
 		}
 	}

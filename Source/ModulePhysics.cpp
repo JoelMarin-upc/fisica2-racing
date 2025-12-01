@@ -227,6 +227,11 @@ void ModulePhysics::CreateMouseJoint(b2Body* body, b2Vec2 target)
 	mouseJoint = (b2MouseJoint*)world->CreateJoint(&mouseJointDef);
 }
 
+float ModulePhysics::GetDistance(b2Body* bodyA, b2Body* bodyB)
+{
+	return b2Distance(bodyA->GetPosition(), bodyB->GetPosition());
+}
+
 void ModulePhysics::DestroyBody(b2Body* body)
 {
 	if (body) bodiesToDestroy.push_back(body);

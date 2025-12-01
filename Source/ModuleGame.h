@@ -34,6 +34,7 @@ public:
 	void EndRace();
 	void GetInput();
 	void AdjustCamera();
+	void CalculatePositions();
 
 	void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
 

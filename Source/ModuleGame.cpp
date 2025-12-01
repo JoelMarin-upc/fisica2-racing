@@ -6,6 +6,8 @@
 #include "ModulePhysics.h"
 #include <iostream>
 #include <string>
+#include <algorithm>
+#include <vector>
 
 ModuleGame::ModuleGame(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -23,8 +25,9 @@ bool ModuleGame::Start()
 
 	CreateMap();
 	//AddCars();
-	car = new Car(App, 100, 400, 90, this, LoadTexture("Assets/car1.png"), 1, true);
+	car = new Car(App, 30, 500, 0, this, LoadTexture("Assets/car1.png"), 1, true);
 	cars.push_back(car);
+	cars.push_back(new Car(App, 100, 500, 0, this, LoadTexture("Assets/car1.png"), 2, false));
 
 	return ret;
 }
@@ -41,9 +44,10 @@ void ModuleGame::CreateMap()
 {
 	// add circuit, checkpoints and finishline
 	map = MapLoader::LoadMap(1, App, this);
-	map->AddCheckPoint(new Checkpoint(App, 400, 400, 50, 800, 0, this, 1));
-	map->AddCheckPoint(new Checkpoint(App, 700, 400, 50, 800, 0, this, 2));
-	map->AddFinishLine(new Finishline(App, 1000, 400, 50, 800, 0, this));
+	map->addCheckPoint(new Checkpoint(App, 500, 100, 50, 200, 0, this, 1));
+	map->addCheckPoint(new Checkpoint(App, 1000, 350, 50, 200, 90, this, 2));
+	map->addCheckPoint(new Checkpoint(App, 500, 600, 50, 200, 0, this, 3));
+	map->addFinishLine(new Finishline(App, 50, 350, 50, 200, 90, this));
 	//map->playerStartPositions ...
 	//map->obstacles ...
 }
@@ -106,6 +110,27 @@ void ModuleGame::AdjustCamera()
 	// App->renderer->camera
 }
 
+void ModuleGame::CalculatePositions()
+{
+	for (auto& c : cars) {
+		PhysBody* b;
+		if (c->currentCheckpointNum == 0) b = map->finishline->body;
+		else b = map->getCheckPoint(c->currentCheckpointNum)->body;
+
+		c->distanceToLastCheckpoint = std::fabs(App->physics->GetDistance(c->body->body, b->body));
+	}
+
+	std::sort(cars.begin(), cars.end(),
+		[](const Car* c1, const Car* c2) {
+			if (c1->currentLap != c2->currentLap) return c1->currentLap > c2->currentLap;
+			if (c1->currentCheckpointNum != c2->currentCheckpointNum) return c1->currentCheckpointNum > c2->currentCheckpointNum;
+			return c1->distanceToLastCheckpoint < c2->distanceToLastCheckpoint;
+		}
+	);
+
+	for (int i = 0; i < cars.size(); i++) cars[i]->currentPosition = i + 1;
+}
+
 // Update: draw background
 update_status ModuleGame::Update(float dt)
 {
@@ -117,8 +142,11 @@ update_status ModuleGame::Update(float dt)
 	for (Car* c : cars) c->Update(dt);
 
 	AdjustCamera();
-	App->renderer->DrawText(std::to_string(car->currentCheckpointNum).c_str(), 0, 0, { 20 }, 5, { 255, 0, 0, 255 });
-	App->renderer->DrawText(std::to_string(car->currentLap).c_str(), 0, 20, {20}, 5, {255, 0, 0, 255});
+	App->renderer->DrawText(TextFormat("Last checkpoint: %d", car->currentCheckpointNum), 10, 30, {20}, 5, {255, 0, 0, 255});
+	App->renderer->DrawText(TextFormat("Laps: %d", car->currentLap), 10, 50, {20}, 5, {255, 0, 0, 255});
+
+	CalculatePositions();
+	App->renderer->DrawText(TextFormat("Position: %d", car->currentPosition), 10, 70, { 20 }, 5, { 255, 0, 0, 255 });
 
 	//for (PhysicEntity* entity : entities) entity->Update(dt);
 
