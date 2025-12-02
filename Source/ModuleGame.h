@@ -59,7 +59,7 @@ public:
 	bool raceActive = false;
 	bool countdownStarted = false;
 
-	const int totalLaps = 1;
+	const int totalLaps = 3;
 	const int totalCars = 4;
 
 	//std::vector<PhysicEntity*> entities;
