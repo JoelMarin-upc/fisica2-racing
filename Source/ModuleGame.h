@@ -27,7 +27,7 @@ public:
 	update_status Update(float dt);
 	bool CleanUp();
 
-	void CreateMap();
+	void LoadMap();
 	void AddCars();
 	void PerformCountdown();
 	void StartRace();
@@ -38,6 +38,11 @@ public:
 	void CreateMouseJoint();
 	void DestroyMouseJoint();
 	void UpdateMouseJoint();
+	void MarkLap(int doneLap);
+	void RunTimer();
+	void PrintInfo();
+	void PrintEndScreen();
+	void Restart();
 
 	void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
 
@@ -45,14 +50,17 @@ public:
 	const double countdownTime = 3.f;
 	
 	Timer lapTimer;
-	double lapTime;
-	double raceTime;
+	double lapTime = 0;
+	double bestLapTime = 0;
+	double bestLap = 0;
+	double raceTime = 0;
 
+	bool raceEnded = false;
 	bool raceActive = false;
 	bool countdownStarted = false;
 
-	const int totalLaps = 3;
-	const int totalCars = 8;
+	const int totalLaps = 1;
+	const int totalCars = 4;
 
 	//std::vector<PhysicEntity*> entities;
 	std::vector<Car*> cars;
@@ -63,5 +71,11 @@ public:
 	bool nitroInput;
 
 	b2MouseJoint* mouseJoint = nullptr;
+
+	Font fontTitle;
+	Font fontSubtitle;
+	Font fontText;
+	Font fontSmall;
+	const char* fontPath = "Assets/static/ScienceGothic_Condensed-Black.ttf";
 
 };

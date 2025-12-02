@@ -6,6 +6,7 @@
 #include "Finishline.h"
 #include "PhysicEntity.h"
 #include "ModulePhysics.h"
+#include "Transform2D.h"
 
 class Map : public Chain
 {
@@ -37,8 +38,8 @@ public:
 		return max;
 	}
 
-	void addStartPosition(Vector2 p) {
-		playerStartPositions.push_back(p);
+	void addStartPosition(Transform2D t) {
+		playerStartPositions.push_back(t);
 	}
 
 	void addObstacle(PhysicEntity* o) {
@@ -60,11 +61,25 @@ public:
 	}
 
 	~Map() {
+		for (auto& c : checkpoints)
+		{
+			delete c;
+			c = nullptr;
+		}
+		checkpoints.clear();
+		for (auto& o : obstacles)
+		{
+			delete o;
+			o = nullptr;
+		}
+		obstacles.clear();
+		delete finishline;
+		finishline = nullptr;
 		auto pbody = body->body;
 		physics->DestroyBody(pbody);
 	}
 
-	std::vector<Vector2> playerStartPositions;
+	std::vector<Transform2D> playerStartPositions;
 	std::vector<PhysicEntity*> obstacles;
 	std::vector<Checkpoint*> checkpoints;
 	Finishline* finishline;
@@ -78,14 +93,21 @@ public:
 	static Map* LoadMap(int mapNumber, Application* app, Module* listener) {
 		if (mapNumber == 1)
 		{
-			/*int points[8] = {
-				12, 65,
-				847, 65,
-				846, 775,
-				11, 775
-			};*/
 			int points[3] = { 1, 2, 3 };
-			return new Map(app, 0, 0, 0, points, 8, listener, LoadTexture("Assets/road.png"));
+			Map* map = new Map(app, 0, 0, 0, points, 8, listener, LoadTexture("Assets/road.png"));
+			map->addCheckPoint(new Checkpoint(app, 500, 100, 50, 200, 0, listener, 1));
+			map->addCheckPoint(new Checkpoint(app, 1000, 350, 50, 200, 90, listener, 2));
+			map->addCheckPoint(new Checkpoint(app, 500, 600, 50, 200, 0, listener, 3));
+			map->addFinishLine(new Finishline(app, 50, 350, 50, 200, 90, listener));
+			map->addStartPosition(Transform2D(30, 500, 0));
+			map->addStartPosition(Transform2D(100, 500, 0));
+			map->addStartPosition(Transform2D(30, 700, 0));
+			map->addStartPosition(Transform2D(100, 700, 0));
+			//map->playerStartPositions ...
+			//map->obstacles ...
+			return map;
 		}
+		else if (mapNumber == 2) { }
+		else if (mapNumber == 3) { }
 	}
 };

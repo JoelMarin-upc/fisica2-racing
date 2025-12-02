@@ -20,6 +20,7 @@ public:
 	bool Draw(Texture2D texture, int x, int y, const Rectangle* section = NULL, double angle = 0, int pivot_x = 0, int pivot_y = 0) const;
 	bool DrawTexturePRO(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color color) const;
 	bool DrawText(const char* text, int x, int y, Font font, int spacing, Color tint) const;
+	bool DrawTextCentered(const char* text, int centerX, int centerY, Font font, int spacing, Color tint) const;
 	bool rDrawCircle(int x, int y, float radius, Color color) const;
 	bool rDrawLine(int x1, int y1, int x2, int y2, Color color) const;
 

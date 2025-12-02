@@ -17,22 +17,25 @@ ModuleGame::ModuleGame(Application* app, bool start_enabled) : Module(app, start
 ModuleGame::~ModuleGame()
 {}
 
-// Load assets
 bool ModuleGame::Start()
 {
 	LOG("Loading Intro assets");
 	bool ret = true;
 
-	CreateMap();
-	//AddCars();
-	car = new Car(App, 30, 500, 0, this, LoadTexture("Assets/car1.png"), 1, true);
+	fontTitle = LoadFontEx(fontPath, 60, nullptr, 0);
+	fontSubtitle = LoadFontEx(fontPath, 50, nullptr, 0);
+	fontText = LoadFontEx(fontPath, 30, nullptr, 0);
+	fontSmall = LoadFontEx(fontPath, 20, nullptr, 0);
+
+	LoadMap();
+	AddCars();
+	/*car = new Car(App, 30, 500, 0, this, LoadTexture("Assets/car1.png"), 1, true);
 	cars.push_back(car);
-	cars.push_back(new Car(App, 100, 500, 0, this, LoadTexture("Assets/car1.png"), 2, false));
+	cars.push_back(new Car(App, 100, 500, 0, this, LoadTexture("Assets/car1.png"), 2, false));*/
 
 	return ret;
 }
 
-// Load assets
 bool ModuleGame::CleanUp()
 {
 	LOG("Unloading Intro scene");
@@ -40,28 +43,22 @@ bool ModuleGame::CleanUp()
 	return true;
 }
 
-void ModuleGame::CreateMap()
+void ModuleGame::LoadMap()
 {
-	// add circuit, checkpoints and finishline
+	// adds circuit, checkpoints and finishline
 	map = MapLoader::LoadMap(1, App, this);
-	map->addCheckPoint(new Checkpoint(App, 500, 100, 50, 200, 0, this, 1));
-	map->addCheckPoint(new Checkpoint(App, 1000, 350, 50, 200, 90, this, 2));
-	map->addCheckPoint(new Checkpoint(App, 500, 600, 50, 200, 0, this, 3));
-	map->addFinishLine(new Finishline(App, 50, 350, 50, 200, 90, this));
-	//map->playerStartPositions ...
-	//map->obstacles ...
 }
 
 void ModuleGame::AddCars()
 {
 	for (int i = 0; i < totalCars - 1; i++)
 	{
-		Vector2 pos = map->playerStartPositions[i];
+		Transform2D t = map->playerStartPositions[i];
 		const std::string tex = "Assets/car" + std::to_string(i + 1) + ".png";
-		cars.push_back(new Car(App, pos.x, pos.y, 0, this, LoadTexture(tex.c_str()), i++, false));
+		cars.push_back(new Car(App, t.position.x, t.position.y, t.rotation, this, LoadTexture(tex.c_str()), i + 1, false));
 	}
-	Vector2 playerPos = map->playerStartPositions[totalCars-1];
-	car = new Car(App, playerPos.x, playerPos.y, 0, this, LoadTexture("Assets/carPlayer.png"), totalCars, true);
+	Transform2D playerTransform = map->playerStartPositions[totalCars-1];
+	car = new Car(App, playerTransform.position.x, playerTransform.position.y, playerTransform.rotation, this, LoadTexture("Assets/carPlayer.png"), totalCars, true);
 	cars.push_back(car);
 }
 
@@ -78,7 +75,7 @@ void ModuleGame::PerformCountdown()
 	if (currentNumber == 0) countdownText = "Start";
 	else if (currentNumber == -1) StartRace();
 	else countdownText = std::to_string(currentNumber);
-	App->renderer->DrawText(countdownText.c_str(), GetScreenWidth() / 2, GetScreenHeight() / 2, { 20 }, 5, { 255, 0, 0, 255 });
+	App->renderer->DrawTextCentered(countdownText.c_str(), GetScreenWidth() / 2, GetScreenHeight() / 2, fontTitle, 5, YELLOW);
 }
 
 void ModuleGame::StartRace()
@@ -90,6 +87,7 @@ void ModuleGame::StartRace()
 void ModuleGame::EndRace()
 {
 	raceActive = false;
+	raceEnded = true;
 	for (Car* c : cars) c->Disable();
 }
 
@@ -106,12 +104,10 @@ void ModuleGame::GetInput()
 
 void ModuleGame::AdjustCamera()
 {
-	// adjust position and rotation of the camera to have the players car in the center
-	// App->renderer->camera
 	int x, y;
 	car->body->GetPhysicPosition(x, y);
-	App->renderer->camera.x = -x + GetScreenWidth() / 2;
-	App->renderer->camera.y = -y + GetScreenHeight() / 2;
+	App->renderer->camera.x = -x + GetScreenWidth() / 2.f;
+	App->renderer->camera.y = -y + GetScreenHeight() / 2.f;
 	//car->body->GetRotation();
 }
 
@@ -172,7 +168,78 @@ void ModuleGame::UpdateMouseJoint()
 	}
 }
 
-// Update: draw background
+void ModuleGame::MarkLap(int doneLap)
+{
+	if (doneLap == 0) {
+		lapTimer = Timer();
+		bestLapTime = INT64_MAX;
+	}
+	else {
+		if (bestLapTime > lapTime)
+		{
+			bestLap = doneLap;
+			bestLapTime = lapTime;
+		}
+		raceTime += lapTime;
+	}
+	lapTimer.Start();
+}
+
+void ModuleGame::RunTimer()
+{
+	if (car->currentLap > 0) lapTime = lapTimer.ReadSec();
+}
+
+void ModuleGame::PrintInfo()
+{
+	App->renderer->DrawText(TextFormat("Last checkpoint: %d", car->currentCheckpointNum), 10, 30, fontText, 5, RED);
+	App->renderer->DrawText(TextFormat("Laps: %d", car->currentLap), 10, 50, fontText, 5, RED);
+	App->renderer->DrawText(TextFormat("Position: %d", car->currentPosition), 10, 70, fontText, 5, RED);
+	App->renderer->DrawText(TextFormat("Lap time: %02.02f s", lapTime), 10, 90, fontText, 5, RED);
+	App->renderer->DrawText(TextFormat("Total time: %02.02f s", raceTime), 10, 110, fontText, 5, RED);
+	for (int i = 0; i < cars.size(); i++)
+	{
+		Car* c = cars[i];
+		const char* text;
+		if (c->isHumanControlled) text = TextFormat("Position %d -> PLAYER", c->currentPosition, c->carNum);
+		else text = TextFormat("Position %d -> CAR %d", c->currentPosition, c->carNum);
+		App->renderer->DrawText(text, 10, 140 + 15 * (i + 1), fontSmall, 5, RED);
+	}
+}
+
+void ModuleGame::PrintEndScreen()
+{
+	int centerX = GetScreenWidth() / 2;
+	int centerY = GetScreenHeight() / 2;
+	App->renderer->DrawTextCentered(TextFormat("Position: %d", car->currentPosition), centerX, centerY - 50, fontTitle, 5, YELLOW);
+	App->renderer->DrawTextCentered(TextFormat("Race time: %02.02f s", raceTime), centerX, centerY, fontSubtitle, 5, YELLOW);
+	App->renderer->DrawTextCentered(TextFormat("Best lap time: %02.02f s", bestLapTime), centerX, centerY + 30, fontSubtitle, 5, YELLOW);
+	App->renderer->DrawTextCentered("Press [R] to restart", centerX, centerY + 100, fontSubtitle, 5, YELLOW);
+}
+
+void ModuleGame::Restart()
+{
+	for (auto& c : cars) {
+		delete c;
+		c = nullptr;
+	}
+	cars.clear();
+	delete map;
+	map = nullptr;
+
+	lapTime = 0;
+	bestLapTime = 0;
+	bestLap = 0;
+	raceTime = 0;
+
+	raceEnded = false;
+	raceActive = false;
+	countdownStarted = false;
+
+	LoadMap();
+	AddCars();
+}
+
 update_status ModuleGame::Update(float dt)
 {
 	if (IsKeyPressed(KEY_F1)) {
@@ -180,22 +247,30 @@ update_status ModuleGame::Update(float dt)
 		else CreateMouseJoint();
 	}
 
-	if (raceActive) GetInput();
+	if (raceActive && !raceEnded)
+	{
+		GetInput();
+		RunTimer();
+	}
 
 	map->Update(dt);
 
 	for (Car* c : cars) c->Update(dt);
 
 	AdjustCamera();
-	App->renderer->DrawText(TextFormat("Last checkpoint: %d", car->currentCheckpointNum), 10, 30, {20}, 5, {255, 0, 0, 255});
-	App->renderer->DrawText(TextFormat("Laps: %d", car->currentLap), 10, 50, {20}, 5, {255, 0, 0, 255});
-
-	CalculatePositions();
-	App->renderer->DrawText(TextFormat("Position: %d", car->currentPosition), 10, 70, { 20 }, 5, { 255, 0, 0, 255 });
-
 	UpdateMouseJoint();
+	
+	if (raceEnded) {
+		PrintEndScreen();
+		if (IsKeyPressed(KEY_R)) Restart();
+	}
+	else
+	{
+		CalculatePositions();
+		PrintInfo();
+	}
 
-	if (!raceActive) PerformCountdown();
+	if (!raceActive && !raceEnded) PerformCountdown();
 
 	//for (PhysicEntity* entity : entities) entity->Update(dt);
 

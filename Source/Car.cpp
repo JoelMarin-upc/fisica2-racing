@@ -107,6 +107,8 @@ void Car::OnCollision(PhysicEntity* other)
 	}
 	if (other->type == FINISHLINE) {
 		if (currentLap != 0 && dynamic_cast<Finishline*>(other)->requiredCheckpoint != currentCheckpointNum) return;
+		if (currentLap + 1 > game->totalLaps) game->EndRace();
+		game->MarkLap(currentLap);
 		currentLap++;
 		currentCheckpointNum = 0;
 	}

@@ -20,7 +20,10 @@ protected:
 	}
 
 public:
-	virtual ~PhysicEntity() = default;
+	virtual ~PhysicEntity() {
+		auto pbody = body->body;
+		physics->DestroyBody(pbody);
+	}
 	virtual void Update(float dt) = 0;
 	virtual void OnCollision(PhysicEntity* other) = 0;
 	virtual int RayHit(vec2<int> ray, vec2<int> mouse, vec2<float>& normal)

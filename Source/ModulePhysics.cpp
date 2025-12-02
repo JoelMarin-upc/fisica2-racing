@@ -238,7 +238,7 @@ void ModulePhysics::CleanUpDestructionQueue()
 	for (b2Body* body : bodiesToDestroy) {
 		if (body) {
 			auto pbody = (PhysBody*)body->GetUserData().pointer;
-			delete pbody;
+			if (pbody) delete pbody;
 			body->GetUserData().pointer = 0;
 			world->DestroyBody(body);
 		}

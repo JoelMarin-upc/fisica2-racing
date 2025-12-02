@@ -190,6 +190,7 @@
     <ClInclude Include="Source/p2Point.h" />
     <ClInclude Include="Source\ModuleGame.h" />
     <ClInclude Include="Source\Timer.h" />
+    <ClInclude Include="Source\Transform2D.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source/Application.cpp" />

@@ -107,6 +107,19 @@ bool ModuleRender::DrawText(const char * text, int x, int y, Font font, int spac
     return ret;
 }
 
+bool ModuleRender::DrawTextCentered(const char* text, int centerX, int centerY, Font font, int spacing, Color tint) const
+{
+    bool ret = true;
+
+    Vector2 textSize = MeasureTextEx(font, text, (float)font.baseSize, (float)spacing);
+
+    Vector2 pos = { (float)centerX - textSize.x * 0.5f, (float)centerY - textSize.y * 0.5f };
+
+    DrawTextEx(font, text, pos, (float)font.baseSize, (float)spacing, tint);
+
+    return ret;
+}
+
 bool ModuleRender::rDrawCircle(int x, int y, float radius, Color color) const
 {
     bool ret = true;
