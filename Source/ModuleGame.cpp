@@ -303,8 +303,50 @@ void ModuleGame::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 		if (o->body == bodyB) entityB = o;
 	}
 
+	for (auto& z : map->slowZones) {
+		if (z->body == bodyA) entityA = z;
+		if (z->body == bodyB) entityB = z;
+	}
+
 	if (entityA/* && entityB*/) {
 		entityA->OnCollision(entityB);
 		//entityB->OnCollision(entityA);
+	}
+}
+
+void ModuleGame::OnCollisionEnd(PhysBody* bodyA, PhysBody* bodyB)
+{
+	PhysicEntity* entityA = nullptr;
+	PhysicEntity* entityB = nullptr;
+
+	for (auto& c : cars) {
+		if (c->body == bodyA) entityA = c;
+		if (c->body == bodyB) entityB = c;
+	}
+
+	if (map->body == bodyA) entityA = map;
+	if (map->body == bodyB) entityB = map;
+
+	if (map->finishline->body == bodyA) entityA = map->finishline;
+	if (map->finishline->body == bodyB) entityB = map->finishline;
+
+	for (auto& c : map->checkpoints) {
+		if (c->body == bodyA) entityA = c;
+		if (c->body == bodyB) entityB = c;
+	}
+
+	for (auto& o : map->obstacles) {
+		if (o->body == bodyA) entityA = o;
+		if (o->body == bodyB) entityB = o;
+	}
+
+	for (auto& z : map->slowZones) {
+		if (z->body == bodyA) entityA = z;
+		if (z->body == bodyB) entityB = z;
+	}
+
+	if (entityA/* && entityB*/) {
+		entityA->OnCollisionEnd(entityB);
+		//entityB->OnCollisionEnd(entityA);
 	}
 }

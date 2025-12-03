@@ -93,6 +93,9 @@
     <ClInclude Include="Source\Transform2D.h">
       <Filter>Headers\Containers</Filter>
     </ClInclude>
+    <ClInclude Include="Source\SlowZone.h">
+      <Filter>Headers\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers">

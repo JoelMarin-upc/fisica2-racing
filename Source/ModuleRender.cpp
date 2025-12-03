@@ -85,7 +85,7 @@ bool ModuleRender::Draw(Texture2D texture, int x, int y, const Rectangle* sectio
 	return ret;
 }
 
-bool ModuleRender::DrawTexturePRO(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color color) const
+bool ModuleRender::rDrawTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color color) const
 {
     bool ret = true;
 

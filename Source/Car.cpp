@@ -58,6 +58,7 @@ void Car::Move(float dt)
 	b2Vec2 forward = body->GetWorldVector(b2Vec2(0, targetDirection->y));
 	auto force = engineForce * forward;
 	if (nitroActive) force *= nitroMultiplier;
+	force *= speedScale;
 	body->ApplyForce(force.x, force.y);
 }
 
@@ -71,6 +72,11 @@ void Car::CheckNitro()
 	if (nitroActive && nitroTimer.ReadSec() > nitroTime) {
 		nitroActive = false;
 	}
+}
+
+void Car::SetSpeedScale(float scale)
+{
+	speedScale = scale;
 }
 
 void Car::Enable()
@@ -95,7 +101,7 @@ void Car::Update(float dt)
 
 	int x, y;
 	body->GetPhysicPosition(x, y);
-	render->DrawTexturePRO(texture, Rectangle{ 0, 0, (float)texture.width, (float)texture.height },
+	render->rDrawTexturePro(texture, Rectangle{ 0, 0, (float)texture.width, (float)texture.height },
 		Rectangle{ (float)x, (float)y, (float)texture.width, (float)texture.height },
 		Vector2{ (float)texture.width / 2.0f, (float)texture.height / 2.0f }, body->GetRotation() * RAD2DEG, WHITE);
 }
@@ -111,5 +117,16 @@ void Car::OnCollision(PhysicEntity* other)
 		game->MarkLap(currentLap);
 		currentLap++;
 		currentCheckpointNum = 0;
+	}
+	if (other->type == SLOWZONE) {
+		double scale = dynamic_cast<SlowZone*>(other)->slowScale;
+		SetSpeedScale(scale);
+	}
+}
+
+void Car::OnCollisionEnd(PhysicEntity* other)
+{
+	if (other->type == SLOWZONE) {
+		SetSpeedScale();
 	}
 }

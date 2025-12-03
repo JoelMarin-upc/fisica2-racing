@@ -17,12 +17,16 @@ public:
 	{
 		int x, y;
 		body->GetPhysicPosition(x, y);
-		render->DrawTexturePRO(texture, Rectangle{ 0, 0, (float)texture.width, (float)texture.height },
+		render->rDrawTexturePro(texture, Rectangle{ 0, 0, (float)texture.width, (float)texture.height },
 			Rectangle{ (float)x, (float)y, (float)texture.width, (float)texture.height },
 			Vector2{ (float)texture.width / 2.0f, (float)texture.height / 2.0f }, body->GetRotation() * RAD2DEG, WHITE);
 	}
 
 	void OnCollision(PhysicEntity* other) {
+
+	}
+
+	void OnCollisionEnd(PhysicEntity* other) {
 
 	}
 

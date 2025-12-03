@@ -6,6 +6,7 @@
 #include "box2d\box2d.h"
 
 #include <vector>
+#include <unordered_set>
 
 #define GRAVITY_X 0.0f
 #define GRAVITY_Y 0.0f
@@ -22,6 +23,7 @@ enum EntityType {
 	CAR,
 	CHECKPOINT,
 	FINISHLINE,
+	SLOWZONE,
 	CIRCUIT
 };
 
@@ -48,7 +50,7 @@ public:
 
 public:
 	int width, height;
-	b2Body* body;
+	b2Body* body = nullptr;
 	Module* listener;
 	EntityType type;
 };
@@ -81,6 +83,7 @@ public:
 
 	// b2ContactListener ---
 	void BeginContact(b2Contact* contact);
+	void EndContact(b2Contact* contact);
 
 	void CleanUpDestructionQueue();
 
@@ -95,6 +98,6 @@ private:
 	bool gravityOn;
 	b2World* world;
 	b2Body* ground;
-	std::vector<b2Body*> bodiesToDestroy;
-	std::vector<b2Joint*> jointsToDestroy;
+	std::unordered_set<b2Body*> bodiesToDestroy;
+	std::unordered_set<b2Joint*> jointsToDestroy;
 };
