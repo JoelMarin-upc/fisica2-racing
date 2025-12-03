@@ -225,12 +225,12 @@ bool ModulePhysics::TestPoint(b2Body* body, b2Vec2 point)
 
 void ModulePhysics::DestroyBody(b2Body* body)
 {
-	if (body) bodiesToDestroy.push_back(body);
+	if (body) bodiesToDestroy.insert(body);
 }
 
 void ModulePhysics::DestroyJoint(b2Joint* joint) 
 {
-	if (joint) jointsToDestroy.push_back(joint);
+	if (joint) jointsToDestroy.insert(joint);
 }
 
 void ModulePhysics::CleanUpDestructionQueue()
@@ -396,6 +396,21 @@ void ModulePhysics::BeginContact(b2Contact* contact)
 
 	if (physB && physB->listener != NULL)
 		physB->listener->OnCollision(physB, physA);
+}
+
+void ModulePhysics::EndContact(b2Contact* contact)
+{
+	b2BodyUserData dataA = contact->GetFixtureA()->GetBody()->GetUserData();
+	b2BodyUserData dataB = contact->GetFixtureB()->GetBody()->GetUserData();
+
+	PhysBody* physA = (PhysBody*)dataA.pointer;
+	PhysBody* physB = (PhysBody*)dataB.pointer;
+
+	if (physA && physA->listener != NULL)
+		physA->listener->OnCollisionEnd(physA, physB);
+
+	if (physB && physB->listener != NULL)
+		physB->listener->OnCollisionEnd(physB, physA);
 }
 
 void PhysBody::GetPhysicPosition(int& x, int& y) const

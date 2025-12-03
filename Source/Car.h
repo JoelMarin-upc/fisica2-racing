@@ -23,6 +23,8 @@ public:
 
 	void CheckNitro();
 
+	void SetSpeedScale(float scale = 1);
+
 	void Enable();
 
 	void Disable();
@@ -30,6 +32,8 @@ public:
 	void Update(float dt) override;
 
 	void OnCollision(PhysicEntity* other);
+
+	void OnCollisionEnd(PhysicEntity* other);
 
 	const float engineForce = 10.f;
 	const float steerStrength = 12.f;
@@ -54,4 +58,5 @@ public:
 	bool nitroActive;
 	bool nitroInput;
 
+	double speedScale = 1;
 };

@@ -189,6 +189,7 @@
     <ClInclude Include="Source/ModuleWindow.h" />
     <ClInclude Include="Source/p2Point.h" />
     <ClInclude Include="Source\ModuleGame.h" />
+    <ClInclude Include="Source\SlowZone.h" />
     <ClInclude Include="Source\Timer.h" />
     <ClInclude Include="Source\Transform2D.h" />
   </ItemGroup>

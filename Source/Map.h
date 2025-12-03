@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "Chain.h"
 #include "Checkpoint.h"
+#include "SlowZone.h"
 #include "Finishline.h"
 #include "PhysicEntity.h"
 #include "ModulePhysics.h"
@@ -21,7 +22,7 @@ public:
 	{
 		int x, y;
 		body->GetPhysicPosition(x, y);
-		render->DrawTexturePRO(texture, Rectangle{ 0, 0, (float)texture.width, (float)texture.height },
+		render->rDrawTexturePro(texture, Rectangle{ 0, 0, (float)texture.width, (float)texture.height },
 			Rectangle{ (float)x + texture.width / 2, (float)y + texture.height / 2, (float)texture.width, (float)texture.height },
 			Vector2{ (float)texture.width / 2.0f, (float)texture.height / 2.0f }, body->GetRotation() * RAD2DEG, WHITE);
 		
@@ -29,6 +30,10 @@ public:
 	}
 
 	void OnCollision(PhysicEntity* other) {
+
+	}
+
+	void OnCollisionEnd(PhysicEntity* other) {
 
 	}
 
@@ -48,6 +53,10 @@ public:
 	
 	void addCheckPoint(Checkpoint* c) {
 		checkpoints.push_back(c);
+	}
+
+	void addSlowZone(BoxSensor* z) {
+		slowZones.push_back(z);
 	}
 
 	void addFinishLine(Finishline* f) {
@@ -73,6 +82,12 @@ public:
 			o = nullptr;
 		}
 		obstacles.clear();
+		for (auto& z : slowZones)
+		{
+			delete z;
+			z = nullptr;
+		}
+		slowZones.clear();
 		delete finishline;
 		finishline = nullptr;
 		auto pbody = body->body;
@@ -82,8 +97,8 @@ public:
 	std::vector<Transform2D> playerStartPositions;
 	std::vector<PhysicEntity*> obstacles;
 	std::vector<Checkpoint*> checkpoints;
+	std::vector<BoxSensor*> slowZones;
 	Finishline* finishline;
-
 	
 };
 
@@ -103,8 +118,10 @@ public:
 			map->addStartPosition(Transform2D(100, 500, 0));
 			map->addStartPosition(Transform2D(30, 700, 0));
 			map->addStartPosition(Transform2D(100, 700, 0));
-			//map->playerStartPositions ...
+			map->addSlowZone(new SlowZone(app, 1000, 200, 400, 400, 0, listener, .3f));
+			//map->slowZones ...
 			//map->obstacles ...
+			//map->playerStartPositions ...
 			return map;
 		}
 		else if (mapNumber == 2) { }

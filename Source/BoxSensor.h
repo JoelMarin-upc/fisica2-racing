@@ -21,6 +21,10 @@ public:
 
 	}
 
+	void OnCollisionEnd(PhysicEntity* other) {
+
+	}
+
 	int RayHit(vec2<int> ray, vec2<int> mouse, vec2<float>& normal) override
 	{
 		return body->RayCast(ray.x, ray.y, mouse.x, mouse.y, normal.x, normal.y);;

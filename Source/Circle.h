@@ -23,10 +23,14 @@ public:
 		Rectangle dest = { position.x, position.y, (float)texture.width * scale, (float)texture.height * scale };
 		Vector2 origin = { (float)texture.width / 2.0f, (float)texture.height / 2.0f };
 		float rotation = body->GetRotation() * RAD2DEG;
-		render->DrawTexturePRO(texture, source, dest, origin, rotation, WHITE);
+		render->rDrawTexturePro(texture, source, dest, origin, rotation, WHITE);
 	}
 
 	void OnCollision(PhysicEntity* other) {
+
+	}
+
+	void OnCollisionEnd(PhysicEntity* other) {
 
 	}
 

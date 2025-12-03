@@ -18,6 +18,10 @@ public:
 
 	}
 
+	void OnCollisionEnd(PhysicEntity* other) {
+
+	}
+
 	~Checkpoint() {
 		auto pbody = body->body;
 		physics->DestroyBody(pbody);

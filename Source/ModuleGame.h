@@ -12,6 +12,7 @@
 #include "Car.h"
 #include "Finishline.h"
 #include "Checkpoint.h"
+#include "SlowZone.h"
 #include "Map.h"
 #include "PhysicEntity.h"
 
@@ -45,6 +46,7 @@ public:
 	void Restart();
 
 	void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
+	void OnCollisionEnd(PhysBody* bodyA, PhysBody* bodyB);
 
 	Timer countdownTimer;
 	const double countdownTime = 3.f;
