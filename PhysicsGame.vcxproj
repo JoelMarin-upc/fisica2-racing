@@ -188,6 +188,7 @@
     <ClInclude Include="Source/ModuleRender.h" />
     <ClInclude Include="Source/ModuleWindow.h" />
     <ClInclude Include="Source/p2Point.h" />
+    <ClInclude Include="Source\MapLoader.h" />
     <ClInclude Include="Source\ModuleGame.h" />
     <ClInclude Include="Source\SlowZone.h" />
     <ClInclude Include="Source\Timer.h" />
@@ -225,7 +226,17 @@
   <ItemGroup>
     <ResourceCompile Include="Source\resources.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\pugixml.1.15.0\build\native\pugixml.targets" Condition="Exists('packages\pugixml.1.15.0\build\native\pugixml.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Este proyecto hace referencia a los paquetes NuGet que faltan en este equipo. Use la restauración de paquetes NuGet para descargarlos. Para obtener más información, consulte http://go.microsoft.com/fwlink/?LinkID=322105. El archivo que falta es {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\pugixml.1.15.0\build\native\pugixml.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\pugixml.1.15.0\build\native\pugixml.targets'))" />
+  </Target>
 </Project>

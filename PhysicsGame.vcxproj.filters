@@ -96,6 +96,9 @@
     <ClInclude Include="Source\SlowZone.h">
       <Filter>Headers\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="Source\MapLoader.h">
+      <Filter>Headers\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers">
@@ -116,5 +119,8 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Source\resources.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

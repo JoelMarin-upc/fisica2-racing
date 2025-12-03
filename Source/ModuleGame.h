@@ -14,6 +14,7 @@
 #include "Checkpoint.h"
 #include "SlowZone.h"
 #include "Map.h"
+#include "MapLoader.h"
 #include "PhysicEntity.h"
 
 class Car;

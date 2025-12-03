@@ -101,30 +101,3 @@ public:
 	Finishline* finishline;
 	
 };
-
-class MapLoader
-{
-public:
-	static Map* LoadMap(int mapNumber, Application* app, Module* listener) {
-		if (mapNumber == 1)
-		{
-			int points[3] = { 1, 2, 3 };
-			Map* map = new Map(app, 0, 0, 0, points, 8, listener, LoadTexture("Assets/road.png"));
-			map->addCheckPoint(new Checkpoint(app, 500, 100, 50, 200, 0, listener, 1));
-			map->addCheckPoint(new Checkpoint(app, 1000, 350, 50, 200, 90, listener, 2));
-			map->addCheckPoint(new Checkpoint(app, 500, 600, 50, 200, 0, listener, 3));
-			map->addFinishLine(new Finishline(app, 50, 350, 50, 200, 90, listener));
-			map->addStartPosition(Transform2D(30, 500, 0));
-			map->addStartPosition(Transform2D(100, 500, 0));
-			map->addStartPosition(Transform2D(30, 700, 0));
-			map->addStartPosition(Transform2D(100, 700, 0));
-			map->addSlowZone(new SlowZone(app, 1000, 200, 400, 400, 0, listener, .3f));
-			//map->slowZones ...
-			//map->obstacles ...
-			//map->playerStartPositions ...
-			return map;
-		}
-		else if (mapNumber == 2) { }
-		else if (mapNumber == 3) { }
-	}
-};
