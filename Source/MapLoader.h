@@ -24,39 +24,48 @@ class MapLoader
 {
 public:
 	static Map* LoadMap(int mapNumber, Application* app, Module* listener) {
+		int* points = nullptr;
+		unsigned int size = 0;
+		const char* mapImg = nullptr;
+		const char* mapTmx = nullptr;
 		if (mapNumber == 1)
 		{
-			int points[3] = { 1, 2, 3 };
-			Map* map = new Map(app, 0, 0, 0, points, 8, listener, LoadTexture("Assets/road.png"));
-			MapData data = GetMapData("Assets/road.tmx", app, listener);
-			
-			// order start positions by p.second
-
-			for (auto& p : data.startPositions) map->addStartPosition(p.first);
-			for (auto& c : data.checkpoints) map->addCheckPoint(c);
-			for (auto& o : data.obstacles) map->addObstacle(o);
-			for (auto& z : data.slowZones) map->addSlowZone(z);
-			map->addFinishLine(data.finishline);
-
-			return map;
+			int p[6] = { 
+				1, 1, 
+				2, 2, 
+				3, 3 
+			};
+			points = p;
+			size = 6;
+			mapImg = "Assets/road.png";
+			mapTmx = "Assets/road.tmx";
 		}
 		else if (mapNumber == 2) 
 		{
-			int points[3] = { 1, 2, 3 };
-			Map* map = new Map(app, 0, 0, 0, points, 8, listener, LoadTexture("Assets/road.png"));
-			map->addCheckPoint(new Checkpoint(app, 500, 100, 50, 200, 0, listener, 1));
-			map->addCheckPoint(new Checkpoint(app, 1000, 350, 50, 200, 90, listener, 2));
-			map->addCheckPoint(new Checkpoint(app, 500, 600, 50, 200, 0, listener, 3));
-			map->addFinishLine(new Finishline(app, 50, 350, 50, 200, 90, listener));
-			map->addStartPosition(Transform2D(30, 500, 0));
-			map->addStartPosition(Transform2D(100, 500, 0));
-			map->addStartPosition(Transform2D(30, 700, 0));
-			map->addStartPosition(Transform2D(100, 700, 0));
-			map->addSlowZone(new SlowZone(app, 1000, 200, 400, 400, 0, listener, .3f));
-			//map->obstacles ...
-			return map;
+			// change with map 2
+			int p[6] = {
+				1, 1,
+				2, 2,
+				3, 3
+			};
+			points = p;
+			size = 6;
+			mapImg = "Assets/road.png";
+			mapTmx = "Assets/road.tmx";
 		}
-		else if (mapNumber == 3) {}
+
+		mapImg = "Assets/road.png";
+		Map* map = new Map(app, 0, 0, 0, points, size, listener, LoadTexture(mapImg));
+		MapData data = GetMapData(mapTmx, app, listener);
+
+		// order start positions by p.second
+
+		for (auto& p : data.startPositions) map->addStartPosition(p.first);
+		for (auto& c : data.checkpoints) map->addCheckPoint(c);
+		for (auto& o : data.obstacles) map->addObstacle(o);
+		for (auto& z : data.slowZones) map->addSlowZone(z);
+		map->addFinishLine(data.finishline);
+		return map;
 	}
 
 	static MapData GetMapData(const char* mapPath, Application* app, Module* listener) {
