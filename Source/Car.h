@@ -13,6 +13,17 @@ public:
 
 	~Car();
 
+	void Enable();
+
+	void Disable();
+
+	void Update(float dt) override;
+
+	void OnCollision(PhysicEntity* other);
+
+	void OnCollisionEnd(PhysicEntity* other);
+
+private:
 	void GetInput();
 
 	void AI();
@@ -25,28 +36,22 @@ public:
 
 	void SetSpeedScale(float scale = 1);
 
-	void Enable();
+public:
+	int carNum;
+	int currentPosition;
+	int currentLap;
+	int currentCheckpointNum;
+	int distanceToLastCheckpoint;
+	bool isHumanControlled;
+	int availableNitros;
 
-	void Disable();
-
-	void Update(float dt) override;
-
-	void OnCollision(PhysicEntity* other);
-
-	void OnCollisionEnd(PhysicEntity* other);
-
+private:
 	const float engineForce = 10.f;
 	const float steerStrength = 12.f;
 	const float nitroMultiplier = 2.f;
 	
 	Vector2* targetDirection;
 	bool active;
-	bool isHumanControlled;
-	int carNum;
-	int currentPosition;
-	int currentLap;
-	int currentCheckpointNum;
-	int distanceToLastCheckpoint;
 
 	ModuleGame* game;
 	ModuleAudio* audio;
@@ -54,7 +59,6 @@ public:
 	Timer nitroTimer;
 	const double nitroTime = 2.f;
 	const int maxAvailableNitros = 3;
-	int availableNitros = maxAvailableNitros;
 	bool nitroActive;
 	bool nitroInput;
 

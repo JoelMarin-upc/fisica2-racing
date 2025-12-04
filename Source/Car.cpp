@@ -5,6 +5,7 @@ Car::Car(Application* app, int _x, int _y, float angle, Module* _listener, Textu
 	: Box(app->physics, app->renderer, _x, _y, _listener, _texture, CAR, angle),
 	carNum(carNum), isHumanControlled(isHuman), currentPosition(carNum), targetDirection(new Vector2{ 0, 0 }), currentLap(0), nitroInput(false), nitroActive(false), active(false), game(app->scene_intro), audio(app->audio), currentCheckpointNum(0)
 {
+	availableNitros = maxAvailableNitros;
 	body->SetLinearDamping(1.0f);
 	body->SetAngularDamping(2.0f);
 }
@@ -97,7 +98,7 @@ void Car::Update(float dt)
 		CheckNitro();
 		Move(dt);
 	}
-	//if (nitroActive) game->App->renderer->DrawText("Nitro", GetScreenWidth() / 2, GetScreenHeight() / 2, {20}, 5, {255, 0, 0, 255});
+	//if (nitroActive) render->DrawText("Nitro", GetScreenWidth() / 2, GetScreenHeight() / 2, {20}, 5, {255, 0, 0, 255});
 
 	int x, y;
 	body->GetPhysicPosition(x, y);

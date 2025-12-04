@@ -29,26 +29,34 @@ public:
 	update_status Update(float dt);
 	bool CleanUp();
 
+	void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
+	void OnCollisionEnd(PhysBody* bodyA, PhysBody* bodyB);
+	
+	void MarkLap(int doneLap);
+	void EndRace();
+
+private:
 	void LoadMap();
 	void AddCars();
 	void PerformCountdown();
 	void StartRace();
-	void EndRace();
 	void GetInput();
 	void AdjustCamera();
 	void CalculatePositions();
 	void CreateMouseJoint();
 	void DestroyMouseJoint();
 	void UpdateMouseJoint();
-	void MarkLap(int doneLap);
 	void RunTimer();
 	void PrintInfo();
 	void PrintEndScreen();
 	void Restart();
 
-	void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
-	void OnCollisionEnd(PhysBody* bodyA, PhysBody* bodyB);
+public:
+	const int totalLaps = 3;
+	Vector2* movementInput;
+	bool nitroInput;
 
+private:
 	Timer countdownTimer;
 	const double countdownTime = 3.f;
 	
@@ -62,16 +70,12 @@ public:
 	bool raceActive = false;
 	bool countdownStarted = false;
 
-	const int totalLaps = 3;
 	const int totalCars = 4;
 
 	//std::vector<PhysicEntity*> entities;
 	std::vector<Car*> cars;
 	Car* car; // should be in cars list
 	Map* map;
-
-	Vector2* movementInput;
-	bool nitroInput;
 
 	b2MouseJoint* mouseJoint = nullptr;
 
@@ -80,5 +84,5 @@ public:
 	Font fontText;
 	Font fontSmall;
 	const char* fontPath = "Assets/static/ScienceGothic_Condensed-Black.ttf";
-
+	
 };

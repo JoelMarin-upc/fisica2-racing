@@ -11,12 +11,13 @@
 
 class MapData {
 public:
-	int width, height;
+	MapData() {}
+	int width = 0, height = 0;
 	std::vector<Checkpoint*> checkpoints;
 	std::vector<PhysicEntity*> obstacles;
 	std::vector<SlowZone*> slowZones;
 	std::vector<std::pair<Transform2D, int>> startPositions;
-	Finishline* finishline;
+	Finishline* finishline = nullptr;
 };
 
 class MapLoader
@@ -35,7 +36,7 @@ public:
 			for (auto& c : data.checkpoints) map->addCheckPoint(c);
 			for (auto& o : data.obstacles) map->addObstacle(o);
 			for (auto& z : data.slowZones) map->addSlowZone(z);
-			map->finishline = data.finishline;
+			map->addFinishLine(data.finishline);
 
 			return map;
 		}
@@ -78,16 +79,29 @@ public:
 				int height = objectNode.attribute("height").as_int();
 				float rot = objectNode.attribute("rotation").as_float();
 
+				float centerX = x + width / 2.f;
+				float centerY = y + height / 2.f;
+
+				float angleRad = rot * (PI / 180.f);
+
+				float newX = centerX;
+				float newY = centerY;
+
+				/*if (rot != 0) {
+					newX = cos(angleRad) * (x - centerX) - sin(angleRad) * (y - centerY) + centerX;
+					newY = sin(angleRad) * (x - centerX) + cos(angleRad) * (y - centerY) + centerY;
+				}*/
+
 				if (name == "StartPositions")
 				{
 					int order = objectNode.child("properties").child("property").attribute("value").as_int();
-					Transform2D t(x, y, rot);
+					Transform2D t(newX, newY, rot);
 					data.startPositions.push_back(std::make_pair(t, order));
 				}
 				else if (name == "SlowZones")
 				{
 					float scale = objectNode.child("properties").child("property").attribute("value").as_float();
-					SlowZone* z = new SlowZone(app, x, y, width, height, rot, listener, scale);
+					SlowZone* z = new SlowZone(app, newX, newY, width, height, rot, listener, scale);
 					data.slowZones.push_back(z);
 				}
 				else if (name == "Obstacles")
@@ -97,16 +111,16 @@ public:
 				else if (name == "Checkpoints")
 				{
 					int order = objectNode.child("properties").child("property").attribute("value").as_int();
-					Checkpoint* c = new Checkpoint(app, x, y, width, height, rot, listener, order);
+					Checkpoint* c = new Checkpoint(app, newX, newY, width, height, rot, listener, order);
 					data.checkpoints.push_back(c);
 				}
 				else if (name == "Finishline")
 				{
-					data.finishline = new Finishline(app, x, y, width, height, rot, listener);
+					data.finishline = new Finishline(app, newX, newY, width, height, rot, listener);
 				}
 			}
 		}
+		
+		return data;
 	}
-
-
 };

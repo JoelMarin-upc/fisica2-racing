@@ -197,13 +197,14 @@ void ModuleGame::PrintInfo()
 	App->renderer->DrawText(TextFormat("Position: %d", car->currentPosition), 10, 70, fontText, 5, RED);
 	App->renderer->DrawText(TextFormat("Lap time: %02.02f s", lapTime), 10, 90, fontText, 5, RED);
 	App->renderer->DrawText(TextFormat("Total time: %02.02f s", raceTime), 10, 110, fontText, 5, RED);
+	App->renderer->DrawText(TextFormat("Avaliable nitros: %d", car->availableNitros), 10, 130, fontText, 5, RED);
 	for (int i = 0; i < cars.size(); i++)
 	{
 		Car* c = cars[i];
 		const char* text;
 		if (c->isHumanControlled) text = TextFormat("Position %d -> PLAYER", c->currentPosition, c->carNum);
 		else text = TextFormat("Position %d -> CAR %d", c->currentPosition, c->carNum);
-		App->renderer->DrawText(text, 10, 140 + 15 * (i + 1), fontSmall, 5, RED);
+		App->renderer->DrawText(text, 10, 160 + 15 * (i + 1), fontSmall, 5, RED);
 	}
 }
 
