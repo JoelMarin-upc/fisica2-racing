@@ -79,18 +79,19 @@ public:
 				int height = objectNode.attribute("height").as_int();
 				float rot = objectNode.attribute("rotation").as_float();
 
-				float centerX = x + width / 2.f;
-				float centerY = y + height / 2.f;
-
-				float angleRad = rot * (PI / 180.f);
+				float halfW = width / 2.f;
+				float halfH = height / 2.f;
+				float centerX = x + halfW;
+				float centerY = y + halfH;
 
 				float newX = centerX;
 				float newY = centerY;
 
-				/*if (rot != 0) {
-					newX = cos(angleRad) * (x - centerX) - sin(angleRad) * (y - centerY) + centerX;
-					newY = sin(angleRad) * (x - centerX) + cos(angleRad) * (y - centerY) + centerY;
-				}*/
+				if (rot != 0) {
+					float r = rot * (PI / 180.f);
+					newX = x + halfW * cos(r) - halfH * sin(r);
+					newY = y + halfW * sin(r) + halfH * cos(r);
+				}
 
 				if (name == "StartPositions")
 				{
