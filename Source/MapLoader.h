@@ -8,6 +8,7 @@
 #include "Transform2D.h"
 #include "Map.h"
 #include "pugixml.hpp"
+#include <algorithm>
 
 class MapData {
 public:
@@ -58,7 +59,10 @@ public:
 		Map* map = new Map(app, 0, 0, 0, points, size, listener, LoadTexture(mapImg));
 		MapData data = GetMapData(mapTmx, app, listener);
 
-		// order start positions by p.second
+		std::sort(data.startPositions.begin(), data.startPositions.end(),
+			[](const std::pair<Transform2D, int>& a, const std::pair<Transform2D, int>& b) {
+				return a.second < b.second;
+			});
 
 		for (auto& p : data.startPositions) map->addStartPosition(p.first);
 		for (auto& c : data.checkpoints) map->addCheckPoint(c);
