@@ -38,12 +38,19 @@ private:
 
 public:
 	int carNum;
+
 	int currentPosition;
 	int currentLap;
 	int currentCheckpointNum;
 	int distanceToLastCheckpoint;
+	
 	bool isHumanControlled;
+	
 	int availableNitros;
+
+	double engineTemperature;
+	double maxEngineTemperature;
+	bool isOverHeated;
 
 private:
 	const float engineForce = 10.f;
@@ -63,4 +70,7 @@ private:
 	bool nitroInput;
 
 	double speedScale = 1;
+
+	const float warmingVelocityThreshold = 9;
+
 };

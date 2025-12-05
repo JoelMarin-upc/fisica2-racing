@@ -98,7 +98,7 @@ void Car::Update(float dt)
 		CheckNitro();
 		Move(dt);
 	}
-	//if (nitroActive) render->DrawText("Nitro", GetScreenWidth() / 2, GetScreenHeight() / 2, {20}, 5, {255, 0, 0, 255});
+	//render->DrawText(TextFormat("V=%f", body->GetLinearVelocity().Length()), GetScreenWidth() / 2, GetScreenHeight() / 2, {20}, 5, {255, 0, 0, 255});
 
 	int x, y;
 	body->GetPhysicPosition(x, y);
