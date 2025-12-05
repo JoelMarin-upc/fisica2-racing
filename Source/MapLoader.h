@@ -7,6 +7,7 @@
 #include "PhysicEntity.h"
 #include "Transform2D.h"
 #include "Map.h"
+#include "Circle.h"
 #include "pugixml.hpp"
 #include <algorithm>
 
@@ -29,6 +30,8 @@ public:
 		unsigned int size = 0;
 		const char* mapImg = nullptr;
 		const char* mapTmx = nullptr;
+		const char* boxTex = nullptr;
+		const char* circleTex = nullptr;
 		if (mapNumber == 1)
 		{
 			int p[6] = { 
@@ -38,26 +41,18 @@ public:
 			};
 			points = p;
 			size = 6;
-			mapImg = "Assets/road.png";
-			mapTmx = "Assets/road.tmx";
+			mapImg = "Assets/Maps/Road/road.png";
+			mapTmx = "Assets/Maps/Road/road.tmx";
+			boxTex = "Assets/Maps/Road/boxObstacle.png";
+			circleTex = "Assets/Maps/Road/circleObstacle.png";
 		}
 		else if (mapNumber == 2) 
 		{
-			// change with map 2
-			int p[6] = {
-				1, 1,
-				2, 2,
-				3, 3
-			};
-			points = p;
-			size = 6;
-			mapImg = "Assets/road.png";
-			mapTmx = "Assets/road.tmx";
+			// add map 2
 		}
 
-		mapImg = "Assets/road.png";
 		Map* map = new Map(app, 0, 0, 0, points, size, listener, LoadTexture(mapImg));
-		MapData data = GetMapData(mapTmx, app, listener);
+		MapData data = GetMapData(mapTmx, app, listener, boxTex, circleTex);
 
 		std::sort(data.startPositions.begin(), data.startPositions.end(),
 			[](const std::pair<Transform2D, int>& a, const std::pair<Transform2D, int>& b) {
@@ -72,7 +67,7 @@ public:
 		return map;
 	}
 
-	static MapData GetMapData(const char* mapPath, Application* app, Module* listener) {
+	static MapData GetMapData(const char* mapPath, Application* app, Module* listener, const char* boxTex, const char* circleTex) {
 		MapData data;
 
 		pugi::xml_document mapFileXML;
@@ -120,7 +115,21 @@ public:
 				}
 				else if (name == "Obstacles")
 				{
-					// ?
+					std::string type = "";
+					float restitution = 0;
+					
+					for (pugi::xml_node propNode = objectNode.child("properties").child("property"); propNode != NULL; propNode = propNode.next_sibling("property")) {
+						std::string prop = propNode.attribute("name").as_string();
+						pugi::xml_attribute valAttr = propNode.attribute("value");
+						if (prop == "type") type = valAttr.as_string();
+						if (prop == "restitution") restitution = valAttr.as_float();
+					}
+					
+					PhysicEntity* o = nullptr;
+					if (type == "box") o = new Box(app->physics, app->renderer, newX, newY, listener, LoadTexture(boxTex), EntityType::OBSTACLE, rot, false, restitution);
+					else if (type == "circle") o = new Circle(app->physics, app->renderer, newX, newY, listener, LoadTexture(circleTex), EntityType::OBSTACLE, rot, false, restitution);
+					
+					if (o) data.obstacles.push_back(o);
 				}
 				else if (name == "Checkpoints")
 				{

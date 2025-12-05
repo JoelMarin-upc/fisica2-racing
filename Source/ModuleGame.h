@@ -83,6 +83,6 @@ private:
 	Font fontSubtitle;
 	Font fontText;
 	Font fontSmall;
-	const char* fontPath = "Assets/static/ScienceGothic_Condensed-Black.ttf";
+	const char* fontPath = "Assets/ScienceGothic_Condensed-Black.ttf";
 	
 };

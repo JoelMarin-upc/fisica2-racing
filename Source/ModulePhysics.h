@@ -24,6 +24,7 @@ enum EntityType {
 	CHECKPOINT,
 	FINISHLINE,
 	SLOWZONE,
+	OBSTACLE,
 	CIRCUIT
 };
 

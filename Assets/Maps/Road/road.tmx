@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="94" height="94" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="21">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="94" height="94" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="24">
  <objectgroup id="7" name="StartPositions">
   <object id="13" x="180" y="1576" width="34" height="48">
    <properties>
@@ -59,7 +59,25 @@
    </properties>
   </object>
  </objectgroup>
- <objectgroup id="5" name="Obstacles"/>
+ <objectgroup id="5" name="Obstacles">
+  <object id="21" x="172" y="830.667" width="45.3333" height="61.3333">
+   <properties>
+    <property name="type" value="box"/>
+   </properties>
+  </object>
+  <object id="22" x="961.333" y="228" width="46.6667" height="64">
+   <properties>
+    <property name="type" value="box"/>
+   </properties>
+  </object>
+  <object id="23" x="372" y="198.667" width="36" height="36">
+   <properties>
+    <property name="restitution" type="float" value="1"/>
+    <property name="type" value="circle"/>
+   </properties>
+   <ellipse/>
+  </object>
+ </objectgroup>
  <objectgroup id="3" name="Checkpoints">
   <object id="18" x="22" y="926" width="458" height="34">
    <properties>

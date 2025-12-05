@@ -54,11 +54,11 @@ void ModuleGame::AddCars()
 	for (int i = 0; i < totalCars - 1; i++)
 	{
 		Transform2D t = map->playerStartPositions[i];
-		const std::string tex = "Assets/car" + std::to_string(i + 1) + ".png";
+		const std::string tex = "Assets/Cars/car" + std::to_string(i + 1) + ".png";
 		cars.push_back(new Car(App, t.position.x, t.position.y, t.rotation, this, LoadTexture(tex.c_str()), i + 1, false));
 	}
 	Transform2D playerTransform = map->playerStartPositions[totalCars-1];
-	car = new Car(App, playerTransform.position.x, playerTransform.position.y, playerTransform.rotation, this, LoadTexture("Assets/carPlayer.png"), totalCars, true);
+	car = new Car(App, playerTransform.position.x, playerTransform.position.y, playerTransform.rotation, this, LoadTexture("Assets/Cars/carPlayer.png"), totalCars, true);
 	cars.push_back(car);
 }
 

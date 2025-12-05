@@ -47,7 +47,7 @@ public:
 
 private:
 	const float engineForce = 10.f;
-	const float steerStrength = 12.f;
+	const float steerStrength = 6.f;
 	const float nitroMultiplier = 2.f;
 	
 	Vector2* targetDirection;
