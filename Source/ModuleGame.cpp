@@ -27,6 +27,10 @@ bool ModuleGame::Start()
 	fontText = LoadFontEx(fontPath, 30, nullptr, 0);
 	fontSmall = LoadFontEx(fontPath, 20, nullptr, 0);
 
+	//sounds
+	sprintFX = App->audio->LoadFx("GitHub / fisica2 - racing / Assets / Sounds / Music / GlooGloo.ogg/FX/sprint.wav");
+
+	App->audio->PlayMusic("GitHub/fisica2 - racing/Assets/Sounds/Music/GlooGloo.ogg");
 	LoadMap();
 	AddCars();
 	/*car = new Car(App, 30, 500, 0, this, LoadTexture("Assets/car1.png"), 1, true);
@@ -95,11 +99,19 @@ void ModuleGame::GetInput()
 {
 	movementInput = new Vector2();
 	nitroInput = false;
-	if (IsKeyDown(KEY_RIGHT)) movementInput->x = 1;
-	if (IsKeyDown(KEY_LEFT)) movementInput->x = -1;
-	if (IsKeyDown(KEY_UP)) movementInput->y = -1;
-	if (IsKeyDown(KEY_DOWN)) movementInput->y = 1;
+	if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) movementInput->x = 1;
+	if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) movementInput->x = -1;
+	if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) movementInput->y = -1;
+	if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) movementInput->y = 1;
 	if (IsKeyPressed(KEY_SPACE)) nitroInput = true;
+}
+
+void ModuleGame::Nitro() {
+
+	if (nitroInput) {
+		App->audio->PlayFx(sprintFX);
+	}
+
 }
 
 void ModuleGame::AdjustCamera()

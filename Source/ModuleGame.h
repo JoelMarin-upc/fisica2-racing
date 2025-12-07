@@ -46,6 +46,7 @@ private:
 	void CreateMouseJoint();
 	void DestroyMouseJoint();
 	void UpdateMouseJoint();
+	void Nitro();
 	void RunTimer();
 	void PrintInfo();
 	void PrintEndScreen();
@@ -84,5 +85,7 @@ private:
 	Font fontText;
 	Font fontSmall;
 	const char* fontPath = "Assets/ScienceGothic_Condensed-Black.ttf";
+
+	int sprintFX;
 	
 };
