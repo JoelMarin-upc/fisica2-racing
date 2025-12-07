@@ -273,12 +273,6 @@ update_status ModuleGame::Update(float dt)
 		RunTimer();
 	}
 
-	if (raceActive && !raceEnded)
-	{
-		GetInput();
-		RunTimer();
-	}
-
 	if (sprinting)
 	{
 		currentTime += dt;
@@ -294,8 +288,22 @@ update_status ModuleGame::Update(float dt)
 		if (currentTime >= maxTime)
 		{
 			sprinting = false;
+			sprinted = true;
 		}
 	}
+
+	if (sprinted) 
+	{
+		currentTime = 0;
+		currentTime += dt;
+
+		if (currentTime >= nitroReuseTime)
+		{
+			car->availableNitros++;
+		}
+	}
+
+
 
 	map->Update(dt);
 

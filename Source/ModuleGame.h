@@ -60,7 +60,8 @@ public:
 	bool sprinting = false;
 	float currentTime = 0.0f;
 	float maxTime = 100.0f;
-	float nitroForce = 30.0f;
+	float nitroForce = 50.0f;
+	float nitroReuseTime = 100;
 
 private:
 	Timer countdownTimer;
