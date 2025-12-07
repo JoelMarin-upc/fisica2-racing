@@ -108,7 +108,14 @@ void ModuleGame::GetInput()
 
 void ModuleGame::Nitro() {
 
-	if (nitroInput) {
+	if (nitroInput && !sprinting && car->availableNitros > 0)
+	{
+		LOG("sprint");
+
+		sprinting = true;
+		currentTime = 0.0f;
+		car->availableNitros--;
+
 		App->audio->PlayFx(sprintFX);
 	}
 
@@ -264,6 +271,30 @@ update_status ModuleGame::Update(float dt)
 	{
 		GetInput();
 		RunTimer();
+	}
+
+	if (raceActive && !raceEnded)
+	{
+		GetInput();
+		RunTimer();
+	}
+
+	if (sprinting)
+	{
+		currentTime += dt;
+
+		// Dirección hacia delante del coche
+		b2Vec2 forward = car->body->GetWorldVector({ 0, -1 });
+
+		car->body->ApplyForce(
+			forward.x * nitroForce,
+			forward.y * nitroForce
+		);
+
+		if (currentTime >= maxTime)
+		{
+			sprinting = false;
+		}
 	}
 
 	map->Update(dt);

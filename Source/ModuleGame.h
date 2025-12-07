@@ -56,6 +56,11 @@ public:
 	const int totalLaps = 3;
 	Vector2* movementInput;
 	bool nitroInput;
+	bool sprinted = false;
+	bool sprinting = false;
+	float currentTime = 0.0f;
+	float maxTime = 100.0f;
+	float nitroForce = 30.0f;
 
 private:
 	Timer countdownTimer;
