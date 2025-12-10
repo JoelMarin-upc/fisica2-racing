@@ -24,9 +24,78 @@ void Car::GetInput()
 
 void Car::AI()
 {
-	// find direction with AI
-	// targetDirection = direction from AI;
-	// nitro ?
+	/*int x, y;
+	body->GetPhysicPosition(x, y);
+	int targetX, targetY;
+	Map* map = game->map;
+	if (currentCheckpointNum >= map->getLastCheckpointOrder()) map->finishline->body->GetPhysicPosition(targetX, targetY);
+	else map->getCheckPoint(currentCheckpointNum + 1)->body->GetPhysicPosition(targetX, targetY);
+	
+	targetDirection = new Vector2();
+	targetDirection->x = 0;
+	targetDirection->y = 0;
+	if (targetX > x) targetDirection->x = 1;
+	if (targetX < x) targetDirection->x = -1;
+	if (targetY > y) targetDirection->y = 1;
+	if (targetY < y) targetDirection->y = -1;*/
+
+	int x, y;
+	body->GetPhysicPosition(x, y);
+
+	int targetX, targetY;
+	Map* map = game->map;
+
+	// Get the target checkpoint's position
+	if (currentCheckpointNum >= map->getLastCheckpointOrder()) {
+		auto finishline = map->finishline->body;
+		finishline->GetPhysicPosition(targetX, targetY);
+		targetX -= finishline->width / 2;
+		targetY -= finishline->height / 2;
+	}
+	else {
+		auto checkpoint = map->getCheckPoint(currentCheckpointNum + 1)->body;
+		checkpoint->GetPhysicPosition(targetX, targetY);
+		targetX -= checkpoint->width / 2;
+		targetY -= checkpoint->height / 2;
+	}
+
+	// Calculate the difference in position
+	int dx = targetX - x;
+	int dy = targetY - y;
+
+	// Calculate the angle to the target (in radians)
+	float targetAngle = atan2(dy, dx);  // Angle to the target point
+
+	// Round the target angle to the nearest cardinal direction
+	const float halfPi = PI / 2.0f;
+
+	// Determine the primary direction
+	int directionX = 0, directionY = 0;
+
+	// Calculate X direction (left or right)
+	if (targetAngle > -halfPi && targetAngle < halfPi) {
+		// Target is generally to the right
+		directionX = 1;
+	}
+	else if (targetAngle > halfPi && targetAngle < 3 * halfPi) {
+		// Target is generally to the left
+		directionX = -1;
+	}
+
+	// Calculate Y direction (up or down)
+	if (targetAngle > -PI && targetAngle < 0) {
+		// Target is generally down (move backward)
+		directionY = -1;
+	}
+	else if (targetAngle > 0 && targetAngle < PI) {
+		// Target is generally up (move forward)
+		directionY = 1;
+	}
+
+	// Create the targetDirection as unitary vector with values -1, 0, or 1
+	targetDirection = new Vector2();
+	targetDirection->x = directionX;
+	targetDirection->y = directionY;
 }
 
 void Car::GetTargetDirection()

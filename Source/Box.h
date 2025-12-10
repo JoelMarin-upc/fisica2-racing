@@ -13,6 +13,11 @@ public:
 		body->type = type;
 	}
 
+	~Box() {
+		auto pbody = body->body;
+		physics->DestroyBody(pbody);
+	}
+
 	void Update(float dt) override
 	{
 		int x, y;

@@ -291,6 +291,18 @@ void ModuleGame::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 	if (map->body == bodyA) entityA = map;
 	if (map->body == bodyB) entityB = map;
 
+	if (map->boundsIn->body == bodyA) entityA = map;
+	if (map->boundsIn->body == bodyB) entityB = map;
+
+	if (map->boundsOut->body == bodyA) entityA = map;
+	if (map->boundsOut->body == bodyB) entityB = map;
+
+	if (map->navigationLayerIn->body == bodyA) entityA = map;
+	if (map->navigationLayerIn->body == bodyB) entityB = map;
+
+	if (map->navigationLayerOut->body == bodyA) entityA = map;
+	if (map->navigationLayerOut->body == bodyB) entityB = map;
+
 	if (map->finishline->body == bodyA) entityA = map->finishline;
 	if (map->finishline->body == bodyB) entityB = map->finishline;
 
@@ -327,6 +339,18 @@ void ModuleGame::OnCollisionEnd(PhysBody* bodyA, PhysBody* bodyB)
 
 	if (map->body == bodyA) entityA = map;
 	if (map->body == bodyB) entityB = map;
+
+	if (map->boundsIn->body == bodyA) entityA = map;
+	if (map->boundsIn->body == bodyB) entityB = map;
+
+	if (map->boundsOut->body == bodyA) entityA = map;
+	if (map->boundsOut->body == bodyB) entityB = map;
+
+	if (map->navigationLayerIn->body == bodyA) entityA = map;
+	if (map->navigationLayerIn->body == bodyB) entityB = map;
+
+	if (map->navigationLayerOut->body == bodyA) entityA = map;
+	if (map->navigationLayerOut->body == bodyB) entityB = map;
 
 	if (map->finishline->body == bodyA) entityA = map->finishline;
 	if (map->finishline->body == bodyB) entityB = map->finishline;

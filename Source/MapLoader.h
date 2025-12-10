@@ -26,21 +26,160 @@ class MapLoader
 {
 public:
 	static Map* LoadMap(int mapNumber, Application* app, Module* listener) {
-		int* points = nullptr;
-		unsigned int size = 0;
+		int* boundsIn = nullptr;
+		unsigned int boundsInSize = 0;
+		int* boundsOut = nullptr;
+		unsigned int boundsOutSize = 0;
+		int* navigationLayerIn = nullptr;
+		unsigned int navigationLayerInSize = 0;
+		int* navigationLayerOut = nullptr;
+		unsigned int navigationLayerOutSize = 0;
 		const char* mapImg = nullptr;
 		const char* mapTmx = nullptr;
 		const char* boxTex = nullptr;
 		const char* circleTex = nullptr;
 		if (mapNumber == 1)
 		{
-			int p[6] = { 
-				1, 1, 
-				2, 2, 
-				3, 3 
+			int bIn[34] = {
+				477, 480,
+				477, 2505,
+				1017, 2514,
+				1020, 2017,
+				1977, 2020,
+				1977, 2514,
+				2514, 2520,
+				2517, 1980,
+				1020, 1977,
+				1022, 1020,
+				2520, 1017,
+				2520, 480,
+				2482, 482,
+				2477, 977,
+				1020, 980,
+				1020, 482,
+				491, 477
 			};
-			points = p;
-			size = 6;
+			int bOut[32] = {
+				1492, 20,
+				16, 24,
+				20, 2976,
+				1480, 2975,
+				1484, 2484,
+				1520, 2485,
+				1522, 2980,
+				2977, 2977,
+				2976, 1523,
+				1523, 1520,
+				1523, 1480,
+				2976, 1480,
+				2976, 26,
+				2026, 26,
+				2020, 520,
+				1473, 523
+			};
+			int navIn[84] = {
+				368, 2492,
+				368, 504,
+				420, 416,
+				500, 380,
+				1000, 376,
+				1080, 408,
+				1132, 504,
+				1200, 700,
+				1312, 808,
+				1472, 860,
+				2028, 864,
+				2216, 796,
+				2312, 676,
+				2380, 440,
+				2492, 368,
+				2588, 416,
+				2624, 508,
+				2620, 996,
+				2576, 1084,
+				2484, 1128,
+				1484, 1124,
+				1196, 1276,
+				1120, 1512,
+				1288, 1796,
+				1540, 1872,
+				2500, 1872,
+				2580, 1916,
+				2620, 1996,
+				2620, 2484,
+				2584, 2576,
+				2472, 2620,
+				1988, 2612,
+				1904, 2568,
+				1852, 2460,
+				1696, 2184,
+				1488, 2128,
+				1280, 2196,
+				1124, 2488,
+				1084, 2584,
+				996, 2620,
+				496, 2620,
+				412, 2568
+			};
+			int navOut[96] = {
+				217, 262,
+				495, 127,
+				1020, 140,
+				1240, 217,
+				1372, 502,
+				1427, 597,
+				1502, 625,
+				2000, 622,
+				2077, 585,
+				2120, 497,
+				2196, 288,
+				2480, 136,
+				2716, 196,
+				2828, 340,
+				2868, 552,
+				2864, 1020,
+				2804, 1212,
+				2672, 1320,
+				2488, 1364,
+				1504, 1368,
+				1384, 1436,
+				1368, 1512,
+				1420, 1584,
+				1504, 1624,
+				2500, 1624,
+				2704, 1696,
+				2816, 1824,
+				2860, 1972,
+				2864, 2500,
+				2800, 2708,
+				2692, 2812,
+				2528, 2860,
+				1964, 2864,
+				1792, 2808,
+				1680, 2676,
+				1624, 2476,
+				1556, 2384,
+				1452, 2372,
+				1380, 2448,
+				1360, 2576,
+				1296, 2708,
+				1128, 2836,
+				1020, 2860,
+				476, 2860,
+				276, 2788,
+				168, 2640,
+				128, 2500,
+				132, 480
+			};
+
+			boundsIn = bIn;
+			boundsInSize = 34;
+			boundsOut = bOut;
+			boundsOutSize = 32;
+			navigationLayerIn = navIn;
+			navigationLayerInSize = 84;
+			navigationLayerOut = navOut;
+			navigationLayerOutSize = 96;
 			mapImg = "Assets/Maps/Road/road.png";
 			mapTmx = "Assets/Maps/Road/road.tmx";
 			boxTex = "Assets/Maps/Road/boxObstacle.png";
@@ -51,7 +190,7 @@ public:
 			// add map 2
 		}
 
-		Map* map = new Map(app, 0, 0, 0, points, size, listener, LoadTexture(mapImg));
+		Map* map = new Map(app, 0, 0, 0, boundsIn, boundsInSize, boundsOut, boundsOutSize, navigationLayerIn, navigationLayerInSize, navigationLayerOut, navigationLayerOutSize, listener, LoadTexture(mapImg));
 		MapData data = GetMapData(mapTmx, app, listener, boxTex, circleTex);
 
 		std::sort(data.startPositions.begin(), data.startPositions.end(),

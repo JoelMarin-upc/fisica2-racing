@@ -56,6 +56,8 @@ public:
 	Vector2* movementInput;
 	bool nitroInput;
 
+	Map* map;
+
 private:
 	Timer countdownTimer;
 	const double countdownTime = 3.f;
@@ -75,7 +77,6 @@ private:
 	//std::vector<PhysicEntity*> entities;
 	std::vector<Car*> cars;
 	Car* car; // should be in cars list
-	Map* map;
 
 	b2MouseJoint* mouseJoint = nullptr;
 

@@ -151,8 +151,14 @@ PhysBody* ModulePhysics::CreateRectangleSensor(int x, int y, int width, int heig
 	return pbody;
 }
 
-PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, unsigned int size, float angle, bool dynamic, float restitution, bool reverse)
+PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, unsigned int size, float angle, bool dynamic, float restitution, bool reverse, bool isSensor)
 {
+	if (size == 0)
+	{
+		auto b = new PhysBody();
+		b->body = nullptr;
+		return b;
+	}
 	b2BodyDef body;
 	body.type = dynamic ? b2_dynamicBody : b2_staticBody;
 	body.bullet = dynamic;
@@ -177,6 +183,7 @@ PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, unsigned int siz
 	b2FixtureDef fixture;
 	fixture.shape = &shape;
 	fixture.restitution = restitution;
+	fixture.isSensor = isSensor;
 
 	b->CreateFixture(&fixture);
 
