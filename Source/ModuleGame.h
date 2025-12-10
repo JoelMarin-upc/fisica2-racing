@@ -92,6 +92,6 @@ private:
 	Font fontSmall;
 	const char* fontPath = "Assets/ScienceGothic_Condensed-Black.ttf";
 
-	int sprintFX;
+	
 	
 };

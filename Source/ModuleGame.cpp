@@ -27,10 +27,8 @@ bool ModuleGame::Start()
 	fontText = LoadFontEx(fontPath, 30, nullptr, 0);
 	fontSmall = LoadFontEx(fontPath, 20, nullptr, 0);
 
-	//sounds
-	sprintFX = App->audio->LoadFx("GitHub / fisica2 - racing / Assets / Sounds / Music / GlooGloo.ogg/FX/sprint.wav");
+	App->audio->PlayMusic("Assets/Sounds/Music/GlooGloo.wav");
 
-	App->audio->PlayMusic("GitHub/fisica2 - racing/Assets/Sounds/Music/GlooGloo.ogg");
 	LoadMap();
 	AddCars();
 	/*car = new Car(App, 30, 500, 0, this, LoadTexture("Assets/car1.png"), 1, true);
@@ -107,17 +105,6 @@ void ModuleGame::GetInput()
 }
 
 void ModuleGame::Nitro() {
-
-	if (nitroInput && !sprinting && car->availableNitros > 0)
-	{
-		LOG("sprint");
-
-		sprinting = true;
-		currentTime = 0.0f;
-		car->availableNitros--;
-
-		App->audio->PlayFx(sprintFX);
-	}
 
 }
 

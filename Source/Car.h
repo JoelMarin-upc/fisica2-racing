@@ -55,7 +55,7 @@ public:
 private:
 	const float engineForce = 10.f;
 	const float steerStrength = 6.f;
-	const float nitroMultiplier = 2.f;
+	const float nitroMultiplier = 3.f;
 	
 	Vector2* targetDirection;
 	bool active;
@@ -72,5 +72,7 @@ private:
 	double speedScale = 1;
 
 	const float warmingVelocityThreshold = 9;
+
+	int sprintFX;
 
 };
