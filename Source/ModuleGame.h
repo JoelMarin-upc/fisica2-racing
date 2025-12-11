@@ -47,6 +47,8 @@ private:
 	void DestroyMouseJoint();
 	void UpdateMouseJoint();
 	void RunTimer();
+	void GetMenuInput();
+	void PrintMenu();
 	void PrintInfo();
 	void PrintEndScreen();
 	void Restart();
@@ -68,6 +70,7 @@ private:
 	double bestLap = 0;
 	double raceTime = 0;
 
+	bool gameStarted = false;
 	bool raceEnded = false;
 	bool raceActive = false;
 	bool countdownStarted = false;
@@ -85,5 +88,9 @@ private:
 	Font fontText;
 	Font fontSmall;
 	const char* fontPath = "Assets/ScienceGothic_Condensed-Black.ttf";
+
+	int menuOption = 1;
+	int mapNumber = 1;
+	int difficulty = 3;
 	
 };

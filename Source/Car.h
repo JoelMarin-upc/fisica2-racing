@@ -9,7 +9,7 @@ class ModuleGame;
 class Car : public Box
 {
 public:
-	Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman);
+	Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman, int _difficulty = 1);
 
 	~Car();
 
@@ -73,4 +73,5 @@ private:
 
 	const float warmingVelocityThreshold = 9;
 
+	int difficulty = 1;
 };

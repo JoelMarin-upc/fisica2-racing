@@ -1,9 +1,9 @@
 #include "ModuleGame.h"
 #include "ModuleRender.h"
 
-Car::Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman)
+Car::Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman, int _difficulty)
 	: Box(app->physics, app->renderer, _x, _y, _listener, _texture, CAR, angle),
-	carNum(carNum), isHumanControlled(isHuman), currentPosition(carNum), targetDirection(new Vector2{ 0, 0 }), currentLap(0), nitroInput(false), nitroActive(false), active(false), game(app->scene_intro), audio(app->audio), currentCheckpointNum(0)
+	carNum(carNum), isHumanControlled(isHuman), currentPosition(carNum), targetDirection(new Vector2{ 0, 0 }), currentLap(0), nitroInput(false), nitroActive(false), active(false), game(app->scene_intro), audio(app->audio), currentCheckpointNum(0), difficulty(_difficulty)
 {
 	availableNitros = maxAvailableNitros;
 	body->SetLinearDamping(1.0f);
@@ -24,78 +24,105 @@ void Car::GetInput()
 
 void Car::AI()
 {
-	/*int x, y;
-	body->GetPhysicPosition(x, y);
-	int targetX, targetY;
-	Map* map = game->map;
-	if (currentCheckpointNum >= map->getLastCheckpointOrder()) map->finishline->body->GetPhysicPosition(targetX, targetY);
-	else map->getCheckPoint(currentCheckpointNum + 1)->body->GetPhysicPosition(targetX, targetY);
-	
-	targetDirection = new Vector2();
-	targetDirection->x = 0;
-	targetDirection->y = 0;
-	if (targetX > x) targetDirection->x = 1;
-	if (targetX < x) targetDirection->x = -1;
-	if (targetY > y) targetDirection->y = 1;
-	if (targetY < y) targetDirection->y = -1;*/
+    int x, y;
+    body->GetPhysicPosition(x, y);
 
-	int x, y;
-	body->GetPhysicPosition(x, y);
+    int targetX, targetY;
+    Map* map = game->map;
 
-	int targetX, targetY;
-	Map* map = game->map;
+    if (currentCheckpointNum >= map->getLastCheckpointOrder()) {
+        auto finishline = map->finishline->body;
+        finishline->GetPhysicPosition(targetX, targetY);
+    }
+    else {
+        auto checkpoint = map->getCheckPoint(currentCheckpointNum + 1)->body;
+        checkpoint->GetPhysicPosition(targetX, targetY);
+    }
 
-	// Get the target checkpoint's position
-	if (currentCheckpointNum >= map->getLastCheckpointOrder()) {
-		auto finishline = map->finishline->body;
-		finishline->GetPhysicPosition(targetX, targetY);
-		targetX -= finishline->width / 2;
-		targetY -= finishline->height / 2;
-	}
-	else {
-		auto checkpoint = map->getCheckPoint(currentCheckpointNum + 1)->body;
-		checkpoint->GetPhysicPosition(targetX, targetY);
-		targetX -= checkpoint->width / 2;
-		targetY -= checkpoint->height / 2;
-	}
+    b2Vec2 right = body->GetWorldVector(b2Vec2(1, 0));
+    b2Vec2 left = body->GetWorldVector(b2Vec2(-1, 0));
+    b2Vec2 forward = body->GetWorldVector(b2Vec2(0, 1));
+    b2Vec2 back = body->GetWorldVector(b2Vec2(0, -1));
 
-	// Calculate the difference in position
-	int dx = targetX - x;
-	int dy = targetY - y;
+    b2Vec2 rightPix = { (float)METERS_TO_PIXELS(right.x),   (float)METERS_TO_PIXELS(right.y) };
+    b2Vec2 leftPix = { (float)METERS_TO_PIXELS(left.x),    (float)METERS_TO_PIXELS(left.y) };
+    b2Vec2 frontPix = { (float)METERS_TO_PIXELS(back.x), (float)METERS_TO_PIXELS(back.y) };
 
-	// Calculate the angle to the target (in radians)
-	float targetAngle = atan2(dy, dx);  // Angle to the target point
+    int rx1 = x;
+    int ry1 = y;
+    int rx2 = x + rightPix.x * 5;
+    int ry2 = y + rightPix.y * 5;
 
-	// Round the target angle to the nearest cardinal direction
-	const float halfPi = PI / 2.0f;
+    int lx1 = x;
+    int ly1 = y;
+    int lx2 = x + leftPix.x * 5;
+    int ly2 = y + leftPix.y * 5;
 
-	// Determine the primary direction
-	int directionX = 0, directionY = 0;
+    int fx1 = x;
+    int fy1 = y;
+    int fx2 = x + frontPix.x * 4;
+    int fy2 = y + frontPix.y * 4;
 
-	// Calculate X direction (left or right)
-	if (targetAngle > -halfPi && targetAngle < halfPi) {
-		// Target is generally to the right
-		directionX = 1;
-	}
-	else if (targetAngle > halfPi && targetAngle < 3 * halfPi) {
-		// Target is generally to the left
-		directionX = -1;
-	}
+    float normalx, normaly;
 
-	// Calculate Y direction (up or down)
-	if (targetAngle > -PI && targetAngle < 0) {
-		// Target is generally down (move backward)
-		directionY = -1;
-	}
-	else if (targetAngle > 0 && targetAngle < PI) {
-		// Target is generally up (move forward)
-		directionY = 1;
-	}
+    int distRight = body->RayCast(rx1, ry1, rx2, ry2, normalx, normaly);
+    int distLeft = body->RayCast(lx1, ly1, lx2, ly2, normalx, normaly);
+    int distFront = body->RayCast(fx1, fy1, fx2, fy2, normalx, normaly);
 
-	// Create the targetDirection as unitary vector with values -1, 0, or 1
-	targetDirection = new Vector2();
-	targetDirection->x = directionX;
-	targetDirection->y = directionY;
+    // following checkpoints
+
+    float dx = targetX - x;
+    float dy = targetY - y;
+    b2Vec2 toTarget(dx, dy);
+
+    float forwardDot = b2Dot(toTarget, forward);
+    float rightDot = b2Dot(toTarget, right);
+
+    const float eps = 0.2f;
+
+    int directionY = (forwardDot > eps) ? 1 :
+        (forwardDot < -eps) ? -1 : 0;
+
+    int directionX = (rightDot > eps) ? 1 :
+        (rightDot < -eps) ? -1 : 0;
+
+    // avoiding obstacles
+
+    float obstacleSteerX = 0.0f;
+
+    if (distLeft != -1)
+        obstacleSteerX += 1.0f;
+
+    if (distRight != -1)
+        obstacleSteerX -= 1.0f;
+
+    if (distFront != -1)
+    {
+        if (distLeft != -1 && distRight == -1)
+            obstacleSteerX -= 1.0f;
+        else if (distRight != -1 && distLeft == -1)
+            obstacleSteerX += 1.0f;
+        else
+            obstacleSteerX += 1.0f;
+    }
+
+    // combine directions
+
+    float finalSteerX = directionX + obstacleSteerX;
+    float finalSteerY = directionY;
+
+    float mag = sqrt(finalSteerX * finalSteerX + finalSteerY * finalSteerY);
+    if (mag > 0.1f) {
+        finalSteerX /= mag;
+        finalSteerY /= mag;
+    }
+
+    targetDirection = new Vector2();
+    targetDirection->x = (finalSteerX > 0.3f) ? 1 :
+        (finalSteerX < -0.3f) ? -1 : 0;
+
+    targetDirection->y = (finalSteerY > 0.3f) ? 1 :
+        (finalSteerY < -0.3f) ? -1 : 0;
 }
 
 void Car::GetTargetDirection()
@@ -110,11 +137,32 @@ void Car::Move(float dt)
 	float speedFactor = body->GetLinearVelocity().Length() / engineForce;
 	speedFactor = std::min(speedFactor, 1.0f);
 
+    float speedScaleVal = speedScale;
+    float steerStrengthVal = steerStrength;
+
+    if (!isHumanControlled) {
+        if (difficulty == 1) {
+            //speedScaleVal *= 1.f;
+            maxSteerAngle *= 1.5f;
+            steerStrengthVal *= 1.5f;
+        }
+        else if (difficulty == 2) {
+            //speedScaleVal *= 1.1f;
+            maxSteerAngle *= 2.f;
+            steerStrengthVal *= 2.f;
+        }
+        else if (difficulty == 3) {
+            //speedScaleVal *= 1.2f;
+            maxSteerAngle *= 2.5f;
+            steerStrengthVal *= 2.5f;
+        }
+    }
+
 	float targetAngularVelocity = targetDirection->x * maxSteerAngle * speedFactor;
 
 	float currentW = body->GetAngularVelocity();
 
-	float newW = currentW + (targetAngularVelocity - currentW) * (dt * steerStrength);
+	float newW = currentW + (targetAngularVelocity - currentW) * (dt * steerStrengthVal);
 	body->SetAngularVelocity(newW);
 
 	b2Vec2 right = body->GetWorldVector(b2Vec2(1, 0));
@@ -128,7 +176,7 @@ void Car::Move(float dt)
 	b2Vec2 forward = body->GetWorldVector(b2Vec2(0, targetDirection->y));
 	auto force = engineForce * forward;
 	if (nitroActive) force *= nitroMultiplier;
-	force *= speedScale;
+	force *= speedScaleVal;
 	body->ApplyForce(force.x, force.y);
 }
 
@@ -167,7 +215,6 @@ void Car::Update(float dt)
 		CheckNitro();
 		Move(dt);
 	}
-	//render->DrawText(TextFormat("V=%f", body->GetLinearVelocity().Length()), GetScreenWidth() / 2, GetScreenHeight() / 2, {20}, 5, {255, 0, 0, 255});
 
 	int x, y;
 	body->GetPhysicPosition(x, y);

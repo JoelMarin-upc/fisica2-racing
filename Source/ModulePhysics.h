@@ -56,6 +56,23 @@ public:
 	EntityType type;
 };
 
+class RayCastClosestCallback : public b2RayCastCallback
+{
+public:
+	bool hit = false;
+	b2Vec2 normal;
+	float fraction = 0.0f;
+
+	float ReportFixture(b2Fixture* fixture, const b2Vec2& point,
+		const b2Vec2& normal, float fraction) override
+	{
+		hit = true;
+		this->normal = normal;
+		this->fraction = fraction;
+		return fraction;
+	}
+};
+
 // Module --------------------------------------
 class ModulePhysics : public Module, public b2ContactListener // TODO
 {

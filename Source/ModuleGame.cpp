@@ -55,7 +55,7 @@ void ModuleGame::AddCars()
 	{
 		Transform2D t = map->playerStartPositions[i];
 		const std::string tex = "Assets/Cars/car" + std::to_string(i + 1) + ".png";
-		cars.push_back(new Car(App, t.position.x, t.position.y, t.rotation, this, LoadTexture(tex.c_str()), i + 1, false));
+		cars.push_back(new Car(App, t.position.x, t.position.y, t.rotation, this, LoadTexture(tex.c_str()), i + 1, false, difficulty));
 	}
 	Transform2D playerTransform = map->playerStartPositions[totalCars-1];
 	car = new Car(App, playerTransform.position.x, playerTransform.position.y, playerTransform.rotation, this, LoadTexture("Assets/Cars/carPlayer.png"), totalCars, true);
@@ -190,6 +190,96 @@ void ModuleGame::RunTimer()
 	if (car->currentLap > 0) lapTime = lapTimer.ReadSec();
 }
 
+void ModuleGame::GetMenuInput()
+{
+	if (IsKeyPressed(KEY_DOWN))
+	{
+		menuOption++;
+		if (menuOption > 3) menuOption = 1;
+	}
+	if (IsKeyPressed(KEY_UP))
+	{
+		menuOption--;
+		if (menuOption < 1) menuOption = 3;
+	}
+	if (IsKeyPressed(KEY_LEFT))
+	{
+		if (menuOption == 1)
+		{
+			mapNumber--;
+			if (mapNumber < 1) mapNumber = 2;
+		}
+		if (menuOption == 2)
+		{
+			difficulty--;
+			if (difficulty < 1) difficulty = 3;
+		}
+	}
+	if (IsKeyPressed(KEY_RIGHT))
+	{
+		if (menuOption == 1)
+		{
+			mapNumber++;
+			if (mapNumber > 2) mapNumber = 1;
+		}
+		if (menuOption == 2)
+		{
+			difficulty++;
+			if (difficulty > 3) difficulty = 1;
+		}
+	}
+	if (IsKeyPressed(KEY_ENTER))
+	{
+		if (menuOption == 3)
+		{
+			gameStarted = true;
+		}
+	}
+}
+
+void ModuleGame::PrintMenu()
+{
+	Color selected = RED;
+	Color unselected = YELLOW;
+	
+	std::string mapName;
+	switch (mapNumber)
+	{
+	case 1:
+		mapName = "Map 1";
+		break;
+	case 2:
+		mapName = "Map 2";
+		break;
+	default:
+		mapName = "None";
+		break;
+	}
+	std::string diffName;
+	switch (difficulty)
+	{
+	case 1:
+		diffName = "Easy";
+		break;
+	case 2:
+		diffName = "Medium";
+		break;
+	case 3:
+		diffName = "Hard";
+		break;
+	default:
+		diffName = "None";
+		break;
+	}
+	
+	int screenCenterX = GetScreenWidth() / 2;
+	int screenCenterY = GetScreenHeight() / 2;
+
+	App->renderer->DrawTextCentered(TextFormat("Map: < %s >", mapName.c_str()), screenCenterX, screenCenterY - 30, fontText, 5, menuOption == 1 ? selected : unselected);
+	App->renderer->DrawTextCentered(TextFormat("Difficulty: < %s >", diffName.c_str()), screenCenterX, screenCenterY, fontText, 5, menuOption == 2 ? selected : unselected);
+	App->renderer->DrawTextCentered("Start game", screenCenterX, screenCenterY + 30, fontSubtitle, 5, menuOption == 3 ? selected : unselected);
+}
+
 void ModuleGame::PrintInfo()
 {
 	App->renderer->DrawText(TextFormat("Last checkpoint: %d", car->currentCheckpointNum), 10, 30, fontText, 5, RED);
@@ -243,35 +333,42 @@ void ModuleGame::Restart()
 
 update_status ModuleGame::Update(float dt)
 {
-	if (IsKeyPressed(KEY_F1)) {
-		if (mouseJoint) DestroyMouseJoint();
-		else CreateMouseJoint();
-	}
-
-	if (raceActive && !raceEnded)
+	if (gameStarted)
 	{
-		GetInput();
-		RunTimer();
+		if (IsKeyPressed(KEY_F1)) {
+			if (mouseJoint) DestroyMouseJoint();
+			else CreateMouseJoint();
+		}
+
+		if (raceActive && !raceEnded)
+		{
+			GetInput();
+			RunTimer();
+		}
+
+		map->Update(dt);
+
+		for (Car* c : cars) c->Update(dt);
+
+		AdjustCamera();
+		UpdateMouseJoint();
+
+		if (raceEnded) {
+			PrintEndScreen();
+			if (IsKeyPressed(KEY_R)) Restart();
+		}
+		else
+		{
+			CalculatePositions();
+			PrintInfo();
+		}
+
+		if (!raceActive && !raceEnded) PerformCountdown();
 	}
-
-	map->Update(dt);
-
-	for (Car* c : cars) c->Update(dt);
-
-	AdjustCamera();
-	UpdateMouseJoint();
-	
-	if (raceEnded) {
-		PrintEndScreen();
-		if (IsKeyPressed(KEY_R)) Restart();
+	else {
+		GetMenuInput();
+		PrintMenu();
 	}
-	else
-	{
-		CalculatePositions();
-		PrintInfo();
-	}
-
-	if (!raceActive && !raceEnded) PerformCountdown();
 
 	//for (PhysicEntity* entity : entities) entity->Update(dt);
 
