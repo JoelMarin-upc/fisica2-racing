@@ -38,14 +38,14 @@ bool ModulePhysics::Start()
 
 update_status ModulePhysics::PreUpdate()
 {
-	//if (gravityOn) world->Step(1.f / GetFPS(), 8, 3);
+	world->Step(App->dt, 8, 3); 
 
 	for (b2Contact* c = world->GetContactList(); c; c = c->GetNext())
 	{
 		if (c->GetFixtureA()->IsSensor() && c->IsTouching())
 		{
 			b2BodyUserData data1 = c->GetFixtureA()->GetBody()->GetUserData();
-			b2BodyUserData data2 = c->GetFixtureA()->GetBody()->GetUserData();
+			b2BodyUserData data2 = c->GetFixtureB()->GetBody()->GetUserData();
 
 			PhysBody* pb1 = (PhysBody*)data1.pointer;
 			PhysBody* pb2 = (PhysBody*)data2.pointer;
@@ -180,7 +180,7 @@ PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, unsigned int siz
 
 	b->CreateFixture(&fixture);
 
-	delete p;
+	delete[] p;
 
 	pbody->body = b;
 	//body.userData.pointer = reinterpret_cast<uintptr_t>(pbody);
@@ -206,7 +206,7 @@ b2MouseJoint* ModulePhysics::CreateMouseJoint(b2Body* body, b2Vec2 target)
 
 	mouseJointDef.bodyA = ground;
 	mouseJointDef.bodyB = body;
-	mouseJointDef.target = { PIXEL_TO_METERS(target.x), PIXEL_TO_METERS(target.y) };
+	mouseJointDef.target = target;
 	mouseJointDef.damping = 10.f;
 	mouseJointDef.stiffness = 150.f;
 	mouseJointDef.maxForce = 2000.0f * body->GetMass();

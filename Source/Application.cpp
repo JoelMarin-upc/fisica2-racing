@@ -71,6 +71,7 @@ update_status Application::Update()
 {
 	update_status ret = UPDATE_CONTINUE;
 
+
 	// --- T-key toggle FPS ---
 	if (IsKeyPressed(KEY_T))
 	{
@@ -82,7 +83,7 @@ update_status Application::Update()
 	// --- Delta time ---
 	static double lastTime = GetTime(); // seconds
 	double currentTime = GetTime();
-	double dt = currentTime - lastTime; // seconds since last frame
+	dt = currentTime - lastTime; // seconds since last frame
 	lastTime = currentTime;
 
 	// --- Fixed timestep physics ---
