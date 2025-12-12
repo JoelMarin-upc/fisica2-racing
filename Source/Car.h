@@ -53,8 +53,8 @@ public:
 	bool isOverHeated;
 
 private:
-	const float engineForce = 10.f;
-	const float steerStrength = 6.f;
+	const float engineForce = 8.f;
+	const float steerStrength = 5.f;
 	const float nitroMultiplier = 2.f;
 	
 	Vector2* targetDirection;

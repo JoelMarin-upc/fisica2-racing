@@ -240,7 +240,7 @@ void ModuleGame::GetMenuInput()
 void ModuleGame::PrintMenu()
 {
 	Color selected = RED;
-	Color unselected = YELLOW;
+	Color unselected = BLUE;
 	
 	std::string mapName;
 	switch (mapNumber)
@@ -282,7 +282,7 @@ void ModuleGame::PrintMenu()
 
 void ModuleGame::PrintInfo()
 {
-	App->renderer->DrawText(TextFormat("Last checkpoint: %d", car->currentCheckpointNum), 10, 30, fontText, 5, RED);
+	//App->renderer->DrawText(TextFormat("Last checkpoint: %d", car->currentCheckpointNum), 10, 30, fontText, 5, RED);
 	App->renderer->DrawText(TextFormat("Laps: %d", car->currentLap), 10, 50, fontText, 5, RED);
 	App->renderer->DrawText(TextFormat("Position: %d", car->currentPosition), 10, 70, fontText, 5, RED);
 	App->renderer->DrawText(TextFormat("Lap time: %02.02f s", lapTime), 10, 90, fontText, 5, RED);
@@ -323,6 +323,7 @@ void ModuleGame::Restart()
 	bestLap = 0;
 	raceTime = 0;
 
+	gameStarted = false;
 	raceEnded = false;
 	raceActive = false;
 	countdownStarted = false;
@@ -363,7 +364,7 @@ update_status ModuleGame::Update(float dt)
 			PrintInfo();
 		}
 
-		if (!raceActive && !raceEnded) PerformCountdown();
+		if (gameStarted && !raceActive && !raceEnded) PerformCountdown();
 	}
 	else {
 		GetMenuInput();

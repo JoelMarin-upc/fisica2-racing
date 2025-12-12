@@ -142,19 +142,19 @@ void Car::Move(float dt)
 
     if (!isHumanControlled) {
         if (difficulty == 1) {
-            //speedScaleVal *= 1.f;
+            speedScaleVal *= 1.f;
             maxSteerAngle *= 1.5f;
             steerStrengthVal *= 1.5f;
         }
         else if (difficulty == 2) {
-            //speedScaleVal *= 1.1f;
-            maxSteerAngle *= 2.f;
-            steerStrengthVal *= 2.f;
+            speedScaleVal *= 1.075f;
+            maxSteerAngle *= 2.2f;
+            steerStrengthVal *= 2.2f;
         }
         else if (difficulty == 3) {
-            //speedScaleVal *= 1.2f;
-            maxSteerAngle *= 2.5f;
-            steerStrengthVal *= 2.5f;
+            speedScaleVal *= 1.15f;
+            maxSteerAngle *= 3.f;
+            steerStrengthVal *= 3.f;
         }
     }
 
