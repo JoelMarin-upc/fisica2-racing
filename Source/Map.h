@@ -8,6 +8,7 @@
 #include "PhysicEntity.h"
 #include "ModulePhysics.h"
 #include "Transform2D.h"
+#include "ModuleRender.h"
 
 class Map : public Chain
 {

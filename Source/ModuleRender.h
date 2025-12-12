@@ -1,6 +1,7 @@
 #pragma once
 #include "Module.h"
 #include "Globals.h"
+#include "PhysicEntity.h"
 
 #include <limits.h>
 
@@ -16,6 +17,8 @@ public:
 	update_status PostUpdate();
 	bool CleanUp();
 
+	void SetCameraTarget(PhysicEntity* target);
+	void AdjustCamera();
     void SetBackgroundColor(Color color);
 	bool Draw(Texture2D texture, int x, int y, const Rectangle* section = NULL, double angle = 0, int pivot_x = 0, int pivot_y = 0) const;
 	bool rDrawTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color color) const;
@@ -24,8 +27,12 @@ public:
 	bool rDrawCircle(int x, int y, float radius, Color color) const;
 	bool rDrawLine(int x1, int y1, int x2, int y2, Color color) const;
 
-public:
+public: 
+	Camera2D camera = { 0 };
+
+private:
 
 	Color background;
-    Rectangle camera;
+	//Rectangle camera;
+	PhysicEntity* cameraTarget;
 };

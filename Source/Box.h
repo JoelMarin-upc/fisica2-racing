@@ -2,6 +2,7 @@
 
 #include "PhysicEntity.h"
 #include "ModulePhysics.h"
+#include "ModuleRender.h"
 
 class Box : public PhysicEntity
 {

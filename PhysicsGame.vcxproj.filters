@@ -58,6 +58,9 @@
     <ClCompile Include="Source\Car.cpp">
       <Filter>Sources\Entities</Filter>
     </ClCompile>
+    <ClCompile Include="Source\PhysicEntity.cpp">
+      <Filter>Sources\Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source/p2Point.h">

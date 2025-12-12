@@ -215,6 +215,7 @@
     <ClCompile Include="Source\Finishline.h" />
     <ClCompile Include="Source\Map.h" />
     <ClCompile Include="Source\ModuleGame.cpp" />
+    <ClCompile Include="Source\PhysicEntity.cpp" />
     <ClCompile Include="Source\PhysicEntity.h" />
     <ClCompile Include="Source\Timer.cpp" />
   </ItemGroup>

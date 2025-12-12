@@ -104,11 +104,10 @@ void ModuleGame::GetInput()
 
 void ModuleGame::AdjustCamera()
 {
-	int x, y;
+	/*int x, y;
 	car->body->GetPhysicPosition(x, y);
 	App->renderer->camera.x = -x + GetScreenWidth() / 2.f;
-	App->renderer->camera.y = -y + GetScreenHeight() / 2.f;
-	//car->body->GetRotation();
+	App->renderer->camera.y = -y + GetScreenHeight() / 2.f;*/
 }
 
 void ModuleGame::CalculatePositions()
@@ -136,7 +135,7 @@ void ModuleGame::CreateMouseJoint()
 {
 	bool jointDone = false;
 	Vector2 mouse = GetMousePosition();
-	b2Vec2 mouseb2 = { mouse.x - App->renderer->camera.x, mouse.y - App->renderer->camera.y };
+	b2Vec2 mouseb2 = { mouse.x - App->renderer->camera.target.x, mouse.y - App->renderer->camera.target.y };
 	for (auto& c : cars) {
 		if (c->TestPoint(mouseb2)) {
 			mouseJoint = App->physics->CreateMouseJoint(c->body->body, mouseb2);
@@ -156,8 +155,8 @@ void ModuleGame::UpdateMouseJoint()
 {
 	if (mouseJoint) {
 		Vector2 mouse = GetMousePosition();
-		float x = mouse.x - App->renderer->camera.x;
-		float y = mouse.y - App->renderer->camera.y;
+		float x = mouse.x - App->renderer->camera.target.x;
+		float y = mouse.y - App->renderer->camera.target.y;
 		b2Vec2 mouseb2 = { PIXEL_TO_METERS(x), PIXEL_TO_METERS(y) };
 		mouseJoint->SetTarget(mouseb2);
 		App->renderer->rDrawLine(METERS_TO_PIXELS(mouseb2.x),
@@ -233,6 +232,7 @@ void ModuleGame::GetMenuInput()
 		if (menuOption == 3)
 		{
 			gameStarted = true;
+			App->renderer->SetCameraTarget(car);
 		}
 	}
 }
