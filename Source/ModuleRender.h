@@ -3,6 +3,9 @@
 #include "Globals.h"
 #include "PhysicEntity.h"
 
+#include <functional>
+#include <iostream>
+#include <vector>
 #include <limits.h>
 
 class ModuleRender : public Module
@@ -22,6 +25,8 @@ public:
     void SetBackgroundColor(Color color);
 	bool Draw(Texture2D texture, int x, int y, const Rectangle* section = NULL, double angle = 0, int pivot_x = 0, int pivot_y = 0) const;
 	bool rDrawTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color color) const;
+	void rDrawText(const char* text, int x, int y, Font font, int spacing, Color tint);
+	void rDrawTextCentered(const char* text, int centerX, int centerY, Font font, int spacing, Color tint);
 	bool DrawText(const char* text, int x, int y, Font font, int spacing, Color tint) const;
 	bool DrawTextCentered(const char* text, int centerX, int centerY, Font font, int spacing, Color tint) const;
 	bool rDrawCircle(int x, int y, float radius, Color color) const;
@@ -29,10 +34,13 @@ public:
 
 public: 
 	Camera2D camera = { 0 };
+	bool cameraRotationActive = false;
 
 private:
 
 	Color background;
 	//Rectangle camera;
 	PhysicEntity* cameraTarget;
+	float cameraRotation = 0.0f;
+	std::vector<std::function<void()>> uiCalls;
 };

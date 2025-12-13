@@ -75,7 +75,7 @@ void ModuleGame::PerformCountdown()
 	if (currentNumber == 0) countdownText = "Start";
 	else if (currentNumber == -1) StartRace();
 	else countdownText = std::to_string(currentNumber);
-	App->renderer->DrawTextCentered(countdownText.c_str(), GetScreenWidth() / 2, GetScreenHeight() / 2, fontTitle, 5, YELLOW);
+	App->renderer->rDrawTextCentered(countdownText.c_str(), GetScreenWidth() / 2, GetScreenHeight() / 2, fontTitle, 5, YELLOW);
 }
 
 void ModuleGame::StartRace()
@@ -275,26 +275,26 @@ void ModuleGame::PrintMenu()
 	int screenCenterX = GetScreenWidth() / 2;
 	int screenCenterY = GetScreenHeight() / 2;
 
-	App->renderer->DrawTextCentered(TextFormat("Map: < %s >", mapName.c_str()), screenCenterX, screenCenterY - 30, fontText, 5, menuOption == 1 ? selected : unselected);
-	App->renderer->DrawTextCentered(TextFormat("Difficulty: < %s >", diffName.c_str()), screenCenterX, screenCenterY, fontText, 5, menuOption == 2 ? selected : unselected);
-	App->renderer->DrawTextCentered("Start game", screenCenterX, screenCenterY + 30, fontSubtitle, 5, menuOption == 3 ? selected : unselected);
+	App->renderer->rDrawTextCentered(TextFormat("Map: < %s >", mapName.c_str()), screenCenterX, screenCenterY - 30, fontText, 5, menuOption == 1 ? selected : unselected);
+	App->renderer->rDrawTextCentered(TextFormat("Difficulty: < %s >", diffName.c_str()), screenCenterX, screenCenterY, fontText, 5, menuOption == 2 ? selected : unselected);
+	App->renderer->rDrawTextCentered("Start game", screenCenterX, screenCenterY + 30, fontSubtitle, 5, menuOption == 3 ? selected : unselected);
 }
 
 void ModuleGame::PrintInfo()
 {
 	//App->renderer->DrawText(TextFormat("Last checkpoint: %d", car->currentCheckpointNum), 10, 30, fontText, 5, RED);
-	App->renderer->DrawText(TextFormat("Laps: %d", car->currentLap), 10, 50, fontText, 5, RED);
-	App->renderer->DrawText(TextFormat("Position: %d", car->currentPosition), 10, 70, fontText, 5, RED);
-	App->renderer->DrawText(TextFormat("Lap time: %02.02f s", lapTime), 10, 90, fontText, 5, RED);
-	App->renderer->DrawText(TextFormat("Total time: %02.02f s", raceTime), 10, 110, fontText, 5, RED);
-	App->renderer->DrawText(TextFormat("Avaliable nitros: %d", car->availableNitros), 10, 130, fontText, 5, RED);
+	App->renderer->rDrawText(TextFormat("Laps: %d", car->currentLap), 10, 50, fontText, 5, RED);
+	App->renderer->rDrawText(TextFormat("Position: %d", car->currentPosition), 10, 70, fontText, 5, RED);
+	App->renderer->rDrawText(TextFormat("Lap time: %02.02f s", lapTime), 10, 90, fontText, 5, RED);
+	App->renderer->rDrawText(TextFormat("Total time: %02.02f s", raceTime), 10, 110, fontText, 5, RED);
+	App->renderer->rDrawText(TextFormat("Avaliable nitros: %d", car->availableNitros), 10, 130, fontText, 5, RED);
 	for (int i = 0; i < cars.size(); i++)
 	{
 		Car* c = cars[i];
 		const char* text;
 		if (c->isHumanControlled) text = TextFormat("Position %d -> PLAYER", c->currentPosition, c->carNum);
 		else text = TextFormat("Position %d -> CAR %d", c->currentPosition, c->carNum);
-		App->renderer->DrawText(text, 10, 160 + 15 * (i + 1), fontSmall, 5, RED);
+		App->renderer->rDrawText(text, 10, 160 + 15 * (i + 1), fontSmall, 5, RED);
 	}
 }
 
@@ -302,10 +302,10 @@ void ModuleGame::PrintEndScreen()
 {
 	int centerX = GetScreenWidth() / 2;
 	int centerY = GetScreenHeight() / 2;
-	App->renderer->DrawTextCentered(TextFormat("Position: %d", car->currentPosition), centerX, centerY - 50, fontTitle, 5, YELLOW);
-	App->renderer->DrawTextCentered(TextFormat("Race time: %02.02f s", raceTime), centerX, centerY, fontSubtitle, 5, YELLOW);
-	App->renderer->DrawTextCentered(TextFormat("Best lap time: %02.02f s", bestLapTime), centerX, centerY + 30, fontSubtitle, 5, YELLOW);
-	App->renderer->DrawTextCentered("Press [R] to restart", centerX, centerY + 100, fontSubtitle, 5, YELLOW);
+	App->renderer->rDrawTextCentered(TextFormat("Position: %d", car->currentPosition), centerX, centerY - 50, fontTitle, 5, YELLOW);
+	App->renderer->rDrawTextCentered(TextFormat("Race time: %02.02f s", raceTime), centerX, centerY, fontSubtitle, 5, YELLOW);
+	App->renderer->rDrawTextCentered(TextFormat("Best lap time: %02.02f s", bestLapTime), centerX, centerY + 30, fontSubtitle, 5, YELLOW);
+	App->renderer->rDrawTextCentered("Press [R] to restart", centerX, centerY + 100, fontSubtitle, 5, YELLOW);
 }
 
 void ModuleGame::Restart()
@@ -336,6 +336,7 @@ update_status ModuleGame::Update(float dt)
 {
 	if (gameStarted)
 	{
+		if (IsKeyPressed(KEY_C)) App->renderer->cameraRotationActive = !App->renderer->cameraRotationActive;
 		if (IsKeyPressed(KEY_F1)) {
 			if (mouseJoint) DestroyMouseJoint();
 			else CreateMouseJoint();

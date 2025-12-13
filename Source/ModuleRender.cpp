@@ -25,12 +25,6 @@ bool ModuleRender::Init()
 // PreUpdate: clear buffer
 update_status ModuleRender::PreUpdate()
 {
-	return UPDATE_CONTINUE;
-}
-
-// Update: debug camera
-update_status ModuleRender::Update()
-{
     ClearBackground(background);
 
     AdjustCamera();
@@ -39,7 +33,15 @@ update_status ModuleRender::Update()
     // maximum performance, all consecutive Draw() calls are
     // not processed until EndDrawing() is called
     BeginDrawing();
-    BeginMode2D(camera);
+    if (cameraTarget) BeginMode2D(camera);
+
+	return UPDATE_CONTINUE;
+}
+
+// Update: debug camera
+update_status ModuleRender::Update()
+{
+    
 
 	return UPDATE_CONTINUE;
 }
@@ -49,7 +51,10 @@ update_status ModuleRender::PostUpdate()
 {
     // Draw everything in our batch!
 
-    EndMode2D();
+    if (cameraTarget) EndMode2D();
+
+    for (auto& f : uiCalls) f();
+    uiCalls.clear();
 
     EndDrawing();
 
@@ -82,16 +87,29 @@ void ModuleRender::SetCameraTarget(PhysicEntity* target)
     camera.zoom = 1.f;
 }
 
+static float LerpAngle(float from, float to, float t)
+{
+    float delta = fmodf(to - from + 180.0f, 360.0f) - 180.0f;
+    return from + delta * t;
+}
+
 void ModuleRender::AdjustCamera()
 {
     if (!cameraTarget) return;
     int x, y;
     cameraTarget->body->GetPhysicPosition(x, y);
-    Vector2 pos = Vector2();
-    pos.x = x;
-    pos.y = y;
-    camera.target = pos;
-    camera.rotation = cameraTarget->body->GetRotation();
+    camera.target = { (float)x, (float)y };
+    if (cameraRotationActive) {
+        float targetRot = cameraTarget->body->GetRotation() * RAD2DEG;
+
+        float smooth = 0.05f;
+
+        cameraRotation = LerpAngle(cameraRotation, targetRot, smooth);
+        camera.rotation = -cameraRotation;
+    }
+    else {
+        camera.rotation = 0.f;
+    }
 }
 
 void ModuleRender::SetBackgroundColor(Color color)
@@ -131,7 +149,19 @@ bool ModuleRender::rDrawTexturePro(Texture2D texture, Rectangle source, Rectangl
     return ret;
 }
 
-bool ModuleRender::DrawText(const char * text, int x, int y, Font font, int spacing, Color tint) const
+void ModuleRender::rDrawText(const char * text, int x, int y, Font font, int spacing, Color tint)
+{
+    std::string textCopy = text;
+    uiCalls.push_back([=]() { DrawText(textCopy.c_str(), x, y, font, spacing, tint); });
+}
+
+void ModuleRender::rDrawTextCentered(const char* text, int centerX, int centerY, Font font, int spacing, Color tint)
+{
+    std::string textCopy = text;
+    uiCalls.push_back([=]() { DrawTextCentered(textCopy.c_str(), centerX, centerY, font, spacing, tint); });
+}
+
+bool ModuleRender::DrawText(const char* text, int x, int y, Font font, int spacing, Color tint) const
 {
     bool ret = true;
 
