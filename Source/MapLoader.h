@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "Checkpoint.h"
 #include "SlowZone.h"
+#include "BoostZone.h"
 #include "Finishline.h"
 #include "PhysicEntity.h"
 #include "Transform2D.h"
@@ -18,6 +19,7 @@ public:
 	std::vector<Checkpoint*> checkpoints;
 	std::vector<PhysicEntity*> obstacles;
 	std::vector<SlowZone*> slowZones;
+	std::vector<BoostZone*> boostZones;
 	std::vector<std::pair<Transform2D, int>> startPositions;
 	Finishline* finishline = nullptr;
 };
@@ -41,8 +43,8 @@ public:
 			};
 			points = p;
 			size = 6;
-			mapImg = "Assets/Maps/Road/road.png";
-			mapTmx = "Assets/Maps/Road/road.tmx";
+			mapImg = "Assets/Maps/Road/MapRacing1.png";
+			mapTmx = "Assets/Maps/Road/Map1.tmx";
 			boxTex = "Assets/Maps/Road/boxObstacle.png";
 			circleTex = "Assets/Maps/Road/circleObstacle.png";
 		}
@@ -63,6 +65,7 @@ public:
 		for (auto& c : data.checkpoints) map->addCheckPoint(c);
 		for (auto& o : data.obstacles) map->addObstacle(o);
 		for (auto& z : data.slowZones) map->addSlowZone(z);
+		for (auto& b : data.boostZones) map->addBoostZone(b);
 		map->addFinishLine(data.finishline);
 		return map;
 	}
@@ -112,6 +115,12 @@ public:
 					float scale = objectNode.child("properties").child("property").attribute("value").as_float();
 					SlowZone* z = new SlowZone(app, newX, newY, width, height, rot, listener, scale);
 					data.slowZones.push_back(z);
+				}
+				else if (name == "BoostZones")
+				{
+					float impulse = objectNode.child("properties").child("property").attribute("value").as_float();
+					BoostZone* b = new BoostZone(app, newX, newY, width, height, rot, listener, impulse);
+					data.boostZones.push_back(b);
 				}
 				else if (name == "Obstacles")
 				{

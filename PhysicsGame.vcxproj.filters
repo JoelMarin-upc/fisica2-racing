@@ -99,6 +99,9 @@
     <ClInclude Include="Source\MapLoader.h">
       <Filter>Headers\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="BoostZone.h">
+      <Filter>Headers\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers">

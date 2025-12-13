@@ -309,6 +309,11 @@ void ModuleGame::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 		if (z->body == bodyB) entityB = z;
 	}
 
+	for (auto& b : map->boostZones) {
+		if (b->body == bodyA) entityA = b;
+		if (b->body == bodyB) entityB = b;
+	}
+
 	if (entityA/* && entityB*/) {
 		entityA->OnCollision(entityB);
 		//entityB->OnCollision(entityA);
@@ -344,6 +349,11 @@ void ModuleGame::OnCollisionEnd(PhysBody* bodyA, PhysBody* bodyB)
 	for (auto& z : map->slowZones) {
 		if (z->body == bodyA) entityA = z;
 		if (z->body == bodyB) entityB = z;
+	}
+
+	for (auto& b : map->boostZones) {
+		if (b->body == bodyA) entityA = b;
+		if (b->body == bodyB) entityB = b;
 	}
 
 	if (entityA/* && entityB*/) {

@@ -4,6 +4,7 @@
 #include "Chain.h"
 #include "Checkpoint.h"
 #include "SlowZone.h"
+#include "BoostZone.h"
 #include "Finishline.h"
 #include "PhysicEntity.h"
 #include "ModulePhysics.h"
@@ -59,6 +60,10 @@ public:
 		slowZones.push_back(z);
 	}
 
+	void addBoostZone(BoostZone* b) {
+		boostZones.push_back(b);
+	}
+
 	void addFinishLine(Finishline* f) {
 		finishline = f;
 		f->requiredCheckpoint = getLastCheckpointOrder();
@@ -88,6 +93,12 @@ public:
 			z = nullptr;
 		}
 		slowZones.clear();
+		for (auto& b : boostZones)
+		{
+			delete b;
+			b = nullptr;
+		}
+		boostZones.clear();
 		delete finishline;
 		finishline = nullptr;
 		auto pbody = body->body;
@@ -98,6 +109,7 @@ public:
 	std::vector<PhysicEntity*> obstacles;
 	std::vector<Checkpoint*> checkpoints;
 	std::vector<BoxSensor*> slowZones;
+	std::vector<BoostZone*> boostZones;
 	Finishline* finishline;
 	
 };
