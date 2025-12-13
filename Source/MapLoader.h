@@ -118,7 +118,14 @@ public:
 				}
 				else if (name == "BoostZones")
 				{
-					float impulse = objectNode.child("properties").child("property").attribute("value").as_float();
+					float impulse = 0.0f;
+					for (pugi::xml_node propNode = objectNode.child("properties").child("property"); propNode != NULL; propNode = propNode.next_sibling("property")) {
+						std::string propName = propNode.attribute("name").as_string();
+						if (propName == "impulse") {
+							impulse = propNode.attribute("value").as_float();
+							break;
+						}
+					}
 					BoostZone* b = new BoostZone(app, newX, newY, width, height, rot, listener, impulse);
 					data.boostZones.push_back(b);
 				}
