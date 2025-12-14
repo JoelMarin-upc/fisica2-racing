@@ -72,6 +72,7 @@ bool ModuleRender::CleanUp()
 void ModuleRender::SetCameraTarget(PhysicEntity* target)
 {
     cameraTarget = target;
+    if (!cameraTarget) return;
     camera = { 0 };
     int x, y;
     cameraTarget->body->GetPhysicPosition(x, y);

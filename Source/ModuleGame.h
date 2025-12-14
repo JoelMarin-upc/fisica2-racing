@@ -41,7 +41,6 @@ private:
 	void PerformCountdown();
 	void StartRace();
 	void GetInput();
-	void AdjustCamera();
 	void CalculatePositions();
 	void CreateMouseJoint();
 	void DestroyMouseJoint();

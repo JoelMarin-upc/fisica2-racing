@@ -97,14 +97,6 @@ void ModuleGame::GetInput()
 	if (IsKeyPressed(KEY_SPACE)) nitroInput = true;
 }
 
-void ModuleGame::AdjustCamera()
-{
-	/*int x, y;
-	car->body->GetPhysicPosition(x, y);
-	App->renderer->camera.x = -x + GetScreenWidth() / 2.f;
-	App->renderer->camera.y = -y + GetScreenHeight() / 2.f;*/
-}
-
 void ModuleGame::CalculatePositions()
 {
 	for (auto& c : cars) {
@@ -130,7 +122,9 @@ void ModuleGame::CreateMouseJoint()
 {
 	bool jointDone = false;
 	Vector2 mouse = GetMousePosition();
-	b2Vec2 mouseb2 = { mouse.x - App->renderer->camera.target.x, mouse.y - App->renderer->camera.target.y };
+	//b2Vec2 mouseb2 = { mouse.x - App->renderer->camera.target.x, mouse.y - App->renderer->camera.target.y };
+	Vector2 mouseWorld = GetScreenToWorld2D(mouse, App->renderer->camera);
+	b2Vec2 mouseb2 = { mouseWorld.x, mouseWorld.y };
 	for (auto& c : cars) {
 		if (c->TestPoint(mouseb2)) {
 			mouseJoint = App->physics->CreateMouseJoint(c->body->body, mouseb2);
@@ -150,9 +144,11 @@ void ModuleGame::UpdateMouseJoint()
 {
 	if (mouseJoint) {
 		Vector2 mouse = GetMousePosition();
-		float x = mouse.x - App->renderer->camera.target.x;
+		/*float x = mouse.x - App->renderer->camera.target.x;
 		float y = mouse.y - App->renderer->camera.target.y;
-		b2Vec2 mouseb2 = { PIXEL_TO_METERS(x), PIXEL_TO_METERS(y) };
+		b2Vec2 mouseb2 = { PIXEL_TO_METERS(x), PIXEL_TO_METERS(y) };*/
+		Vector2 mouseWorld = GetScreenToWorld2D(mouse, App->renderer->camera);
+		b2Vec2 mouseb2 = { PIXEL_TO_METERS(mouseWorld.x), PIXEL_TO_METERS(mouseWorld.y) };
 		mouseJoint->SetTarget(mouseb2);
 		App->renderer->rDrawLine(METERS_TO_PIXELS(mouseb2.x),
 			METERS_TO_PIXELS(mouseb2.y),
@@ -307,6 +303,10 @@ void ModuleGame::PrintEndScreen()
 
 void ModuleGame::Restart()
 {
+	if (mouseJoint) DestroyMouseJoint();
+	
+	App->renderer->SetCameraTarget(nullptr);
+
 	for (auto& c : cars) {
 		delete c;
 		c = nullptr;
@@ -324,9 +324,6 @@ void ModuleGame::Restart()
 	raceEnded = false;
 	raceActive = false;
 	countdownStarted = false;
-
-	LoadMap();
-	AddCars();
 }
 
 update_status ModuleGame::Update(float dt)
@@ -349,7 +346,6 @@ update_status ModuleGame::Update(float dt)
 
 		for (Car* c : cars) c->Update(dt);
 
-		AdjustCamera();
 		UpdateMouseJoint();
 
 		if (raceEnded) {
@@ -376,6 +372,8 @@ update_status ModuleGame::Update(float dt)
 
 void ModuleGame::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 {
+	if (!gameStarted) return;
+
 	PhysicEntity* entityA = nullptr;
 	PhysicEntity* entityB = nullptr;
 
@@ -425,6 +423,8 @@ void ModuleGame::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 
 void ModuleGame::OnCollisionEnd(PhysBody* bodyA, PhysBody* bodyB)
 {
+	if (!gameStarted) return;
+
 	PhysicEntity* entityA = nullptr;
 	PhysicEntity* entityB = nullptr;
 
