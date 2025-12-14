@@ -79,6 +79,9 @@ private:
 
 	const int totalCars = 4;
 
+	int countdownFX;
+	int startFX;
+
 	//std::vector<PhysicEntity*> entities;
 	std::vector<Car*> cars;
 	Car* car; // should be in cars list

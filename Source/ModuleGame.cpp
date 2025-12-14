@@ -27,6 +27,10 @@ bool ModuleGame::Start()
 	fontText = LoadFontEx(fontPath, 30, nullptr, 0);
 	fontSmall = LoadFontEx(fontPath, 20, nullptr, 0);
 
+	//sounds
+	countdownFX = App->audio->LoadFx("Assets/Sounds/FX/countdown.wav");
+	startFX = App->audio->LoadFx("Assets/Sounds/FX/start.wav");
+
 	App->audio->PlayMusic("Assets/Sounds/Music/GlooGloo.wav");
 
 	LoadMap();
@@ -71,13 +75,21 @@ void ModuleGame::PerformCountdown()
 	{
 		countdownTimer.Start();
 		countdownStarted = true;
+		App->audio->PlayFx(countdownFX);
+
 	}
 	int currentNumber = 3 - floor(countdownTimer.ReadSec());
 	std::string countdownText = "";
-	if (currentNumber == 0) countdownText = "Start";
-	else if (currentNumber == -1) StartRace();
+	if (currentNumber == 0) {
+		countdownText = "Start";
+	}
+	else if (currentNumber == -1) { 
+		StartRace(); 
+		App->audio->PlayFx(startFX);
+	}
 	else countdownText = std::to_string(currentNumber);
 	App->renderer->DrawTextCentered(countdownText.c_str(), GetScreenWidth() / 2, GetScreenHeight() / 2, fontTitle, 5, YELLOW);
+
 }
 
 void ModuleGame::StartRace()
