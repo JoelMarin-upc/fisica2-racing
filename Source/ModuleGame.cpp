@@ -104,7 +104,7 @@ void ModuleGame::GetInput()
 	nitroInput = false;
 	if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) movementInput->x = 2;
 	if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) movementInput->x = -2;
-	if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) movementInput->y = -1;
+	if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) movementInput->y = -1.3;
 	if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) movementInput->y = 1;
 	if (IsKeyPressed(KEY_SPACE)) nitroInput = true;
 }
@@ -290,6 +290,9 @@ void ModuleGame::PrintMenu()
 	int screenCenterX = GetScreenWidth() / 2;
 	int screenCenterY = GetScreenHeight() / 2;
 
+	
+	
+
 	App->renderer->rDrawTextCentered(TextFormat("Map: < %s >", mapName.c_str()), screenCenterX, screenCenterY - 45, fontText, 5, menuOption == 1 ? selected : unselected);
 	App->renderer->rDrawTextCentered(TextFormat("Difficulty: < %s >", diffName.c_str()), screenCenterX, screenCenterY - 15, fontText, 5, menuOption == 2 ? selected : unselected);
 	App->renderer->rDrawTextCentered(TextFormat("Laps: < %i >", totalLaps), screenCenterX, screenCenterY + 15, fontText, 5, menuOption == 3 ? selected : unselected);
@@ -318,6 +321,15 @@ void ModuleGame::PrintEndScreen()
 {
 	int centerX = GetScreenWidth() / 2;
 	int centerY = GetScreenHeight() / 2;
+
+	if (car->currentPosition == 1) {
+		App->renderer->DrawTextCentered("Well played. Another Game?", centerX, centerY + 50, fontSubtitle, 5, YELLOW);
+		App->audio->PlayFx(winFX);
+	}
+	if (car->currentPosition >= 2) {
+		App->renderer->DrawTextCentered("More luck next time...", centerX, centerY + 50, fontSubtitle, 5, YELLOW);
+		App->audio->PlayFx(looseFX);
+	}
 	
 	App->renderer->rDrawTextCentered(TextFormat("Position: %d", car->currentPosition), centerX, centerY - 50, fontTitle, 5, YELLOW);
 	App->renderer->rDrawTextCentered(TextFormat("Race time: %02.02f s", raceTime), centerX, centerY, fontSubtitle, 5, YELLOW);
@@ -373,18 +385,7 @@ update_status ModuleGame::Update(float dt)
 		UpdateMouseJoint();
 
 		if (raceEnded) {
-			int centerX = GetScreenWidth() / 2;
-			int centerY = GetScreenHeight() / 2;
-
 			PrintEndScreen();
-			if (car->currentPosition == 1) {
-				App->renderer->DrawTextCentered("Well played. Another Game?", centerX, centerY + 50, fontSubtitle, 5, YELLOW);
-				App->audio->PlayFx(winFX);
-			}
-			if(car->currentPosition >= 2) {
-				App->renderer->DrawTextCentered("More luck next time...", centerX, centerY + 50, fontSubtitle, 5, YELLOW);
-				App->audio->PlayFx(looseFX);
-			}
 			if (IsKeyPressed(KEY_R)) Restart();
 		}
 		else
