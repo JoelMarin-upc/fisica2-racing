@@ -27,18 +27,6 @@ bool ModuleGame::Start()
 	fontText = LoadFontEx(fontPath, 30, nullptr, 0);
 	fontSmall = LoadFontEx(fontPath, 20, nullptr, 0);
 
-	//sounds
-	countdownFX = App->audio->LoadFx("Assets/Sounds/FX/countdown.wav");
-	startFX = App->audio->LoadFx("Assets/Sounds/FX/start.wav");
-
-	App->audio->PlayMusic("Assets/Sounds/Music/GlooGloo.wav");
-
-	LoadMap();
-	AddCars();
-	/*car = new Car(App, 30, 500, 0, this, LoadTexture("Assets/car1.png"), 1, true);
-	cars.push_back(car);
-	cars.push_back(new Car(App, 100, 500, 0, this, LoadTexture("Assets/car1.png"), 2, false));*/
-
 	return ret;
 }
 
@@ -52,19 +40,20 @@ bool ModuleGame::CleanUp()
 void ModuleGame::LoadMap()
 {
 	// adds circuit, checkpoints and finishline
-	map = MapLoader::LoadMap(1, App, this);
+	map = MapLoader::LoadMap(mapNumber, App, this);
 }
 
 void ModuleGame::AddCars()
 {
-	for (int i = 0; i < totalCars - 1; i++)
+	for (int i = 0; i < map->totalCars - 1; i++)
 	{
 		Transform2D t = map->playerStartPositions[i];
-		const std::string tex = "Assets/Cars/car" + std::to_string(i + 1) + ".png";
-		cars.push_back(new Car(App, t.position.x, t.position.y, t.rotation, this, LoadTexture(tex.c_str()), i + 1, false));
+		const std::string tex = map->carsBasePath + "car" + std::to_string(i + 1) + ".png";
+		cars.push_back(new Car(App, t.position.x, t.position.y, t.rotation, this, LoadTexture(tex.c_str()), i + 1, false, difficulty));
 	}
-	Transform2D playerTransform = map->playerStartPositions[totalCars-1];
-	car = new Car(App, playerTransform.position.x, playerTransform.position.y, playerTransform.rotation, this, LoadTexture("Assets/Cars/carPlayer.png"), totalCars, true);
+	Transform2D playerTransform = map->playerStartPositions[map->totalCars-1];
+	const std::string playerTex = map->carsBasePath + "carPlayer.png";
+	car = new Car(App, playerTransform.position.x, playerTransform.position.y, playerTransform.rotation, this, LoadTexture(playerTex.c_str()), map->totalCars, true);
 	cars.push_back(car);
 }
 
@@ -75,21 +64,13 @@ void ModuleGame::PerformCountdown()
 	{
 		countdownTimer.Start();
 		countdownStarted = true;
-		App->audio->PlayFx(countdownFX);
-
 	}
 	int currentNumber = 3 - floor(countdownTimer.ReadSec());
 	std::string countdownText = "";
-	if (currentNumber == 0) {
-		countdownText = "Start";
-	}
-	else if (currentNumber == -1) { 
-		StartRace(); 
-		App->audio->PlayFx(startFX);
-	}
+	if (currentNumber == 0) countdownText = "Start";
+	else if (currentNumber == -1) StartRace();
 	else countdownText = std::to_string(currentNumber);
-	App->renderer->DrawTextCentered(countdownText.c_str(), GetScreenWidth() / 2, GetScreenHeight() / 2, fontTitle, 5, YELLOW);
-
+	App->renderer->rDrawTextCentered(countdownText.c_str(), GetScreenWidth() / 2, GetScreenHeight() / 2, fontTitle, 5, YELLOW);
 }
 
 void ModuleGame::StartRace()
@@ -109,24 +90,19 @@ void ModuleGame::GetInput()
 {
 	movementInput = new Vector2();
 	nitroInput = false;
-	if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) movementInput->x = 1;
-	if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) movementInput->x = -1;
-	if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) movementInput->y = -1;
-	if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) movementInput->y = 1;
+	if (IsKeyDown(KEY_RIGHT)) movementInput->x = 1;
+	if (IsKeyDown(KEY_LEFT)) movementInput->x = -1;
+	if (IsKeyDown(KEY_UP)) movementInput->y = -1;
+	if (IsKeyDown(KEY_DOWN)) movementInput->y = 1;
 	if (IsKeyPressed(KEY_SPACE)) nitroInput = true;
-}
-
-void ModuleGame::Nitro() {
-
 }
 
 void ModuleGame::AdjustCamera()
 {
-	int x, y;
+	/*int x, y;
 	car->body->GetPhysicPosition(x, y);
 	App->renderer->camera.x = -x + GetScreenWidth() / 2.f;
-	App->renderer->camera.y = -y + GetScreenHeight() / 2.f;
-	//car->body->GetRotation();
+	App->renderer->camera.y = -y + GetScreenHeight() / 2.f;*/
 }
 
 void ModuleGame::CalculatePositions()
@@ -154,7 +130,7 @@ void ModuleGame::CreateMouseJoint()
 {
 	bool jointDone = false;
 	Vector2 mouse = GetMousePosition();
-	b2Vec2 mouseb2 = { mouse.x - App->renderer->camera.x, mouse.y - App->renderer->camera.y };
+	b2Vec2 mouseb2 = { mouse.x - App->renderer->camera.target.x, mouse.y - App->renderer->camera.target.y };
 	for (auto& c : cars) {
 		if (c->TestPoint(mouseb2)) {
 			mouseJoint = App->physics->CreateMouseJoint(c->body->body, mouseb2);
@@ -174,8 +150,8 @@ void ModuleGame::UpdateMouseJoint()
 {
 	if (mouseJoint) {
 		Vector2 mouse = GetMousePosition();
-		float x = mouse.x - App->renderer->camera.x;
-		float y = mouse.y - App->renderer->camera.y;
+		float x = mouse.x - App->renderer->camera.target.x;
+		float y = mouse.y - App->renderer->camera.target.y;
 		b2Vec2 mouseb2 = { PIXEL_TO_METERS(x), PIXEL_TO_METERS(y) };
 		mouseJoint->SetTarget(mouseb2);
 		App->renderer->rDrawLine(METERS_TO_PIXELS(mouseb2.x),
@@ -208,21 +184,114 @@ void ModuleGame::RunTimer()
 	if (car->currentLap > 0) lapTime = lapTimer.ReadSec();
 }
 
+void ModuleGame::GetMenuInput()
+{
+	if (IsKeyPressed(KEY_DOWN))
+	{
+		menuOption++;
+		if (menuOption > 3) menuOption = 1;
+	}
+	if (IsKeyPressed(KEY_UP))
+	{
+		menuOption--;
+		if (menuOption < 1) menuOption = 3;
+	}
+	if (IsKeyPressed(KEY_LEFT))
+	{
+		if (menuOption == 1)
+		{
+			mapNumber--;
+			if (mapNumber < 1) mapNumber = 2;
+		}
+		if (menuOption == 2)
+		{
+			difficulty--;
+			if (difficulty < 1) difficulty = 3;
+		}
+	}
+	if (IsKeyPressed(KEY_RIGHT))
+	{
+		if (menuOption == 1)
+		{
+			mapNumber++;
+			if (mapNumber > 2) mapNumber = 1;
+		}
+		if (menuOption == 2)
+		{
+			difficulty++;
+			if (difficulty > 3) difficulty = 1;
+		}
+	}
+	if (IsKeyPressed(KEY_ENTER))
+	{
+		if (menuOption == 3)
+		{
+			gameStarted = true;
+			LoadMap();
+			AddCars();
+			App->renderer->SetCameraTarget(car);
+		}
+	}
+}
+
+void ModuleGame::PrintMenu()
+{
+	Color selected = RED;
+	Color unselected = BLUE;
+	
+	std::string mapName;
+	switch (mapNumber)
+	{
+	case 1:
+		mapName = "River";
+		break;
+	case 2:
+		mapName = "Road";
+		break;
+	default:
+		mapName = "None";
+		break;
+	}
+	std::string diffName;
+	switch (difficulty)
+	{
+	case 1:
+		diffName = "Easy";
+		break;
+	case 2:
+		diffName = "Medium";
+		break;
+	case 3:
+		diffName = "Hard";
+		break;
+	default:
+		diffName = "None";
+		break;
+	}
+	
+	int screenCenterX = GetScreenWidth() / 2;
+	int screenCenterY = GetScreenHeight() / 2;
+
+	App->renderer->rDrawTextCentered(TextFormat("Map: < %s >", mapName.c_str()), screenCenterX, screenCenterY - 30, fontText, 5, menuOption == 1 ? selected : unselected);
+	App->renderer->rDrawTextCentered(TextFormat("Difficulty: < %s >", diffName.c_str()), screenCenterX, screenCenterY, fontText, 5, menuOption == 2 ? selected : unselected);
+	App->renderer->rDrawTextCentered("Start game", screenCenterX, screenCenterY + 30, fontSubtitle, 5, menuOption == 3 ? selected : unselected);
+}
+
 void ModuleGame::PrintInfo()
 {
-	App->renderer->DrawText(TextFormat("Last checkpoint: %d", car->currentCheckpointNum), 10, 30, fontText, 5, RED);
-	App->renderer->DrawText(TextFormat("Laps: %d", car->currentLap), 10, 50, fontText, 5, RED);
-	App->renderer->DrawText(TextFormat("Position: %d", car->currentPosition), 10, 70, fontText, 5, RED);
-	App->renderer->DrawText(TextFormat("Lap time: %02.02f s", lapTime), 10, 90, fontText, 5, RED);
-	App->renderer->DrawText(TextFormat("Total time: %02.02f s", raceTime), 10, 110, fontText, 5, RED);
-	App->renderer->DrawText(TextFormat("Avaliable nitros: %d", car->availableNitros), 10, 130, fontText, 5, RED);
+	//App->renderer->DrawText(TextFormat("Last checkpoint: %d", car->currentCheckpointNum), 10, 30, fontText, 5, RED);
+	App->renderer->rDrawText(TextFormat("Laps: %d", car->currentLap), 10, 50, fontText, 5, RED);
+	App->renderer->rDrawText(TextFormat("Position: %d", car->currentPosition), 10, 70, fontText, 5, RED);
+	App->renderer->rDrawText(TextFormat("Lap time: %02.02f s", lapTime), 10, 90, fontText, 5, RED);
+	App->renderer->rDrawText(TextFormat("Total time: %02.02f s", raceTime), 10, 110, fontText, 5, RED);
+	App->renderer->rDrawText(TextFormat("Avaliable nitros: %d", car->availableNitros), 10, 130, fontText, 5, RED);
 	for (int i = 0; i < cars.size(); i++)
 	{
 		Car* c = cars[i];
 		const char* text;
 		if (c->isHumanControlled) text = TextFormat("Position %d -> PLAYER", c->currentPosition, c->carNum);
 		else text = TextFormat("Position %d -> CAR %d", c->currentPosition, c->carNum);
-		App->renderer->DrawText(text, 10, 160 + 15 * (i + 1), fontSmall, 5, RED);
+		App->renderer->rDrawText(text, 10, 160 + 15 * (i + 1), fontSmall, 5, RED);
 	}
 }
 
@@ -230,10 +299,10 @@ void ModuleGame::PrintEndScreen()
 {
 	int centerX = GetScreenWidth() / 2;
 	int centerY = GetScreenHeight() / 2;
-	App->renderer->DrawTextCentered(TextFormat("Position: %d", car->currentPosition), centerX, centerY - 50, fontTitle, 5, YELLOW);
-	App->renderer->DrawTextCentered(TextFormat("Race time: %02.02f s", raceTime), centerX, centerY, fontSubtitle, 5, YELLOW);
-	App->renderer->DrawTextCentered(TextFormat("Best lap time: %02.02f s", bestLapTime), centerX, centerY + 30, fontSubtitle, 5, YELLOW);
-	App->renderer->DrawTextCentered("Press [R] to restart", centerX, centerY + 100, fontSubtitle, 5, YELLOW);
+	App->renderer->rDrawTextCentered(TextFormat("Position: %d", car->currentPosition), centerX, centerY - 50, fontTitle, 5, YELLOW);
+	App->renderer->rDrawTextCentered(TextFormat("Race time: %02.02f s", raceTime), centerX, centerY, fontSubtitle, 5, YELLOW);
+	App->renderer->rDrawTextCentered(TextFormat("Best lap time: %02.02f s", bestLapTime), centerX, centerY + 30, fontSubtitle, 5, YELLOW);
+	App->renderer->rDrawTextCentered("Press [R] to restart", centerX, centerY + 100, fontSubtitle, 5, YELLOW);
 }
 
 void ModuleGame::Restart()
@@ -251,6 +320,7 @@ void ModuleGame::Restart()
 	bestLap = 0;
 	raceTime = 0;
 
+	gameStarted = false;
 	raceEnded = false;
 	raceActive = false;
 	countdownStarted = false;
@@ -261,67 +331,43 @@ void ModuleGame::Restart()
 
 update_status ModuleGame::Update(float dt)
 {
-	if (IsKeyPressed(KEY_F1)) {
-		if (mouseJoint) DestroyMouseJoint();
-		else CreateMouseJoint();
-	}
-
-	if (raceActive && !raceEnded)
+	if (gameStarted)
 	{
-		GetInput();
-		RunTimer();
-	}
-
-	if (sprinting)
-	{
-		currentTime += dt;
-
-		// Dirección hacia delante del coche
-		b2Vec2 forward = car->body->GetWorldVector({ 0, -1 });
-
-		car->body->ApplyForce(
-			forward.x * nitroForce,
-			forward.y * nitroForce
-		);
-
-		if (currentTime >= maxTime)
-		{
-			sprinting = false;
-			sprinted = true;
+		if (IsKeyPressed(KEY_C)) App->renderer->cameraRotationActive = !App->renderer->cameraRotationActive;
+		if (IsKeyPressed(KEY_F1)) {
+			if (mouseJoint) DestroyMouseJoint();
+			else CreateMouseJoint();
 		}
-	}
 
-	if (sprinted) 
-	{
-		currentTime = 0;
-		currentTime += dt;
-
-		if (currentTime >= nitroReuseTime)
+		if (raceActive && !raceEnded)
 		{
-			car->availableNitros++;
+			GetInput();
+			RunTimer();
 		}
+
+		map->Update(dt);
+
+		for (Car* c : cars) c->Update(dt);
+
+		AdjustCamera();
+		UpdateMouseJoint();
+
+		if (raceEnded) {
+			PrintEndScreen();
+			if (IsKeyPressed(KEY_R)) Restart();
+		}
+		else
+		{
+			CalculatePositions();
+			PrintInfo();
+		}
+
+		if (gameStarted && !raceActive && !raceEnded) PerformCountdown();
 	}
-
-
-
-	map->Update(dt);
-
-	for (Car* c : cars) c->Update(dt);
-
-	AdjustCamera();
-	UpdateMouseJoint();
-	
-	if (raceEnded) {
-		PrintEndScreen();
-		if (IsKeyPressed(KEY_R)) Restart();
+	else {
+		GetMenuInput();
+		PrintMenu();
 	}
-	else
-	{
-		CalculatePositions();
-		PrintInfo();
-	}
-
-	if (!raceActive && !raceEnded) PerformCountdown();
 
 	//for (PhysicEntity* entity : entities) entity->Update(dt);
 
@@ -340,6 +386,18 @@ void ModuleGame::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 
 	if (map->body == bodyA) entityA = map;
 	if (map->body == bodyB) entityB = map;
+
+	if (map->boundsIn->body == bodyA) entityA = map;
+	if (map->boundsIn->body == bodyB) entityB = map;
+
+	if (map->boundsOut->body == bodyA) entityA = map;
+	if (map->boundsOut->body == bodyB) entityB = map;
+
+	if (map->navigationLayerIn->body == bodyA) entityA = map;
+	if (map->navigationLayerIn->body == bodyB) entityB = map;
+
+	if (map->navigationLayerOut->body == bodyA) entityA = map;
+	if (map->navigationLayerOut->body == bodyB) entityB = map;
 
 	if (map->finishline->body == bodyA) entityA = map->finishline;
 	if (map->finishline->body == bodyB) entityB = map->finishline;
@@ -377,6 +435,18 @@ void ModuleGame::OnCollisionEnd(PhysBody* bodyA, PhysBody* bodyB)
 
 	if (map->body == bodyA) entityA = map;
 	if (map->body == bodyB) entityB = map;
+
+	if (map->boundsIn->body == bodyA) entityA = map;
+	if (map->boundsIn->body == bodyB) entityB = map;
+
+	if (map->boundsOut->body == bodyA) entityA = map;
+	if (map->boundsOut->body == bodyB) entityB = map;
+
+	if (map->navigationLayerIn->body == bodyA) entityA = map;
+	if (map->navigationLayerIn->body == bodyB) entityB = map;
+
+	if (map->navigationLayerOut->body == bodyA) entityA = map;
+	if (map->navigationLayerOut->body == bodyB) entityB = map;
 
 	if (map->finishline->body == bodyA) entityA = map->finishline;
 	if (map->finishline->body == bodyB) entityB = map->finishline;

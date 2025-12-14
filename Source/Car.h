@@ -9,7 +9,7 @@ class ModuleGame;
 class Car : public Box
 {
 public:
-	Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman);
+	Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman, int _difficulty = 1);
 
 	~Car();
 
@@ -53,9 +53,9 @@ public:
 	bool isOverHeated;
 
 private:
-	const float engineForce = 10.f;
-	const float steerStrength = 6.f;
-	const float nitroMultiplier = 3.f;
+	const float engineForce = 5.f;
+	const float steerStrength = 2.5f;
+	const float nitroMultiplier = 2.f;
 	
 	Vector2* targetDirection;
 	bool active;
@@ -73,6 +73,5 @@ private:
 
 	const float warmingVelocityThreshold = 9;
 
-	int sprintFX;
-
+	int difficulty = 1;
 };

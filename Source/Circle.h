@@ -2,6 +2,7 @@
 
 #include "PhysicEntity.h"
 #include "ModulePhysics.h"
+#include "ModuleRender.h"
 
 class Circle : public PhysicEntity
 {
@@ -11,6 +12,11 @@ public:
 		, texture(_texture)
 	{
 		body->type = type;
+	}
+
+	~Circle() {
+		auto pbody = body->body;
+		physics->DestroyBody(pbody);
 	}
 
 	void Update(float dt) override

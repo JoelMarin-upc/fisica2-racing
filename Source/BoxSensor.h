@@ -12,6 +12,11 @@ public:
 		body->type = type;
 	}
 
+	~BoxSensor() {
+		auto pbody = body->body;
+		physics->DestroyBody(pbody);
+	}
+
 	void Update(float dt) override
 	{
 
