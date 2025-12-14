@@ -185,12 +185,12 @@ void ModuleGame::GetMenuInput()
 	if (IsKeyPressed(KEY_DOWN))
 	{
 		menuOption++;
-		if (menuOption > 3) menuOption = 1;
+		if (menuOption > 4) menuOption = 1;
 	}
 	if (IsKeyPressed(KEY_UP))
 	{
 		menuOption--;
-		if (menuOption < 1) menuOption = 3;
+		if (menuOption < 1) menuOption = 4;
 	}
 	if (IsKeyPressed(KEY_LEFT))
 	{
@@ -203,6 +203,11 @@ void ModuleGame::GetMenuInput()
 		{
 			difficulty--;
 			if (difficulty < 1) difficulty = 3;
+		}
+		if (menuOption == 4)
+		{
+			totalLaps--;
+			if (totalLaps < 1) totalLaps = 5;
 		}
 	}
 	if (IsKeyPressed(KEY_RIGHT))
@@ -217,10 +222,15 @@ void ModuleGame::GetMenuInput()
 			difficulty++;
 			if (difficulty > 3) difficulty = 1;
 		}
-	}
-	if (IsKeyPressed(KEY_ENTER))
-	{
 		if (menuOption == 3)
+		{
+			totalLaps++;
+			if (totalLaps > 5) totalLaps = 1;
+		}
+	}
+	if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE))
+	{
+		if (menuOption == 4)
 		{
 			gameStarted = true;
 			LoadMap();
@@ -268,16 +278,17 @@ void ModuleGame::PrintMenu()
 	int screenCenterX = GetScreenWidth() / 2;
 	int screenCenterY = GetScreenHeight() / 2;
 
-	App->renderer->rDrawTextCentered(TextFormat("Map: < %s >", mapName.c_str()), screenCenterX, screenCenterY - 30, fontText, 5, menuOption == 1 ? selected : unselected);
-	App->renderer->rDrawTextCentered(TextFormat("Difficulty: < %s >", diffName.c_str()), screenCenterX, screenCenterY, fontText, 5, menuOption == 2 ? selected : unselected);
-	App->renderer->rDrawTextCentered("Start game", screenCenterX, screenCenterY + 30, fontSubtitle, 5, menuOption == 3 ? selected : unselected);
+	App->renderer->rDrawTextCentered(TextFormat("Map: < %s >", mapName.c_str()), screenCenterX, screenCenterY - 45, fontText, 5, menuOption == 1 ? selected : unselected);
+	App->renderer->rDrawTextCentered(TextFormat("Difficulty: < %s >", diffName.c_str()), screenCenterX, screenCenterY - 15, fontText, 5, menuOption == 2 ? selected : unselected);
+	App->renderer->rDrawTextCentered(TextFormat("Laps: < %i >", totalLaps), screenCenterX, screenCenterY + 15, fontText, 5, menuOption == 3 ? selected : unselected);
+	App->renderer->rDrawTextCentered("Start game", screenCenterX, screenCenterY + 45, fontSubtitle, 5, menuOption == 4 ? selected : unselected);
 }
 
 void ModuleGame::PrintInfo()
 {
 	//App->renderer->DrawText(TextFormat("Last checkpoint: %d", car->currentCheckpointNum), 10, 30, fontText, 5, RED);
-	App->renderer->rDrawText(TextFormat("Laps: %d", car->currentLap), 10, 50, fontText, 5, RED);
-	App->renderer->rDrawText(TextFormat("Position: %d", car->currentPosition), 10, 70, fontText, 5, RED);
+	App->renderer->rDrawText(TextFormat("Laps: %d/%d", car->currentLap, totalLaps), 10, 50, fontText, 5, RED);
+	App->renderer->rDrawText(TextFormat("Position: %d/%d", car->currentPosition, map->totalCars), 10, 70, fontText, 5, RED);
 	App->renderer->rDrawText(TextFormat("Lap time: %02.02f s", lapTime), 10, 90, fontText, 5, RED);
 	App->renderer->rDrawText(TextFormat("Total time: %02.02f s", raceTime), 10, 110, fontText, 5, RED);
 	App->renderer->rDrawText(TextFormat("Avaliable nitros: %d", car->availableNitros), 10, 130, fontText, 5, RED);

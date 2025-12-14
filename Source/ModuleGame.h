@@ -53,7 +53,7 @@ private:
 	void Restart();
 
 public:
-	const int totalLaps = 3;
+	int totalLaps = 3;
 	Vector2* movementInput;
 	bool nitroInput;
 
