@@ -90,7 +90,7 @@ unsigned int ModuleAudio::LoadFx(const char* path)
 		ret = fx_count;
 	}
 
-	return ret;
+	return ret - 1;
 }
 
 // Play WAV

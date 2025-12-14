@@ -91,5 +91,13 @@ private:
 	int menuOption = 1;
 	int mapNumber = 1;
 	int difficulty = 3;
+
+	int startFX;
+	int countdownFX;
+	int winFX;
+	int looseFX;
+
+	int music;
+
 	
 };

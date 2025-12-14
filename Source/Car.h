@@ -70,6 +70,7 @@ private:
 	bool nitroInput;
 
 	double speedScale = 1;
+	int sprintFX;
 
 	const float warmingVelocityThreshold = 9;
 

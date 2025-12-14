@@ -8,6 +8,9 @@ Car::Car(Application* app, int _x, int _y, float angle, Module* _listener, Textu
 	availableNitros = maxAvailableNitros;
 	body->SetLinearDamping(1.0f);
 	body->SetAngularDamping(2.0f);
+
+	//sounds
+	sprintFX = audio->LoadFx("Assets/Sounds/FX/sprint.wav");
 }
 
 Car::~Car()
@@ -182,12 +185,18 @@ void Car::Move(float dt)
 
 void Car::CheckNitro()
 {
-	if (nitroInput && availableNitros > 0 && !nitroActive) {
+
+
+	if (nitroInput && availableNitros > 0 && !nitroActive)
+	{
+		audio->PlayFx(sprintFX);
+
 		nitroActive = true;
 		availableNitros--;
 		nitroTimer.Start();
 	}
-	if (nitroActive && nitroTimer.ReadSec() > nitroTime) {
+	if (nitroActive && nitroTimer.ReadSec() > nitroTime) 
+	{
 		nitroActive = false;
 	}
 }
@@ -230,7 +239,7 @@ void Car::OnCollision(PhysicEntity* other)
 	}
 	if (other->type == FINISHLINE) {
 		if (currentLap != 0 && dynamic_cast<Finishline*>(other)->requiredCheckpoint != currentCheckpointNum) return;
-		if (currentLap + 1 > game->totalLaps) game->EndRace();
+		if (currentLap + 1 > game->totalLaps && isHumanControlled) game->EndRace();
 		game->MarkLap(currentLap);
 		currentLap++;
 		currentCheckpointNum = 0;
