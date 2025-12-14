@@ -88,7 +88,7 @@ void Car::AI()
 
     // avoiding obstacles
 
-    float obstacleSteerX = 0.0f;
+    /*float obstacleSteerX = 0.0f;
 
     if (distLeft != -1)
         obstacleSteerX += 1.0f;
@@ -104,11 +104,11 @@ void Car::AI()
             obstacleSteerX += 1.0f;
         else
             obstacleSteerX += 1.0f;
-    }
+    }*/
 
     // combine directions
 
-    float finalSteerX = directionX + obstacleSteerX;
+    float finalSteerX = directionX;// +obstacleSteerX;
     float finalSteerY = directionY;
 
     float mag = sqrt(finalSteerX * finalSteerX + finalSteerY * finalSteerY);

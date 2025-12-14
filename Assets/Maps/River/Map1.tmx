@@ -303,7 +303,7 @@
     <property name="order" type="int" value="13"/>
    </properties>
   </object>
-  <object id="94" x="1441.67" y="429" width="28.6667" height="278">
+  <object id="94" x="1605.31" y="429" width="28.6667" height="278">
    <properties>
     <property name="order" type="int" value="6"/>
    </properties>
