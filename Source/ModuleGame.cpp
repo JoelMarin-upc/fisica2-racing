@@ -27,6 +27,14 @@ bool ModuleGame::Start()
 	fontText = LoadFontEx(fontPath, 30, nullptr, 0);
 	fontSmall = LoadFontEx(fontPath, 20, nullptr, 0);
 
+	//sounds
+	countdownFX = App->audio->LoadFx("Assets/Sounds/FX/countdown.wav");
+	startFX = App->audio->LoadFx("Assets/Sounds/FX/start.wav");
+	looseFX = App->audio->LoadFx("Assets/Sounds/FX/loose.wav");
+	winFX = App->audio->LoadFx("Assets/Sounds/FX/win.wav");
+
+	App->audio->PlayMusic("Assets/Sounds/Music/GlooGloo.wav");
+
 	return ret;
 }
 
@@ -64,10 +72,14 @@ void ModuleGame::PerformCountdown()
 	{
 		countdownTimer.Start();
 		countdownStarted = true;
+		App->audio->PlayFx(countdownFX);
 	}
 	int currentNumber = 3 - floor(countdownTimer.ReadSec());
 	std::string countdownText = "";
-	if (currentNumber == 0) countdownText = "Start";
+	if (currentNumber == 0) {
+		countdownText = "Start";
+		App->audio->PlayFx(startFX);
+	}
 	else if (currentNumber == -1) StartRace();
 	else countdownText = std::to_string(currentNumber);
 	App->renderer->rDrawTextCentered(countdownText.c_str(), GetScreenWidth() / 2, GetScreenHeight() / 2, fontTitle, 5, YELLOW);
@@ -90,10 +102,10 @@ void ModuleGame::GetInput()
 {
 	movementInput = new Vector2();
 	nitroInput = false;
-	if (IsKeyDown(KEY_RIGHT)) movementInput->x = 1;
-	if (IsKeyDown(KEY_LEFT)) movementInput->x = -1;
-	if (IsKeyDown(KEY_UP)) movementInput->y = -1;
-	if (IsKeyDown(KEY_DOWN)) movementInput->y = 1;
+	if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) movementInput->x = 2;
+	if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) movementInput->x = -2;
+	if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) movementInput->y = -1;
+	if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) movementInput->y = 1;
 	if (IsKeyPressed(KEY_SPACE)) nitroInput = true;
 }
 
@@ -186,17 +198,17 @@ void ModuleGame::RunTimer()
 
 void ModuleGame::GetMenuInput()
 {
-	if (IsKeyPressed(KEY_DOWN))
+	if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
 	{
 		menuOption++;
 		if (menuOption > 3) menuOption = 1;
 	}
-	if (IsKeyPressed(KEY_UP))
+	if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
 	{
 		menuOption--;
 		if (menuOption < 1) menuOption = 3;
 	}
-	if (IsKeyPressed(KEY_LEFT))
+	if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A))
 	{
 		if (menuOption == 1)
 		{
@@ -209,7 +221,7 @@ void ModuleGame::GetMenuInput()
 			if (difficulty < 1) difficulty = 3;
 		}
 	}
-	if (IsKeyPressed(KEY_RIGHT))
+	if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D))
 	{
 		if (menuOption == 1)
 		{
@@ -222,7 +234,7 @@ void ModuleGame::GetMenuInput()
 			if (difficulty > 3) difficulty = 1;
 		}
 	}
-	if (IsKeyPressed(KEY_ENTER))
+	if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE))
 	{
 		if (menuOption == 3)
 		{
@@ -299,6 +311,7 @@ void ModuleGame::PrintEndScreen()
 {
 	int centerX = GetScreenWidth() / 2;
 	int centerY = GetScreenHeight() / 2;
+	
 	App->renderer->rDrawTextCentered(TextFormat("Position: %d", car->currentPosition), centerX, centerY - 50, fontTitle, 5, YELLOW);
 	App->renderer->rDrawTextCentered(TextFormat("Race time: %02.02f s", raceTime), centerX, centerY, fontSubtitle, 5, YELLOW);
 	App->renderer->rDrawTextCentered(TextFormat("Best lap time: %02.02f s", bestLapTime), centerX, centerY + 30, fontSubtitle, 5, YELLOW);
@@ -353,7 +366,18 @@ update_status ModuleGame::Update(float dt)
 		UpdateMouseJoint();
 
 		if (raceEnded) {
+			int centerX = GetScreenWidth() / 2;
+			int centerY = GetScreenHeight() / 2;
+
 			PrintEndScreen();
+			if (car->currentPosition == 1) {
+				App->renderer->DrawTextCentered("Well played. Another Game?", centerX, centerY + 50, fontSubtitle, 5, YELLOW);
+				App->audio->PlayFx(winFX);
+			}
+			if(car->currentPosition >= 2) {
+				App->renderer->DrawTextCentered("More luck next time...", centerX, centerY + 50, fontSubtitle, 5, YELLOW);
+				App->audio->PlayFx(looseFX);
+			}
 			if (IsKeyPressed(KEY_R)) Restart();
 		}
 		else
