@@ -19,8 +19,8 @@ public:
 		physics->DestroyBody(pbody);
 	}
 	virtual void Update(float dt) = 0;
-	virtual void OnCollision(PhysicEntity* other) = 0;
-	virtual void OnCollisionEnd(PhysicEntity* other) = 0;
+	virtual void OnCollision(PhysicEntity* other, bool isSensor) = 0;
+	virtual void OnCollisionEnd(PhysicEntity* other, bool isSensor) = 0;
 	virtual int RayHit(vec2<int> ray, vec2<int> mouse, vec2<float>& normal)
 	{
 		return 0;

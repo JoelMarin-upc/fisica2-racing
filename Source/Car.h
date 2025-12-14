@@ -9,7 +9,7 @@ class ModuleGame;
 class Car : public Box
 {
 public:
-	Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman, int _difficulty = 1);
+	Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman, int _sprintFXId, int _runFXId, int _crashFXId, int _difficulty = 1);
 
 	~Car();
 
@@ -19,9 +19,9 @@ public:
 
 	void Update(float dt) override;
 
-	void OnCollision(PhysicEntity* other);
+	void OnCollision(PhysicEntity* other, bool isSensor);
 
-	void OnCollisionEnd(PhysicEntity* other);
+	void OnCollisionEnd(PhysicEntity* other, bool isSensor);
 
 private:
 	void GetInput();
@@ -31,6 +31,8 @@ private:
 	void GetTargetDirection();
 
 	void Move(float dt);
+
+	void PlayRunAudio();
 
 	void CheckNitro();
 
@@ -71,6 +73,11 @@ private:
 
 	double speedScale = 1;
 	int sprintFX;
+	int runFX;
+	int crashFX;
+
+	Timer runFXTimer;
+	const double runFXSeconds = 3.f;
 
 	const float warmingVelocityThreshold = 9;
 

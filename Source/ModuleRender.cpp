@@ -88,10 +88,10 @@ void ModuleRender::SetCameraTarget(PhysicEntity* target)
     camera.zoom = 1.f;
 }
 
-static float LerpAngle(float from, float to, float t)
+static float LerpAngle(float from, float to, float interpolation)
 {
     float delta = fmodf(to - from + 180.0f, 360.0f) - 180.0f;
-    return from + delta * t;
+    return from + delta * interpolation;
 }
 
 void ModuleRender::AdjustCamera()

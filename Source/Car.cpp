@@ -1,7 +1,7 @@
 #include "ModuleGame.h"
 #include "ModuleRender.h"
 
-Car::Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman, int _difficulty)
+Car::Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman, int _sprintFXId, int _runFXId, int _crashFXId, int _difficulty)
 	: Box(app->physics, app->renderer, _x, _y, _listener, _texture, CAR, angle),
 	carNum(carNum), isHumanControlled(isHuman), currentPosition(carNum), targetDirection(new Vector2{ 0, 0 }), currentLap(0), nitroInput(false), nitroActive(false), active(false), game(app->scene_intro), audio(app->audio), currentCheckpointNum(0), difficulty(_difficulty)
 {
@@ -10,7 +10,11 @@ Car::Car(Application* app, int _x, int _y, float angle, Module* _listener, Textu
 	body->SetAngularDamping(2.0f);
 
 	//sounds
-	sprintFX = audio->LoadFx("Assets/Sounds/FX/sprint.wav");
+    sprintFX = _sprintFXId;
+    runFX = _runFXId;
+    crashFX = _crashFXId;
+
+    runFXTimer = Timer();
 }
 
 Car::~Car()
@@ -183,6 +187,15 @@ void Car::Move(float dt)
 	body->ApplyForce(force.x, force.y);
 }
 
+void Car::PlayRunAudio()
+{
+    if (std::abs(targetDirection->y) < 1) return;
+    if (runFXTimer.ReadSec() > runFXSeconds) {
+        audio->PlayFx(runFX);
+        runFXTimer.Start();
+    }
+}
+
 void Car::CheckNitro()
 {
 
@@ -223,6 +236,7 @@ void Car::Update(float dt)
 		GetTargetDirection();
 		CheckNitro();
 		Move(dt);
+        if (isHumanControlled) PlayRunAudio();
 	}
 
 	int x, y;
@@ -232,7 +246,7 @@ void Car::Update(float dt)
 		Vector2{ (float)texture.width / 2.0f, (float)texture.height / 2.0f }, body->GetRotation() * RAD2DEG, WHITE);
 }
 
-void Car::OnCollision(PhysicEntity* other)
+void Car::OnCollision(PhysicEntity* other, bool isSensor)
 {
 	if (other->type == CHECKPOINT) {
 		currentCheckpointNum = dynamic_cast<Checkpoint*>(other)->order;
@@ -248,9 +262,12 @@ void Car::OnCollision(PhysicEntity* other)
 		double scale = dynamic_cast<SlowZone*>(other)->slowScale;
 		SetSpeedScale(scale);
 	}
+    if ((other->type == CIRCUIT || other->type == OBSTACLE || other->type == CAR) && !isSensor) {
+        if (isHumanControlled) audio->PlayFx(crashFX);
+    }
 }
 
-void Car::OnCollisionEnd(PhysicEntity* other)
+void Car::OnCollisionEnd(PhysicEntity* other, bool isSensor)
 {
 	if (other->type == SLOWZONE) {
 		SetSpeedScale();

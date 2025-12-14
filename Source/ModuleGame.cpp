@@ -33,6 +33,10 @@ bool ModuleGame::Start()
 	looseFX = App->audio->LoadFx("Assets/Sounds/FX/loose.wav");
 	winFX = App->audio->LoadFx("Assets/Sounds/FX/win.wav");
 
+	sprintFX = App->audio->LoadFx("Assets/Sounds/FX/sprint.wav");
+	runFX = App->audio->LoadFx("Assets/Sounds/FX/sprint.wav", .4f);
+	crashFX = App->audio->LoadFx("Assets/Sounds/FX/sprint.wav", .6f);
+
 	App->audio->PlayMusic("Assets/Sounds/Music/GlooGloo.wav");
 
 	return ret;
@@ -57,11 +61,11 @@ void ModuleGame::AddCars()
 	{
 		Transform2D t = map->playerStartPositions[i];
 		const std::string tex = map->carsBasePath + "car" + std::to_string(i + 1) + ".png";
-		cars.push_back(new Car(App, t.position.x, t.position.y, t.rotation, this, LoadTexture(tex.c_str()), i + 1, false, difficulty));
+		cars.push_back(new Car(App, t.position.x, t.position.y, t.rotation, this, LoadTexture(tex.c_str()), i + 1, false, sprintFX, runFX, crashFX, difficulty));
 	}
 	Transform2D playerTransform = map->playerStartPositions[map->totalCars-1];
 	const std::string playerTex = map->carsBasePath + "carPlayer.png";
-	car = new Car(App, playerTransform.position.x, playerTransform.position.y, playerTransform.rotation, this, LoadTexture(playerTex.c_str()), map->totalCars, true);
+	car = new Car(App, playerTransform.position.x, playerTransform.position.y, playerTransform.rotation, this, LoadTexture(playerTex.c_str()), map->totalCars, true, sprintFX, runFX, crashFX);
 	cars.push_back(car);
 }
 
@@ -216,7 +220,7 @@ void ModuleGame::GetMenuInput()
 			difficulty--;
 			if (difficulty < 1) difficulty = 3;
 		}
-		if (menuOption == 4)
+		if (menuOption == 3)
 		{
 			totalLaps--;
 			if (totalLaps < 1) totalLaps = 5;
@@ -409,6 +413,8 @@ void ModuleGame::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 {
 	if (!gameStarted) return;
 
+	bool isSensor = false;
+
 	PhysicEntity* entityA = nullptr;
 	PhysicEntity* entityB = nullptr;
 
@@ -419,6 +425,28 @@ void ModuleGame::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 
 	if (map->body == bodyA) entityA = map;
 	if (map->body == bodyB) entityB = map;
+	
+	if (map->navigationLayerIn->body == bodyA)
+	{
+		entityA = map;
+		isSensor = true;
+	}
+	if (map->navigationLayerIn->body == bodyB)
+	{
+		entityB = map;
+		isSensor = true;
+	}
+
+	if (map->navigationLayerOut->body == bodyA)
+	{
+		entityA = map;
+		isSensor = true;
+	}
+	if (map->navigationLayerOut->body == bodyB)
+	{
+		entityB = map;
+		isSensor = true;
+	}
 
 	if (map->boundsIn->body == bodyA) entityA = map;
 	if (map->boundsIn->body == bodyB) entityB = map;
@@ -426,18 +454,28 @@ void ModuleGame::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 	if (map->boundsOut->body == bodyA) entityA = map;
 	if (map->boundsOut->body == bodyB) entityB = map;
 
-	if (map->navigationLayerIn->body == bodyA) entityA = map;
-	if (map->navigationLayerIn->body == bodyB) entityB = map;
-
-	if (map->navigationLayerOut->body == bodyA) entityA = map;
-	if (map->navigationLayerOut->body == bodyB) entityB = map;
-
-	if (map->finishline->body == bodyA) entityA = map->finishline;
-	if (map->finishline->body == bodyB) entityB = map->finishline;
+	if (map->finishline->body == bodyA)
+	{
+		entityA = map->finishline;
+		isSensor = true;
+	}
+	if (map->finishline->body == bodyB) 
+	{
+		entityB = map->finishline;
+		isSensor = true;
+	}
 
 	for (auto& c : map->checkpoints) {
-		if (c->body == bodyA) entityA = c;
-		if (c->body == bodyB) entityB = c;
+		if (c->body == bodyA)
+		{
+			entityA = c;
+			isSensor = true;
+		}
+		if (c->body == bodyB) 
+		{
+			entityB = c;
+			isSensor = true;
+		}
 	}
 
 	for (auto& o : map->obstacles) {
@@ -446,12 +484,20 @@ void ModuleGame::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 	}
 
 	for (auto& z : map->slowZones) {
-		if (z->body == bodyA) entityA = z;
-		if (z->body == bodyB) entityB = z;
+		if (z->body == bodyA) 
+		{
+			entityA = z;
+			isSensor = true;
+		}
+		if (z->body == bodyB) 
+		{
+			entityB = z;
+			isSensor = true;
+		}
 	}
 
 	if (entityA/* && entityB*/) {
-		entityA->OnCollision(entityB);
+		entityA->OnCollision(entityB, isSensor);
 		//entityB->OnCollision(entityA);
 	}
 }
@@ -460,6 +506,8 @@ void ModuleGame::OnCollisionEnd(PhysBody* bodyA, PhysBody* bodyB)
 {
 	if (!gameStarted) return;
 
+	bool isSensor = false;
+
 	PhysicEntity* entityA = nullptr;
 	PhysicEntity* entityB = nullptr;
 
@@ -471,24 +519,56 @@ void ModuleGame::OnCollisionEnd(PhysBody* bodyA, PhysBody* bodyB)
 	if (map->body == bodyA) entityA = map;
 	if (map->body == bodyB) entityB = map;
 
+	if (map->navigationLayerIn->body == bodyA)
+	{
+		entityA = map;
+		isSensor = true;
+	}
+	if (map->navigationLayerIn->body == bodyB)
+	{
+		entityB = map;
+		isSensor = true;
+	}
+
+	if (map->navigationLayerOut->body == bodyA)
+	{
+		entityA = map;
+		isSensor = true;
+	}
+	if (map->navigationLayerOut->body == bodyB)
+	{
+		entityB = map;
+		isSensor = true;
+	}
+
 	if (map->boundsIn->body == bodyA) entityA = map;
 	if (map->boundsIn->body == bodyB) entityB = map;
 
 	if (map->boundsOut->body == bodyA) entityA = map;
 	if (map->boundsOut->body == bodyB) entityB = map;
 
-	if (map->navigationLayerIn->body == bodyA) entityA = map;
-	if (map->navigationLayerIn->body == bodyB) entityB = map;
-
-	if (map->navigationLayerOut->body == bodyA) entityA = map;
-	if (map->navigationLayerOut->body == bodyB) entityB = map;
-
-	if (map->finishline->body == bodyA) entityA = map->finishline;
-	if (map->finishline->body == bodyB) entityB = map->finishline;
+	if (map->finishline->body == bodyA)
+	{
+		entityA = map->finishline;
+		isSensor = true;
+	}
+	if (map->finishline->body == bodyB)
+	{
+		entityB = map->finishline;
+		isSensor = true;
+	}
 
 	for (auto& c : map->checkpoints) {
-		if (c->body == bodyA) entityA = c;
-		if (c->body == bodyB) entityB = c;
+		if (c->body == bodyA)
+		{
+			entityA = c;
+			isSensor = true;
+		}
+		if (c->body == bodyB)
+		{
+			entityB = c;
+			isSensor = true;
+		}
 	}
 
 	for (auto& o : map->obstacles) {
@@ -497,12 +577,20 @@ void ModuleGame::OnCollisionEnd(PhysBody* bodyA, PhysBody* bodyB)
 	}
 
 	for (auto& z : map->slowZones) {
-		if (z->body == bodyA) entityA = z;
-		if (z->body == bodyB) entityB = z;
+		if (z->body == bodyA)
+		{
+			entityA = z;
+			isSensor = true;
+		}
+		if (z->body == bodyB)
+		{
+			entityB = z;
+			isSensor = true;
+		}
 	}
 
 	if (entityA/* && entityB*/) {
-		entityA->OnCollisionEnd(entityB);
+		entityA->OnCollisionEnd(entityB, isSensor);
 		//entityB->OnCollisionEnd(entityA);
 	}
 }

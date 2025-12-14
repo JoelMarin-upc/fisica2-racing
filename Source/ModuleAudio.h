@@ -19,7 +19,7 @@ public:
 	bool PlayMusic(const char* path, float fade_time = DEFAULT_MUSIC_FADE_TIME);
 
 	// Load a sound in memory
-	unsigned int LoadFx(const char* path);
+	unsigned int LoadFx(const char* path, double volume = 1.f);
 
 	// Play a previously loaded sound
 	bool PlayFx(unsigned int fx, int repeat = 0);
