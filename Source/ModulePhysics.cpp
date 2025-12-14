@@ -57,7 +57,7 @@ update_status ModulePhysics::PreUpdate()
 	return UPDATE_CONTINUE;
 }
 
-PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, float angle, bool dynamic, float restitution)
+PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, float angle, bool dynamic, float restitution, float mass)
 {
 	b2BodyDef body;
 	body.type = dynamic ? b2_dynamicBody : b2_staticBody;
@@ -72,7 +72,8 @@ PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, float angle, boo
 	shape.m_radius = PIXEL_TO_METERS(radius);
 	b2FixtureDef fixture;
 	fixture.shape = &shape;
-	fixture.density = 5.0f;
+	float area = PI * radius * radius;
+	fixture.density = mass / area;
 	fixture.restitution = restitution;
 
 	b->CreateFixture(&fixture);
@@ -87,7 +88,7 @@ PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, float angle, boo
 	return pbody;
 }
 
-PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height, float angle, bool dynamic, float restitution)
+PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height, float angle, bool dynamic, float restitution, float mass)
 {
 	b2BodyDef body;
 	body.type = dynamic ? b2_dynamicBody : b2_staticBody;
@@ -103,7 +104,8 @@ PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height, fl
 
 	b2FixtureDef fixture;
 	fixture.shape = &box;
-	fixture.density = 1.0f;
+	float area = PI * width * height;
+	fixture.density = mass / area;
 	fixture.restitution = restitution;
 
 	b->CreateFixture(&fixture);

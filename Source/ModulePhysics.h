@@ -87,8 +87,8 @@ public:
 	update_status PostUpdate();
 	bool CleanUp();
 
-	PhysBody* CreateCircle(int x, int y, int radius, float angle = 0.f, bool dynamic = true, float restitution = 0.f);
-	PhysBody* CreateRectangle(int x, int y, int width, int height, float angle = 0.f, bool dynamic = true, float restitution = 0.f);
+	PhysBody* CreateCircle(int x, int y, int radius, float angle = 0.f, bool dynamic = true, float restitution = 0.f, float mass = 4000.f);
+	PhysBody* CreateRectangle(int x, int y, int width, int height, float angle = 0.f, bool dynamic = true, float restitution = 0.f, float mass = 4000.f);
 	PhysBody* CreateRectangleSensor(int x, int y, int width, int height, float angle = 0.f, bool dynamic = true);
 	PhysBody* CreateChain(int x, int y, int* points, unsigned int size, float angle = 0.f, bool dynamic = true, float restitution = 0.f, bool reverse = false, bool isSensor = false);
 	b2MouseJoint* CreateMouseJoint(b2Body* body, b2Vec2 target);

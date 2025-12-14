@@ -27,12 +27,6 @@ bool ModuleGame::Start()
 	fontText = LoadFontEx(fontPath, 30, nullptr, 0);
 	fontSmall = LoadFontEx(fontPath, 20, nullptr, 0);
 
-	LoadMap();
-	AddCars();
-	/*car = new Car(App, 30, 500, 0, this, LoadTexture("Assets/car1.png"), 1, true);
-	cars.push_back(car);
-	cars.push_back(new Car(App, 100, 500, 0, this, LoadTexture("Assets/car1.png"), 2, false));*/
-
 	return ret;
 }
 
@@ -46,19 +40,20 @@ bool ModuleGame::CleanUp()
 void ModuleGame::LoadMap()
 {
 	// adds circuit, checkpoints and finishline
-	map = MapLoader::LoadMap(1, App, this);
+	map = MapLoader::LoadMap(mapNumber, App, this);
 }
 
 void ModuleGame::AddCars()
 {
-	for (int i = 0; i < totalCars - 1; i++)
+	for (int i = 0; i < map->totalCars - 1; i++)
 	{
 		Transform2D t = map->playerStartPositions[i];
-		const std::string tex = "Assets/Cars/car" + std::to_string(i + 1) + ".png";
+		const std::string tex = map->carsBasePath + "car" + std::to_string(i + 1) + ".png";
 		cars.push_back(new Car(App, t.position.x, t.position.y, t.rotation, this, LoadTexture(tex.c_str()), i + 1, false, difficulty));
 	}
-	Transform2D playerTransform = map->playerStartPositions[totalCars-1];
-	car = new Car(App, playerTransform.position.x, playerTransform.position.y, playerTransform.rotation, this, LoadTexture("Assets/Cars/carPlayer.png"), totalCars, true);
+	Transform2D playerTransform = map->playerStartPositions[map->totalCars-1];
+	const std::string playerTex = map->carsBasePath + "carPlayer.png";
+	car = new Car(App, playerTransform.position.x, playerTransform.position.y, playerTransform.rotation, this, LoadTexture(playerTex.c_str()), map->totalCars, true);
 	cars.push_back(car);
 }
 
@@ -232,6 +227,8 @@ void ModuleGame::GetMenuInput()
 		if (menuOption == 3)
 		{
 			gameStarted = true;
+			LoadMap();
+			AddCars();
 			App->renderer->SetCameraTarget(car);
 		}
 	}
@@ -246,10 +243,10 @@ void ModuleGame::PrintMenu()
 	switch (mapNumber)
 	{
 	case 1:
-		mapName = "Map 1";
+		mapName = "River";
 		break;
 	case 2:
-		mapName = "Map 2";
+		mapName = "Road";
 		break;
 	default:
 		mapName = "None";

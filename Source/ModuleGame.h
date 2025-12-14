@@ -75,7 +75,7 @@ private:
 	bool raceActive = false;
 	bool countdownStarted = false;
 
-	const int totalCars = 4;
+	//const int totalCars = 9;
 
 	//std::vector<PhysicEntity*> entities;
 	std::vector<Car*> cars;
