@@ -534,6 +534,19 @@ void ModuleGame::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 		}
 	}
 
+	for (auto& b : map->boosters) {
+		if (b->body == bodyA)
+		{
+			entityA = b;
+			isSensor = true;
+		}
+		if (b->body == bodyB)
+		{
+			entityB = b;
+			isSensor = true;
+		}
+	}
+
 	if (entityA/* && entityB*/) {
 		entityA->OnCollision(entityB, isSensor);
 		//entityB->OnCollision(entityA);
@@ -623,6 +636,19 @@ void ModuleGame::OnCollisionEnd(PhysBody* bodyA, PhysBody* bodyB)
 		if (z->body == bodyB)
 		{
 			entityB = z;
+			isSensor = true;
+		}
+	}
+
+	for (auto& b : map->boosters) {
+		if (b->body == bodyA)
+		{
+			entityA = b;
+			isSensor = true;
+		}
+		if (b->body == bodyB)
+		{
+			entityB = b;
 			isSensor = true;
 		}
 	}

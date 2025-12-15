@@ -219,6 +219,22 @@ void Car::SetSpeedScale(float scale)
 	speedScale = scale;
 }
 
+void Car::StartBoost(double scale, double time)
+{
+    SetSpeedScale(scale);
+    boostTime = time;
+    boostTimer.Start();
+}
+
+void Car::RunBoostTimer()
+{
+    if (boostTime < 0.f) return;
+    boostTime -= boostTimer.ReadSec();
+    if (boostTime < 0.f) {
+        SetSpeedScale();
+    }
+}
+
 void Car::Enable()
 {
 	active = true;
@@ -237,6 +253,7 @@ void Car::Update(float dt)
 		CheckNitro();
 		Move(dt);
         if (isHumanControlled) PlayRunAudio();
+        RunBoostTimer();
 	}
 
 	int x, y;
@@ -260,8 +277,15 @@ void Car::OnCollision(PhysicEntity* other, bool isSensor)
 	}
 	if (other->type == SLOWZONE) {
 		double scale = dynamic_cast<SlowZone*>(other)->slowScale;
-		SetSpeedScale(scale);
+        if (boostTime < 0.f) SetSpeedScale(scale);
+        else SetSpeedScale();
 	}
+    if (other->type == BOOSTER) {
+        auto booster = dynamic_cast<Booster*>(other);
+        double scale = booster->boostScale;
+        double time = booster->boostTime;
+        StartBoost(scale, time);
+    }
     if ((other->type == CIRCUIT || other->type == OBSTACLE || other->type == CAR) && !isSensor) {
         if (isHumanControlled) audio->PlayFx(crashFX);
     }
@@ -270,6 +294,6 @@ void Car::OnCollision(PhysicEntity* other, bool isSensor)
 void Car::OnCollisionEnd(PhysicEntity* other, bool isSensor)
 {
 	if (other->type == SLOWZONE) {
-		SetSpeedScale();
+        if (boostTime < 0.f) SetSpeedScale();
 	}
 }

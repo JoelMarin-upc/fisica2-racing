@@ -1,8 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="32" tileheight="32" infinite="0" nextlayerid="7" nextobjectid="104">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="109">
  <imagelayer id="2" name="Background">
   <image source="MapaRacing1.png" width="2048" height="2048"/>
  </imagelayer>
+ <objectgroup id="7" name="Boosters">
+  <object id="104" x="459.193" y="67.6705" width="19.3344" height="215.096">
+   <properties>
+    <property name="scale" type="float" value="5"/>
+    <property name="time" type="float" value="1"/>
+   </properties>
+  </object>
+  <object id="105" x="1751" y="351" width="207" height="20">
+   <properties>
+    <property name="scale" type="float" value="5"/>
+    <property name="time" type="float" value="1"/>
+   </properties>
+  </object>
+  <object id="106" x="1767.17" y="1064.67" width="68.3333" height="20">
+   <properties>
+    <property name="scale" type="float" value="5"/>
+    <property name="time" type="float" value="1"/>
+   </properties>
+  </object>
+  <object id="107" x="1909.83" y="1438" width="68.3333" height="20">
+   <properties>
+    <property name="scale" type="float" value="5"/>
+    <property name="time" type="float" value="1"/>
+   </properties>
+  </object>
+  <object id="108" x="1604.33" y="1845.12" width="19.3344" height="67.096">
+   <properties>
+    <property name="scale" type="float" value="5"/>
+    <property name="time" type="float" value="1"/>
+   </properties>
+  </object>
+ </objectgroup>
  <objectgroup id="3" name="StartPositions">
   <object id="2" x="98.25" y="1522" width="26.25" height="38">
    <properties>

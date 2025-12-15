@@ -102,6 +102,9 @@
     <ClInclude Include="Source\MapLoader.h">
       <Filter>Headers\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Booster.h">
+      <Filter>Headers\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers">

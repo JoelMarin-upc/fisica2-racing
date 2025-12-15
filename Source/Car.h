@@ -38,6 +38,10 @@ private:
 
 	void SetSpeedScale(float scale = 1);
 
+	void RunBoostTimer();
+
+	void StartBoost(double scale, double time);
+
 public:
 	int carNum;
 
@@ -75,6 +79,9 @@ private:
 	int sprintFX;
 	int runFX;
 	int crashFX;
+
+	Timer boostTimer;
+	double boostTime = -0.1f;
 
 	Timer runFXTimer;
 	const double runFXSeconds = 3.f;
