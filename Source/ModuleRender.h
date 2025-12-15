@@ -25,11 +25,14 @@ public:
     void SetBackgroundColor(Color color);
 	bool Draw(Texture2D texture, int x, int y, const Rectangle* section = NULL, double angle = 0, int pivot_x = 0, int pivot_y = 0) const;
 	bool rDrawTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color color) const;
+	void DrawTextureUI(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color color);
 	void rDrawText(const char* text, int x, int y, Font font, int spacing, Color tint);
 	void rDrawTextCentered(const char* text, int centerX, int centerY, Font font, int spacing, Color tint);
 	bool DrawText(const char* text, int x, int y, Font font, int spacing, Color tint) const;
 	bool DrawTextCentered(const char* text, int centerX, int centerY, Font font, int spacing, Color tint) const;
+	void DrawCircleUI(int x, int y, float radius, Color color);
 	bool rDrawCircle(int x, int y, float radius, Color color) const;
+	void DrawLineUI(int x1, int y1, int x2, int y2, Color color);
 	bool rDrawLine(int x1, int y1, int x2, int y2, Color color) const;
 
 public: 

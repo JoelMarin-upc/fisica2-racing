@@ -150,6 +150,11 @@ bool ModuleRender::rDrawTexturePro(Texture2D texture, Rectangle source, Rectangl
     return ret;
 }
 
+void ModuleRender::DrawTextureUI(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color color)
+{
+    uiCalls.push_back([=]() { rDrawTexturePro(texture, source, dest, origin, rotation, color); });
+}
+
 void ModuleRender::rDrawText(const char * text, int x, int y, Font font, int spacing, Color tint)
 {
     std::string textCopy = text;
@@ -186,11 +191,21 @@ bool ModuleRender::DrawTextCentered(const char* text, int centerX, int centerY, 
     return ret;
 }
 
+void ModuleRender::DrawCircleUI(int x, int y, float radius, Color color)
+{
+    uiCalls.push_back([=]() { rDrawCircle(x, y, radius, color); });
+}
+
 bool ModuleRender::rDrawCircle(int x, int y, float radius, Color color) const
 {
     bool ret = true;
     DrawCircle(x, y, radius, color);
     return ret;
+}
+
+void ModuleRender::DrawLineUI(int x1, int y1, int x2, int y2, Color color)
+{
+    uiCalls.push_back([=]() { rDrawLine(x1, y1, x2, y2, color); });
 }
 
 bool ModuleRender::rDrawLine(int x1, int y1, int x2, int y2, Color color) const

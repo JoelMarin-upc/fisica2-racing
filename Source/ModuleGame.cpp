@@ -22,6 +22,7 @@ bool ModuleGame::Start()
 	LOG("Loading Intro assets");
 	bool ret = true;
 
+	fontMainTitle = LoadFontEx(fontPath, 80, nullptr, 0);
 	fontTitle = LoadFontEx(fontPath, 60, nullptr, 0);
 	fontSubtitle = LoadFontEx(fontPath, 50, nullptr, 0);
 	fontText = LoadFontEx(fontPath, 30, nullptr, 0);
@@ -38,6 +39,18 @@ bool ModuleGame::Start()
 	crashFX = App->audio->LoadFx("Assets/Sounds/FX/sprint.wav", .6f);
 
 	App->audio->PlayMusic("Assets/Sounds/Music/GlooGloo.wav");
+
+	positionTex[1] = LoadTexture("Assets/UI/1.png");
+	positionTex[2] = LoadTexture("Assets/UI/2.png");
+	positionTex[3] = LoadTexture("Assets/UI/3.png");
+	positionTex[4] = LoadTexture("Assets/UI/4.png");
+	positionTex[5] = LoadTexture("Assets/UI/5.png");
+	positionTex[6] = LoadTexture("Assets/UI/6.png");
+	positionTex[7] = LoadTexture("Assets/UI/7.png");
+	positionTex[8] = LoadTexture("Assets/UI/8.png");
+	positionTex[9] = LoadTexture("Assets/UI/9.png");
+	
+	menuBack = LoadTexture("Assets/UI/menu_background.png");
 
 	return ret;
 }
@@ -259,7 +272,7 @@ void ModuleGame::GetMenuInput()
 void ModuleGame::PrintMenu()
 {
 	Color selected = RED;
-	Color unselected = BLUE;
+	Color unselected = YELLOW;
 	
 	std::string mapName;
 	switch (mapNumber)
@@ -294,6 +307,10 @@ void ModuleGame::PrintMenu()
 	int screenCenterX = GetScreenWidth() / 2;
 	int screenCenterY = GetScreenHeight() / 2;
 
+	App->renderer->rDrawTextCentered("TITLE OF THE GAME", screenCenterX, screenCenterY - 160, fontMainTitle, 5, YELLOW);
+
+	App->renderer->rDrawTexturePro(menuBack, { 0.f, 0.f, (float)menuBack.width, (float)menuBack.height }, { 0.f, 0.f, (float)menuBack.width, (float)menuBack.height }, { 0.f, 0.f }, 0.f, WHITE);
+
 	App->renderer->rDrawTextCentered(TextFormat("Map: < %s >", mapName.c_str()), screenCenterX, screenCenterY - 45, fontText, 5, menuOption == 1 ? selected : unselected);
 	App->renderer->rDrawTextCentered(TextFormat("Difficulty: < %s >", diffName.c_str()), screenCenterX, screenCenterY - 15, fontText, 5, menuOption == 2 ? selected : unselected);
 	App->renderer->rDrawTextCentered(TextFormat("Laps: < %i >", totalLaps), screenCenterX, screenCenterY + 15, fontText, 5, menuOption == 3 ? selected : unselected);
@@ -302,9 +319,14 @@ void ModuleGame::PrintMenu()
 
 void ModuleGame::PrintInfo()
 {
+	Texture2D positionT = positionTex[car->currentPosition];
+	App->renderer->DrawTextureUI(positionT, { 0.f, 0.f, (float)positionT.width, (float)positionT.height }, 
+								 { (float)GetScreenWidth() - positionT.width - 10, 10.f, (float)positionT.width, (float)positionT.height },
+								 Vector2{ 0.f, 0.f }, 0.f, WHITE);
+
 	//App->renderer->DrawText(TextFormat("Last checkpoint: %d", car->currentCheckpointNum), 10, 30, fontText, 5, RED);
-	App->renderer->rDrawText(TextFormat("Laps: %d/%d", car->currentLap, totalLaps), 10, 50, fontText, 5, RED);
-	App->renderer->rDrawText(TextFormat("Position: %d/%d", car->currentPosition, map->totalCars), 10, 70, fontText, 5, RED);
+	//App->renderer->rDrawText(TextFormat("Position: %d/%d", car->currentPosition, map->totalCars), 10, 50, fontText, 5, RED);
+	App->renderer->rDrawText(TextFormat("Laps: %d/%d", car->currentLap, totalLaps), 10, 70, fontText, 5, RED);
 	App->renderer->rDrawText(TextFormat("Lap time: %02.02f s", lapTime), 10, 90, fontText, 5, RED);
 	App->renderer->rDrawText(TextFormat("Total time: %02.02f s", raceTime), 10, 110, fontText, 5, RED);
 	App->renderer->rDrawText(TextFormat("Avaliable nitros: %d", car->availableNitros), 10, 130, fontText, 5, RED);
@@ -320,19 +342,42 @@ void ModuleGame::PrintInfo()
 
 void ModuleGame::PrintEndScreen()
 {
+
 	int centerX = GetScreenWidth() / 2;
 	int centerY = GetScreenHeight() / 2;
 	
-	App->renderer->rDrawTextCentered(TextFormat("Position: %d", car->currentPosition), centerX, centerY - 50, fontTitle, 5, YELLOW);
-	App->renderer->rDrawTextCentered(TextFormat("Race time: %02.02f s", raceTime), centerX, centerY, fontSubtitle, 5, YELLOW);
-	App->renderer->rDrawTextCentered(TextFormat("Best lap time: %02.02f s", bestLapTime), centerX, centerY + 30, fontSubtitle, 5, YELLOW);
-	App->renderer->rDrawTextCentered("Press [R] to restart", centerX, centerY + 100, fontSubtitle, 5, YELLOW);
+	App->renderer->DrawCircleUI(centerX, centerY, GetScreenHeight() * 2.f, {150, 150, 150, 100});
+	
+	if (car->currentPosition == 1) {
+		App->renderer->rDrawTextCentered("Well played. Another Game?", centerX, centerY - 130, fontSubtitle, 5, YELLOW);
+		if (!endFxPlayed) {
+			endFxPlayed = true;
+			App->audio->PlayFx(winFX);
+		}
+	}
+	if (car->currentPosition >= 2) {
+		App->renderer->rDrawTextCentered("More luck next time...", centerX, centerY - 130, fontSubtitle, 5, YELLOW);
+		if (!endFxPlayed) {
+			endFxPlayed = true;
+			App->audio->PlayFx(looseFX);
+		}
+	}
+
+	//App->renderer->rDrawTextCentered(TextFormat("Position: %d", car->currentPosition), centerX, centerY - 50, fontTitle, 5, YELLOW);
+	App->renderer->rDrawTextCentered("Your position", centerX, centerY - 90, fontText, 5, YELLOW);
+	
+	Texture2D positionT = positionTex[car->currentPosition];
+	App->renderer->DrawTextureUI(positionT, { 0.f, 0.f, (float)positionT.width, (float)positionT.height },
+		{ (float)centerX, (float)centerY - 35, (float)positionT.width, (float)positionT.height },
+		Vector2{ (float)positionT.width / 2.f, (float)positionT.height / 2.f }, 0.f, WHITE);
+
+	App->renderer->rDrawTextCentered(TextFormat("Race time: %02.02f s", raceTime), centerX, centerY + 20, fontSubtitle, 5, YELLOW);
+	App->renderer->rDrawTextCentered(TextFormat("Best lap time (Lap %d): %02.02f s", bestLap, bestLapTime), centerX, centerY + 50, fontSubtitle, 5, YELLOW);
+	App->renderer->rDrawTextCentered("Press [R] to restart", centerX, centerY + 120, fontSubtitle, 5, YELLOW);
 }
 
 void ModuleGame::Restart()
-{
-	if (mouseJoint) DestroyMouseJoint();
-	
+{	
 	App->renderer->SetCameraTarget(nullptr);
 
 	for (auto& c : cars) {
@@ -352,6 +397,7 @@ void ModuleGame::Restart()
 	raceEnded = false;
 	raceActive = false;
 	countdownStarted = false;
+	endFxPlayed = false;
 }
 
 update_status ModuleGame::Update(float dt)
@@ -359,10 +405,11 @@ update_status ModuleGame::Update(float dt)
 	if (gameStarted)
 	{
 		if (IsKeyPressed(KEY_C)) App->renderer->cameraRotationActive = !App->renderer->cameraRotationActive;
-		if (IsKeyPressed(KEY_F1)) {
+		if (IsKeyPressed(KEY_F1) && gameStarted && !raceEnded) {
 			if (mouseJoint) DestroyMouseJoint();
 			else CreateMouseJoint();
 		}
+		if (mouseJoint && raceEnded) DestroyMouseJoint();
 
 		if (raceActive && !raceEnded)
 		{
@@ -381,14 +428,7 @@ update_status ModuleGame::Update(float dt)
 			int centerY = GetScreenHeight() / 2;
 
 			PrintEndScreen();
-			if (car->currentPosition == 1) {
-				App->renderer->DrawTextCentered("Well played. Another Game?", centerX, centerY + 50, fontSubtitle, 5, YELLOW);
-				App->audio->PlayFx(winFX);
-			}
-			if(car->currentPosition >= 2) {
-				App->renderer->DrawTextCentered("More luck next time...", centerX, centerY + 50, fontSubtitle, 5, YELLOW);
-				App->audio->PlayFx(looseFX);
-			}
+			
 			if (IsKeyPressed(KEY_R)) Restart();
 		}
 		else
@@ -403,8 +443,6 @@ update_status ModuleGame::Update(float dt)
 		GetMenuInput();
 		PrintMenu();
 	}
-
-	//for (PhysicEntity* entity : entities) entity->Update(dt);
 
 	return UPDATE_CONTINUE;
 }
