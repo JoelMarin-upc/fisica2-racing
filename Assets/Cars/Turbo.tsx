@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tileset version="1.10" tiledversion="1.11.2" name="Turbo" tilewidth="19" tileheight="19" tilecount="24" columns="6">
- <image source="../../../../Universidad/Asignaturas/Física ll/Turbo.png" width="114" height="76"/>
+ <image source="Turbo.png" width="114" height="76"/>
  <tile id="0">
   <animation>
    <frame tileid="0" duration="80"/>

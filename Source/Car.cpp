@@ -1,8 +1,8 @@
 #include "ModuleGame.h"
 #include "ModuleRender.h"
 
-Car::Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman, int _sprintFXId, int _runFXId, int _crashFXId, int _difficulty)
-	: Box(app->physics, app->renderer, _x, _y, _listener, _texture, CAR, angle),
+Car::Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman, int _sprintFXId, int _runFXId, int _crashFXId, std::string animationsPath, Vector2 colliderSize, int _difficulty)
+	: Box(app->physics, app->renderer, _x, _y, _listener, _texture, CAR, angle, true, 0.f, colliderSize),
 	carNum(carNum), isHumanControlled(isHuman), currentPosition(carNum), targetDirection(new Vector2{ 0, 0 }), currentLap(0), nitroInput(false), nitroActive(false), active(false), game(app->scene_intro), audio(app->audio), currentCheckpointNum(0), difficulty(_difficulty)
 {
 	availableNitros = maxAvailableNitros;
@@ -15,6 +15,10 @@ Car::Car(Application* app, int _x, int _y, float angle, Module* _listener, Textu
     crashFX = _crashFXId;
 
     runFXTimer = Timer();
+
+    std::unordered_map<int, std::string> aliases = { {0,"move"} };
+    anims.LoadFromTSX(animationsPath.c_str(), aliases);
+    anims.SetCurrent("move");
 }
 
 Car::~Car()
@@ -257,10 +261,23 @@ void Car::Update(float dt)
 	}
 
 	int x, y;
-	body->GetPhysicPosition(x, y);
-	render->rDrawTexturePro(texture, Rectangle{ 0, 0, (float)texture.width, (float)texture.height },
-		Rectangle{ (float)x, (float)y, (float)texture.width, (float)texture.height },
-		Vector2{ (float)texture.width / 2.0f, (float)texture.height / 2.0f }, body->GetRotation() * RAD2DEG, WHITE);
+    body->GetPhysicPosition(x, y);
+    anims.Update(dt);
+    const Rectangle& animFrame = anims.GetCurrentFrame();
+
+    Rectangle source = animFrame;
+
+    Rectangle dest = {
+        x,
+        y,
+        animFrame.width,
+        animFrame.height
+    };
+
+    render->rDrawTexturePro(texture, source, dest, { animFrame.width / 2.f, animFrame.height / 2.f }, body->GetRotation() * RAD2DEG, WHITE);
+    /*render->rDrawTexturePro(texture, Rectangle{ 0, 0, (float)texture.width, (float)texture.height },
+        Rectangle{ (float)x, (float)y, (float)texture.width, (float)texture.height },
+        Vector2{ (float)texture.width / 2.0f, (float)texture.height / 2.0f }, body->GetRotation() * RAD2DEG, WHITE);*/
 }
 
 void Car::OnCollision(PhysicEntity* other, bool isSensor)

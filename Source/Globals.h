@@ -30,6 +30,7 @@ enum update_status
 };
 
 // Configuration -----------
+#define EPSILON				1e-08
 #define SCREEN_WIDTH		 1280
 #define SCREEN_HEIGHT		  720
 #define SCREEN_SIZE				1

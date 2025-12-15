@@ -61,6 +61,9 @@
     <ClCompile Include="Source\PhysicEntity.cpp">
       <Filter>Sources\Entities</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Animation.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source/p2Point.h">
@@ -104,6 +107,9 @@
     </ClInclude>
     <ClInclude Include="Source\Booster.h">
       <Filter>Headers\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Animation.h">
+      <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -3,13 +3,14 @@
 #include "Application.h"
 #include "ModuleAudio.h"
 #include "Box.h"
+#include "Animation.h"
 
 class ModuleGame;
 
 class Car : public Box
 {
 public:
-	Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman, int _sprintFXId, int _runFXId, int _crashFXId, int _difficulty = 1);
+	Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman, int _sprintFXId, int _runFXId, int _crashFXId, std::string animationsPath, Vector2 colliderSize = { 0.f, 0.f }, int _difficulty = 1);
 
 	~Car();
 
@@ -89,4 +90,6 @@ private:
 	const float warmingVelocityThreshold = 9;
 
 	int difficulty = 1;
+
+	AnimationSet anims;
 };
