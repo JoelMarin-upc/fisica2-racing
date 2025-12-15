@@ -32,6 +32,8 @@ bool ModuleGame::Start()
 	startFX = App->audio->LoadFx("Assets/Sounds/FX/start.wav");
 	looseFX = App->audio->LoadFx("Assets/Sounds/FX/loose.wav");
 	winFX = App->audio->LoadFx("Assets/Sounds/FX/win.wav");
+	runFX = App->audio->LoadFx("Assets/Sounds/FX/run.wav");
+	crashFX = App->audio->LoadFx("Assets/Sounds/FX/bounce.wav");
 
 	App->audio->PlayMusic("Assets/Sounds/Music/GlooGloo.wav");
 
@@ -290,9 +292,6 @@ void ModuleGame::PrintMenu()
 	int screenCenterX = GetScreenWidth() / 2;
 	int screenCenterY = GetScreenHeight() / 2;
 
-	
-	
-
 	App->renderer->rDrawTextCentered(TextFormat("Map: < %s >", mapName.c_str()), screenCenterX, screenCenterY - 45, fontText, 5, menuOption == 1 ? selected : unselected);
 	App->renderer->rDrawTextCentered(TextFormat("Difficulty: < %s >", diffName.c_str()), screenCenterX, screenCenterY - 15, fontText, 5, menuOption == 2 ? selected : unselected);
 	App->renderer->rDrawTextCentered(TextFormat("Laps: < %i >", totalLaps), screenCenterX, screenCenterY + 15, fontText, 5, menuOption == 3 ? selected : unselected);
@@ -323,11 +322,11 @@ void ModuleGame::PrintEndScreen()
 	int centerY = GetScreenHeight() / 2;
 
 	if (car->currentPosition == 1) {
-		App->renderer->DrawTextCentered("Well played. Another Game?", centerX, centerY + 50, fontSubtitle, 5, YELLOW);
+		App->renderer->rDrawTextCentered("Well played. Another Game?", centerX, centerY + 50, fontSubtitle, 5, YELLOW);
 		App->audio->PlayFx(winFX);
 	}
 	if (car->currentPosition >= 2) {
-		App->renderer->DrawTextCentered("More luck next time...", centerX, centerY + 50, fontSubtitle, 5, YELLOW);
+		App->renderer->rDrawTextCentered("More luck next time...", centerX, centerY + 50, fontSubtitle, 5, YELLOW);
 		App->audio->PlayFx(looseFX);
 	}
 	

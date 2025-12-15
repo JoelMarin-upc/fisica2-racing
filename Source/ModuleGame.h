@@ -96,6 +96,8 @@ private:
 	int countdownFX;
 	int winFX;
 	int looseFX;
+	int runFX;
+	int crashFX;
 
 	int music;
 
