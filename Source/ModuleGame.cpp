@@ -39,7 +39,7 @@ bool ModuleGame::Start()
 	crashFX = App->audio->LoadFx("Assets/Sounds/FX/bounce.wav", .6f);
 	carCrashFX = App->audio->LoadFx("Assets/Sounds/FX/squish.wav", .6f);
 
-	App->audio->PlayMusic("Assets/Sounds/Music/GlooGloo.wav");
+	music = App->audio->LoadFx("Assets/Sounds/Music/GlooGloo.wav");
 
 	positionTex[1] = LoadTexture("Assets/UI/1.png");
 	positionTex[2] = LoadTexture("Assets/UI/2.png");
@@ -442,7 +442,11 @@ update_status ModuleGame::Update(float dt)
 			PrintInfo();
 		}
 
-		if (gameStarted && !raceActive && !raceEnded) PerformCountdown();
+		if (gameStarted && !raceActive && !raceEnded) {
+			App->audio->PlayFx(music);
+			PerformCountdown();
+			
+		}
 	}
 	else {
 		GetMenuInput();
