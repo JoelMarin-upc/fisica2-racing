@@ -1,4 +1,4 @@
-# Pinball
+# Racing Game
 
 ## Description
 
