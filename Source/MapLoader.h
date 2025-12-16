@@ -7,7 +7,8 @@
 #include "PhysicEntity.h"
 #include "Transform2D.h"
 #include "Map.h"
-#include "Circle.h"
+#include "BoxObstacle.h"
+#include "CircleObstacle.h"
 #include "pugixml.hpp"
 #include <algorithm>
 
@@ -31,16 +32,23 @@ public:
         std::string carsBasePath = "";
         int* boundsIn = nullptr;
 		unsigned int boundsInSize = 0;
+        bool boundsInReverse = false;
 		int* boundsOut = nullptr;
 		unsigned int boundsOutSize = 0;
+        bool boundsOutReverse = false;
 		int* navigationLayerIn = nullptr;
 		unsigned int navigationLayerInSize = 0;
+        bool navInReverse = false;
 		int* navigationLayerOut = nullptr;
 		unsigned int navigationLayerOutSize = 0;
+        bool navOutReverse = false;
 		const char* mapImg = nullptr;
 		const char* mapTmx = nullptr;
 		const char* boxTex = nullptr;
 		const char* circleTex = nullptr;
+        const char* boxAnims = "";
+        const char* circleAnims = "";
+
 		if (mapNumber == 1)
 		{
             int bIn[260] = {
@@ -534,18 +542,614 @@ public:
             carsBasePath = "Assets/Maps/River/Cars/";
 			boundsIn = bIn;
 			boundsInSize = 260;
+            boundsInReverse = true;
 			boundsOut = bOut;
 			boundsOutSize = 186;
+            boundsOutReverse = false;
 			navigationLayerIn = navIn;
 			navigationLayerInSize = 310;
+            navInReverse = false;
 			navigationLayerOut = navOut;
 			navigationLayerOutSize = 200;
+            navOutReverse = true;
 			mapImg = "Assets/Maps/River/MapaRacing1.png";
 			mapTmx = "Assets/Maps/River/Map1.tmx";
 			boxTex = "Assets/Maps/River/boxObstacle.png";
 			circleTex = "Assets/Maps/River/circleObstacle.png";
+            boxAnims = "Assets/Maps/River/boxObstacle.tsx";
+            circleAnims = "Assets/Maps/River/circleObstacle.tsx";
 		}
-		else if (mapNumber == 2) 
+        else if (mapNumber == 2) 
+        {
+            int bIn[300] = {
+                1580, 1559,
+                428, 1560,
+                397, 1464,
+                388, 1392,
+                378, 1283,
+                394, 1261,
+                373, 1197,
+                402, 1094,
+                416, 1067,
+                408, 1041,
+                395, 1030,
+                374, 901,
+                397, 860,
+                419, 846,
+                422, 813,
+                420, 759,
+                400, 692,
+                406, 628,
+                377, 519,
+                400, 445,
+                415, 397,
+                469, 363,
+                544, 366,
+                603, 363,
+                664, 373,
+                750, 381,
+                824, 383,
+                1004, 394,
+                1031, 403,
+                1153, 389,
+                1222, 378,
+                1263, 353,
+                1281, 352,
+                1328, 382,
+                1398, 381,
+                1450, 378,
+                1472, 396,
+                1504, 387,
+                1579, 378,
+                1634, 347,
+                1693, 347,
+                1714, 386,
+                1720, 511,
+                1693, 612,
+                1691, 643,
+                1711, 726,
+                1692, 775,
+                1725, 885,
+                1741, 892,
+                1752, 882,
+                1755, 863,
+                1740, 834,
+                1747, 709,
+                1740, 629,
+                1747, 563,
+                1743, 498,
+                1738, 371,
+                1703, 321,
+                1638, 316,
+                1554, 292,
+                1532, 294,
+                1463, 302,
+                1400, 301,
+                1324, 311,
+                1312, 288,
+                1303, 273,
+                1287, 265,
+                1266, 270,
+                1212, 300,
+                1127, 298,
+                1027, 310,
+                960, 295,
+                923, 329,
+                801, 326,
+                774, 298,
+                748, 287,
+                697, 283,
+                651, 294,
+                601, 312,
+                560, 322,
+                540, 280,
+                527, 272,
+                512, 279,
+                496, 308,
+                465, 288,
+                327, 300,
+                306, 312,
+                302, 330,
+                309, 372,
+                317, 468,
+                353, 536,
+                336, 601,
+                318, 640,
+                318, 663,
+                304, 693,
+                305, 713,
+                335, 743,
+                334, 821,
+                307, 871,
+                309, 886,
+                359, 914,
+                373, 999,
+                326, 1070,
+                328, 1088,
+                334, 1153,
+                327, 1206,
+                323, 1224,
+                286, 1285,
+                272, 1299,
+                273, 1314,
+                276, 1351,
+                271, 1369,
+                283, 1382,
+                312, 1408,
+                305, 1480,
+                309, 1500,
+                310, 1545,
+                298, 1563,
+                307, 1583,
+                325, 1627,
+                307, 1680,
+                300, 1699,
+                304, 1718,
+                319, 1725,
+                335, 1716,
+                396, 1722,
+                411, 1720,
+                419, 1708,
+                396, 1667,
+                419, 1618,
+                429, 1591,
+                1578, 1592,
+                1601, 1597,
+                1612, 1652,
+                1598, 1732,
+                1603, 1750,
+                1631, 1751,
+                1646, 1733,
+                1682, 1723,
+                1702, 1728,
+                1731, 1740,
+                1744, 1727,
+                1750, 1656,
+                1744, 1641,
+                1726, 1611,
+                1727, 1590,
+                1714, 1573,
+                1694, 1572,
+                1614, 1571,
+                1588, 1560
+            };
+            int bOut[78] = {
+                18, 18,
+                1878, 17,
+                1919, 33,
+                2000, 95,
+                2015, 139,
+                2000, 175,
+                2001, 193,
+                2031, 235,
+                2032, 1262,
+                1555, 1262,
+                1497, 1250,
+                1428, 1146,
+                1428, 1038,
+                1432, 882,
+                1446, 846,
+                1378, 754,
+                1362, 748,
+                1322, 760,
+                754, 761,
+                754, 792,
+                1322, 791,
+                1397, 879,
+                1359, 1029,
+                1374, 1294,
+                1396, 1308,
+                1422, 1307,
+                1555, 1293,
+                2030, 1294,
+                2032, 2029,
+                276, 2029,
+                257, 2002,
+                182, 1997,
+                126, 2012,
+                82, 2011,
+                47, 1990,
+                29, 1940,
+                60, 1874,
+                17, 1855,
+                17, 26
+            };
+            int navIn[410] = {
+                319, 286,
+                508, 286,
+                519, 274,
+                532, 271,
+                541, 277,
+                545, 285,
+                564, 297,
+                577, 304,
+                601, 304,
+                635, 299,
+                684, 288,
+                692, 280,
+                703, 281,
+                709, 286,
+                1251, 285,
+                1260, 272,
+                1274, 262,
+                1292, 262,
+                1306, 270,
+                1314, 286,
+                1718, 287,
+                1733, 282,
+                1744, 278,
+                1751, 282,
+                1764, 282,
+                1776, 289,
+                1777, 296,
+                1782, 306,
+                1778, 319,
+                1777, 336,
+                1766, 368,
+                1762, 394,
+                1762, 982,
+                1749, 995,
+                1732, 999,
+                1720, 1002,
+                1702, 999,
+                1688, 986,
+                1681, 973,
+                1682, 448,
+                1661, 433,
+                1653, 424,
+                1647, 424,
+                1626, 408,
+                1578, 406,
+                1547, 412,
+                1537, 409,
+                1494, 412,
+                1448, 411,
+                1406, 415,
+                1380, 417,
+                1344, 424,
+                1311, 433,
+                1282, 446,
+                1249, 464,
+                1215, 488,
+                1188, 508,
+                1174, 514,
+                1158, 517,
+                1148, 524,
+                1088, 524,
+                1059, 515,
+                1046, 516,
+                1030, 514,
+                1022, 505,
+                1012, 498,
+                1004, 489,
+                992, 464,
+                974, 452,
+                944, 435,
+                900, 419,
+                849, 406,
+                742, 406,
+                732, 410,
+                709, 412,
+                678, 411,
+                650, 408,
+                625, 406,
+                618, 408,
+                582, 411,
+                554, 424,
+                528, 439,
+                509, 448,
+                488, 456,
+                475, 458,
+                460, 466,
+                448, 480,
+                440, 496,
+                433, 514,
+                433, 1268,
+                426, 1282,
+                424, 1300,
+                416, 1307,
+                416, 1322,
+                412, 1332,
+                409, 1340,
+                416, 1347,
+                426, 1356,
+                433, 1390,
+                433, 1488,
+                446, 1508,
+                462, 1526,
+                478, 1536,
+                505, 1544,
+                516, 1545,
+                534, 1552,
+                1712, 1553,
+                1721, 1547,
+                1757, 1547,
+                1766, 1552,
+                1770, 1563,
+                1770, 1574,
+                1774, 1588,
+                1774, 1601,
+                1766, 1614,
+                1762, 1626,
+                1761, 1740,
+                1766, 1746,
+                1764, 1778,
+                1760, 1788,
+                1747, 1794,
+                1708, 1794,
+                1700, 1796,
+                1688, 1791,
+                1622, 1786,
+                1611, 1787,
+                1596, 1784,
+                1581, 1783,
+                1576, 1776,
+                1567, 1772,
+                1548, 1750,
+                1535, 1722,
+                1516, 1692,
+                1496, 1669,
+                1472, 1651,
+                1447, 1634,
+                1417, 1624,
+                1391, 1618,
+                1234, 1618,
+                1210, 1622,
+                1178, 1636,
+                1150, 1653,
+                1132, 1670,
+                1130, 1679,
+                1123, 1686,
+                1094, 1710,
+                1079, 1729,
+                1070, 1740,
+                1048, 1746,
+                1023, 1746,
+                1000, 1734,
+                983, 1729,
+                974, 1718,
+                962, 1712,
+                952, 1702,
+                933, 1683,
+                915, 1671,
+                886, 1664,
+                875, 1661,
+                540, 1662,
+                515, 1668,
+                508, 1674,
+                497, 1671,
+                484, 1672,
+                459, 1684,
+                440, 1696,
+                435, 1708,
+                439, 1720,
+                440, 1732,
+                439, 1759,
+                432, 1765,
+                416, 1767,
+                400, 1762,
+                317, 1761,
+                305, 1764,
+                296, 1768,
+                286, 1764,
+                280, 1750,
+                282, 1737,
+                286, 1722,
+                286, 1390,
+                275, 1378,
+                266, 1369,
+                270, 1360,
+                276, 1351,
+                274, 1336,
+                274, 1322,
+                268, 1310,
+                267, 1298,
+                275, 1288,
+                286, 1280,
+                286, 1162,
+                283, 1144,
+                278, 1128,
+                276, 1108,
+                270, 1089,
+                273, 1062,
+                286, 1009,
+                286, 326,
+                283, 317,
+                281, 309,
+                281, 290,
+                288, 282,
+                298, 280,
+                313, 285
+            };
+            int navOut[328] = {
+                66, 168,
+                218, 67,
+                1866, 65,
+                1877, 72,
+                1894, 76,
+                1909, 81,
+                1923, 80,
+                1934, 75,
+                1966, 93,
+                1974, 114,
+                1975, 130,
+                1982, 163,
+                1982, 1131,
+                1972, 1158,
+                1939, 1191,
+                1918, 1200,
+                1898, 1213,
+                1874, 1222,
+                1841, 1221,
+                1816, 1223,
+                1797, 1227,
+                1615, 1227,
+                1600, 1223,
+                1589, 1218,
+                1563, 1212,
+                1537, 1199,
+                1507, 1170,
+                1495, 1140,
+                1482, 1119,
+                1470, 1102,
+                1462, 1090,
+                1461, 661,
+                1469, 645,
+                1469, 629,
+                1457, 621,
+                1432, 621,
+                1424, 625,
+                1387, 625,
+                1371, 630,
+                1361, 640,
+                1352, 648,
+                1341, 654,
+                1332, 661,
+                1312, 669,
+                1287, 674,
+                1265, 677,
+                1253, 679,
+                1246, 685,
+                1232, 686,
+                1213, 692,
+                1184, 693,
+                1155, 700,
+                1128, 701,
+                1120, 704,
+                1095, 705,
+                1072, 712,
+                1063, 710,
+                1024, 708,
+                983, 700,
+                948, 689,
+                923, 676,
+                915, 667,
+                904, 652,
+                896, 636,
+                874, 620,
+                847, 606,
+                816, 604,
+                789, 611,
+                766, 626,
+                727, 626,
+                704, 613,
+                660, 612,
+                637, 625,
+                629, 637,
+                635, 651,
+                646, 659,
+                647, 668,
+                653, 673,
+                653, 743,
+                645, 760,
+                639, 783,
+                640, 800,
+                648, 823,
+                659, 836,
+                668, 841,
+                689, 839,
+                715, 832,
+                732, 828,
+                753, 828,
+                757, 826,
+                1284, 826,
+                1298, 836,
+                1315, 849,
+                1321, 864,
+                1330, 876,
+                1339, 885,
+                1339, 1289,
+                1336, 1308,
+                1333, 1326,
+                1338, 1338,
+                1344, 1343,
+                1356, 1340,
+                1374, 1336,
+                1384, 1332,
+                1917, 1334,
+                1933, 1341,
+                1940, 1349,
+                1944, 1366,
+                1952, 1388,
+                1967, 1409,
+                1975, 1427,
+                1981, 1449,
+                1981, 1880,
+                1970, 1918,
+                1960, 1942,
+                1943, 1967,
+                1923, 1982,
+                1575, 1981,
+                1531, 1960,
+                1489, 1928,
+                1456, 1903,
+                1424, 1885,
+                1407, 1872,
+                1395, 1860,
+                1377, 1850,
+                1358, 1844,
+                1344, 1844,
+                1324, 1837,
+                1308, 1831,
+                1248, 1829,
+                1230, 1840,
+                1216, 1858,
+                1200, 1868,
+                1180, 1890,
+                1157, 1919,
+                1112, 1944,
+                1060, 1953,
+                888, 1954,
+                853, 1934,
+                825, 1914,
+                777, 1886,
+                758, 1874,
+                710, 1868,
+                677, 1868,
+                638, 1877,
+                603, 1889,
+                560, 1912,
+                461, 1964,
+                424, 1980,
+                287, 1980,
+                117, 1981,
+                101, 1971,
+                96, 1949,
+                88, 1931,
+                76, 1913,
+                66, 1889,
+                65, 700,
+                75, 671,
+                77, 643,
+                76, 616,
+                72, 604,
+                72, 448,
+                66, 415,
+                65, 178
+            };
+
+            totalCars = 9;
+            carsBasePath = "Assets/Maps/Sea Floor/Cars/";
+            boundsIn = bIn;
+            boundsInSize = 300;
+            boundsInReverse = true;
+            boundsOut = bOut;
+            boundsOutSize = 78;
+            boundsOutReverse = true;
+            navigationLayerIn = navIn;
+            navigationLayerInSize = 410;
+            navInReverse = false;
+            navigationLayerOut = navOut;
+            navigationLayerOutSize = 328;
+            navOutReverse = false;
+            mapImg = "Assets/Maps/Sea Floor/MapaRacing2.png";
+            mapTmx = "Assets/Maps/Sea Floor/Map2.tmx";
+            boxTex = "Assets/Maps/Sea Floor/boxObstacle.png";
+            circleTex = "Assets/Maps/Sea Floor/circleObstacle.png";
+            boxAnims = "Assets/Maps/Sea Floor/boxObstacle.tsx";
+            circleAnims = "Assets/Maps/Sea Floor/circleObstacle.tsx";
+        }
+		else if (mapNumber == 3) 
 		{
 			int bIn[34] = {
 				477, 480,
@@ -683,20 +1287,24 @@ public:
             carsBasePath = "Assets/Maps/Road/Cars/";
 			boundsIn = bIn;
 			boundsInSize = 34;
+            boundsInReverse = true;
 			boundsOut = bOut;
 			boundsOutSize = 32;
+            boundsOutReverse = false;
 			navigationLayerIn = navIn;
 			navigationLayerInSize = 84;
+            navInReverse = false;
 			navigationLayerOut = navOut;
 			navigationLayerOutSize = 96;
+            navOutReverse = true;
 			mapImg = "Assets/Maps/Road/road.png";
 			mapTmx = "Assets/Maps/Road/road.tmx";
 			boxTex = "Assets/Maps/Road/boxObstacle.png";
 			circleTex = "Assets/Maps/Road/circleObstacle.png";
 		}
 
-		Map* map = new Map(app, 0, 0, 0, totalCars, carsBasePath, boundsIn, boundsInSize, boundsOut, boundsOutSize, navigationLayerIn, navigationLayerInSize, navigationLayerOut, navigationLayerOutSize, listener, LoadTexture(mapImg));
-		MapData data = GetMapData(mapTmx, app, listener, boxTex, circleTex);
+		Map* map = new Map(app, 0, 0, 0, totalCars, carsBasePath, boundsIn, boundsInSize, boundsInReverse, boundsOut, boundsOutSize, boundsOutReverse, navigationLayerIn, navigationLayerInSize, navInReverse, navigationLayerOut, navigationLayerOutSize, navOutReverse, listener, LoadTexture(mapImg));
+		MapData data = GetMapData(mapTmx, app, listener, boxTex, circleTex, boxAnims, circleAnims);
 
 		std::sort(data.startPositions.begin(), data.startPositions.end(),
 			[](const std::pair<Transform2D, int>& a, const std::pair<Transform2D, int>& b) {
@@ -712,7 +1320,7 @@ public:
 		return map;
 	}
 
-	static MapData GetMapData(const char* mapPath, Application* app, Module* listener, const char* boxTex, const char* circleTex) {
+	static MapData GetMapData(const char* mapPath, Application* app, Module* listener, const char* boxTex, const char* circleTex, const char* boxAnims, const char* circleAnims) {
 		MapData data;
 
 		pugi::xml_document mapFileXML;
@@ -786,8 +1394,8 @@ public:
 					}
 					
 					PhysicEntity* o = nullptr;
-					if (type == "box") o = new Box(app->physics, app->renderer, newX, newY, listener, LoadTexture(boxTex), EntityType::OBSTACLE, rot, false, restitution);
-					else if (type == "circle") o = new Circle(app->physics, app->renderer, newX, newY, listener, LoadTexture(circleTex), EntityType::OBSTACLE, rot, false, restitution);
+					if (type == "box") o = new BoxObstacle(app->physics, app->renderer, newX, newY, listener, LoadTexture(boxTex), EntityType::OBSTACLE, rot, false, restitution, boxAnims);
+					else if (type == "circle") o = new CircleObstacle(app->physics, app->renderer, newX, newY, listener, LoadTexture(circleTex), EntityType::OBSTACLE, rot, false, restitution, circleAnims);
 					
 					if (o) data.obstacles.push_back(o);
 				}

@@ -1,100 +1,144 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="84">
+<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="105">
  <imagelayer id="2" name="Background">
   <image source="MapaRacing2.png" width="2048" height="2048"/>
  </imagelayer>
  <objectgroup id="3" name="Boosters">
   <object id="1" x="348.75" y="203.25" width="20.75" height="70.25">
    <properties>
-    <property name="scale" type="float" value="5"/>
+    <property name="scale" type="float" value="4"/>
     <property name="time" type="float" value="1"/>
    </properties>
   </object>
   <object id="2" x="68.5455" y="1666.91" width="213.636" height="20.9091">
    <properties>
-    <property name="scale" type="float" value="5"/>
+    <property name="scale" type="float" value="4"/>
     <property name="time" type="float" value="1"/>
    </properties>
   </object>
   <object id="3" x="705.5" y="1337.5" width="23" height="209.5">
    <properties>
-    <property name="scale" type="float" value="5"/>
+    <property name="scale" type="float" value="4"/>
     <property name="time" type="float" value="1"/>
    </properties>
   </object>
   <object id="4" x="1128" y="1156.67" width="70" height="19.6667">
    <properties>
-    <property name="scale" type="float" value="5"/>
+    <property name="scale" type="float" value="4"/>
     <property name="time" type="float" value="1"/>
    </properties>
   </object>
   <object id="5" x="1703.33" y="1847.33" width="22.6667" height="68.3333">
    <properties>
-    <property name="scale" type="float" value="5"/>
+    <property name="scale" type="float" value="4"/>
     <property name="time" type="float" value="1"/>
    </properties>
   </object>
   <object id="6" x="1767.67" y="465" width="212.333" height="22">
    <properties>
-    <property name="scale" type="float" value="5"/>
+    <property name="scale" type="float" value="4"/>
     <property name="time" type="float" value="1"/>
    </properties>
   </object>
  </objectgroup>
+ <objectgroup id="8" name="Obstacles">
+  <object id="99" x="298" y="1912.67" width="36" height="36">
+   <properties>
+    <property name="restitution" type="float" value="1"/>
+    <property name="type" value="circle"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="100" x="534" y="1382" width="36" height="36">
+   <properties>
+    <property name="restitution" type="float" value="1"/>
+    <property name="type" value="circle"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="101" x="1195.33" y="939.333" width="36" height="36">
+   <properties>
+    <property name="restitution" type="float" value="1"/>
+    <property name="type" value="circle"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="102" x="1772.67" y="578" width="36" height="36">
+   <properties>
+    <property name="restitution" type="float" value="1"/>
+    <property name="type" value="circle"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="103" x="1283" y="1916" width="36" height="36">
+   <properties>
+    <property name="restitution" type="float" value="1"/>
+    <property name="type" value="circle"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="104" x="1098.67" y="460" width="36" height="36">
+   <properties>
+    <property name="restitution" type="float" value="1"/>
+    <property name="type" value="circle"/>
+   </properties>
+   <ellipse/>
+  </object>
+ </objectgroup>
  <objectgroup id="4" name="StartPositions">
-  <object id="7" x="726.5" y="87.25" width="45.75" height="26.5">
+  <object id="7" x="772.321" y="87.4771" width="25.25" height="45.75" rotation="90">
    <properties>
     <property name="order" type="int" value="1"/>
    </properties>
   </object>
-  <object id="8" x="701.25" y="148" width="41.25" height="25.25">
+  <object id="85" x="742.375" y="147.792" width="25.25" height="45.75" rotation="90">
    <properties>
     <property name="order" type="int" value="2"/>
    </properties>
   </object>
-  <object id="9" x="668.25" y="206.75" width="43.5" height="25.25">
+  <object id="86" x="711.708" y="206.792" width="25.25" height="45.75" rotation="90">
    <properties>
     <property name="order" type="int" value="3"/>
    </properties>
   </object>
-  <object id="10" x="597.75" y="206.5" width="42.75" height="25.5">
+  <object id="87" x="640.042" y="206.792" width="25.25" height="45.75" rotation="90">
    <properties>
     <property name="order" type="int" value="6"/>
    </properties>
   </object>
-  <object id="11" x="520.25" y="205.75" width="49.5" height="26.5">
-   <properties>
-    <property name="order" type="int" value="9"/>
-   </properties>
-  </object>
-  <object id="12" x="628" y="148.25" width="43" height="25.5">
+  <object id="88" x="671.375" y="147.792" width="25.25" height="45.75" rotation="90">
    <properties>
     <property name="order" type="int" value="5"/>
    </properties>
   </object>
-  <object id="13" x="559.5" y="147.5" width="41.25" height="26">
-   <properties>
-    <property name="order" type="int" value="8"/>
-   </properties>
-  </object>
-  <object id="14" x="657.5" y="87.25" width="43.75" height="27">
+  <object id="89" x="701.708" y="87.4583" width="25.25" height="45.75" rotation="90">
    <properties>
     <property name="order" type="int" value="4"/>
    </properties>
   </object>
-  <object id="15" x="582.5" y="87.5" width="47.5" height="26.25">
+  <object id="90" x="630.375" y="87.4583" width="25.25" height="45.75" rotation="90">
    <properties>
     <property name="order" type="int" value="7"/>
    </properties>
   </object>
+  <object id="91" x="600.708" y="148.125" width="25.25" height="45.75" rotation="90">
+   <properties>
+    <property name="order" type="int" value="8"/>
+   </properties>
+  </object>
+  <object id="92" x="569.375" y="207.125" width="25.25" height="45.75" rotation="90">
+   <properties>
+    <property name="order" type="int" value="9"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup id="5" name="SlowZones">
-  <object id="16" x="18.6667" y="14.6667" width="1874.67" height="50.6667">
+  <object id="16" x="18.6667" y="14.6667" width="2026.67" height="50.6667">
    <properties>
     <property name="scale" type="float" value="0.3"/>
    </properties>
   </object>
-  <object id="17" x="1984" y="232" width="42.6667" height="1029.33">
+  <object id="17" x="1984" y="52" width="42.6667" height="1209.33">
    <properties>
     <property name="scale" type="float" value="0.3"/>
    </properties>
@@ -114,17 +158,17 @@
     <property name="scale" type="float" value="0.3"/>
    </properties>
   </object>
-  <object id="21" x="1021.33" y="424.667" width="156" height="88">
+  <object id="21" x="1026.33" y="421.667" width="156" height="88">
    <properties>
     <property name="scale" type="float" value="0.3"/>
    </properties>
   </object>
-  <object id="22" x="849" y="1046" width="269" height="287">
+  <object id="22" x="659" y="1046" width="459" height="287">
    <properties>
     <property name="scale" type="float" value="0.3"/>
    </properties>
   </object>
-  <object id="23" x="270.667" y="1984" width="1760" height="44">
+  <object id="23" x="66.667" y="1984" width="1964" height="44">
    <properties>
     <property name="scale" type="float" value="0.3"/>
    </properties>
@@ -134,7 +178,7 @@
     <property name="scale" type="float" value="0.3"/>
    </properties>
   </object>
-  <object id="25" x="1539" y="1299" width="454" height="27">
+  <object id="25" x="1471" y="1299" width="522" height="27">
    <properties>
     <property name="scale" type="float" value="0.3"/>
    </properties>
@@ -149,17 +193,17 @@
     <property name="scale" type="float" value="0.3"/>
    </properties>
   </object>
-  <object id="28" x="18" y="50" width="44" height="1806">
+  <object id="28" x="18" y="50" width="44" height="1988">
    <properties>
     <property name="scale" type="float" value="0.3"/>
    </properties>
   </object>
-  <object id="29" x="397" y="868" width="36" height="162">
+  <object id="29" x="431" y="292" width="1256" height="114">
    <properties>
     <property name="scale" type="float" value="0.3"/>
    </properties>
   </object>
-  <object id="31" x="286" y="890" width="73" height="140">
+  <object id="31" x="286" y="292" width="141" height="1460">
    <properties>
     <property name="scale" type="float" value="0.3"/>
    </properties>
@@ -184,12 +228,12 @@
     <property name="scale" type="float" value="0.3"/>
    </properties>
   </object>
-  <object id="36" x="1382" y="629.333" width="82.6667" height="127.333">
+  <object id="36" x="1342" y="731.333" width="122.667" height="595.333">
    <properties>
     <property name="scale" type="float" value="0.3"/>
    </properties>
   </object>
-  <object id="37" x="1331.33" y="657.333" width="46" height="87.3333">
+  <object id="37" x="1373.33" y="633.333" width="88" height="93.3333">
    <properties>
     <property name="scale" type="float" value="0.3"/>
    </properties>
@@ -269,7 +313,7 @@
     <property name="scale" type="float" value="0.3"/>
    </properties>
   </object>
-  <object id="54" x="1245.5" y="1839.5" width="113" height="152.5">
+  <object id="54" x="1246.5" y="1840.5" width="113" height="152.5">
    <properties>
     <property name="scale" type="float" value="0.3"/>
    </properties>
@@ -304,7 +348,7 @@
     <property name="scale" type="float" value="0.3"/>
    </properties>
   </object>
-  <object id="61" x="1685" y="907" width="74" height="85">
+  <object id="61" x="1685" y="291" width="74" height="701">
    <properties>
     <property name="scale" type="float" value="0.3"/>
    </properties>
@@ -314,24 +358,29 @@
     <property name="scale" type="float" value="0.3"/>
    </properties>
   </object>
-  <object id="63" x="1455.8" y="1087.77" width="180" height="43.6543" rotation="57.2451">
+  <object id="63" x="1455.8" y="1087.77" width="221.321" height="94.019" rotation="57.2451">
+   <properties>
+    <property name="scale" type="float" value="0.3"/>
+   </properties>
+  </object>
+  <object id="84" x="1581.5" y="1557.75" width="175" height="222.5">
    <properties>
     <property name="scale" type="float" value="0.3"/>
    </properties>
   </object>
  </objectgroup>
  <objectgroup id="6" name="Checkpoints">
-  <object id="64" x="1701" y="14" width="28" height="272">
+  <object id="64" x="1701" y="14" width="28" height="289.333">
    <properties>
     <property name="order" type="int" value="1"/>
    </properties>
   </object>
-  <object id="65" x="1770" y="350.667" width="258.667" height="30.6667">
+  <object id="65" x="1740.67" y="350.667" width="288" height="30.6667">
    <properties>
     <property name="order" type="int" value="2"/>
    </properties>
   </object>
-  <object id="66" x="1763" y="862" width="228" height="33">
+  <object id="66" x="1756.33" y="862" width="234.667" height="33">
    <properties>
     <property name="order" type="int" value="3"/>
    </properties>
@@ -346,7 +395,7 @@
     <property name="order" type="int" value="5"/>
    </properties>
   </object>
-  <object id="70" x="1393" y="396" width="38" height="222">
+  <object id="70" x="1393" y="396" width="38" height="361.333">
    <properties>
     <property name="order" type="int" value="6"/>
    </properties>
@@ -366,7 +415,7 @@
     <property name="order" type="int" value="9"/>
    </properties>
   </object>
-  <object id="74" x="1711" y="1297" width="32" height="249">
+  <object id="74" x="1711" y="1297" width="32" height="270.333">
    <properties>
     <property name="order" type="int" value="10"/>
    </properties>
@@ -391,28 +440,28 @@
     <property name="order" type="int" value="14"/>
    </properties>
   </object>
-  <object id="79" x="27" y="1597" width="258" height="30">
+  <object id="79" x="29" y="1719" width="268.667" height="30">
    <properties>
     <property name="order" type="int" value="15"/>
    </properties>
   </object>
-  <object id="80" x="20" y="833.333" width="268" height="34.6667">
+  <object id="80" x="20" y="833.333" width="285.333" height="34.6667">
    <properties>
     <property name="order" type="int" value="16"/>
    </properties>
   </object>
-  <object id="81" x="289.333" y="25.3333" width="36" height="261.333">
+  <object id="81" x="308" y="17.3333" width="36" height="309.333">
    <properties>
     <property name="order" type="int" value="18"/>
    </properties>
   </object>
-  <object id="82" x="20" y="346.667" width="264" height="30.6667">
+  <object id="82" x="20" y="346.667" width="282.667" height="30.6667">
    <properties>
     <property name="order" type="int" value="17"/>
    </properties>
   </object>
  </objectgroup>
  <objectgroup id="7" name="Finishline">
-  <object id="83" x="802" y="18" width="22.6667" height="281.333"/>
+  <object id="83" x="802" y="18" width="22.6667" height="310.666"/>
  </objectgroup>
 </map>
