@@ -92,4 +92,6 @@ private:
 	int difficulty = 1;
 
 	AnimationSet anims;
+	bool hasAnims;
+
 };
