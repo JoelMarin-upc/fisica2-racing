@@ -9,6 +9,11 @@
 #include <algorithm>
 #include <vector>
 
+const int MAP_WIDTH_PIXELS = 4096;
+const int MAP_HEIGHT_PIXELS = 4096;
+
+
+
 ModuleGame::ModuleGame(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
 	
@@ -66,6 +71,7 @@ void ModuleGame::LoadMap()
 {
 	// adds circuit, checkpoints and finishline
 	map = MapLoader::LoadMap(mapNumber, App, this);
+
 }
 
 void ModuleGame::AddCars()
@@ -267,6 +273,7 @@ void ModuleGame::GetMenuInput()
 		{
 			gameStarted = true;
 			LoadMap();
+			CalculateMapBounds(); 
 			AddCars();
 			App->renderer->SetCameraTarget(car);
 		}
@@ -342,7 +349,100 @@ void ModuleGame::PrintInfo()
 		else text = TextFormat("Position %d -> CAR %d", c->currentPosition, c->carNum);
 		App->renderer->rDrawText(text, 10, 160 + 15 * (i + 1), fontSmall, 5, RED);
 	}
+
+	if (gameStarted && !raceEnded && raceActive && map)
+	{
+		DrawMiniMap();
+	}
+
 }
+
+void ModuleGame::CalculateMapBounds()
+{
+	mapMinX = mapMinY = FLT_MAX;
+	mapMaxX = mapMaxY = -FLT_MAX;
+
+	auto processBody = [&](PhysBody* body)
+		{
+			int x, y;
+			body->GetPhysicPosition(x, y);
+
+			mapMinX = std::min(mapMinX, (float)x);
+			mapMinY = std::min(mapMinY, (float)y);
+			mapMaxX = std::max(mapMaxX, (float)x);
+			mapMaxY = std::max(mapMaxY, (float)y);
+		};
+
+	processBody(map->finishline->body);
+
+	for (auto& c : map->checkpoints) processBody(c->body);
+	for (auto& o : map->obstacles)   processBody(o->body);
+	for (auto& z : map->slowZones)   processBody(z->body);
+}
+
+
+
+void ModuleGame::DrawMiniMap()
+{
+	const int mapSize = 150;
+	const int margin = 20;
+
+	// Esquina inferior derecha (UI)
+	int miniX = GetScreenWidth() - mapSize - margin;
+	int miniY = GetScreenHeight() - mapSize - margin;
+
+	// --- Dibujar la textura del mapa en miniatura ---
+	if (mapTexture.id) // asegurarse de que la textura exista
+	{
+		App->renderer->rDrawTexturePro(
+			mapTexture,
+			{ 0.f, 0.f, (float)mapTexture.width, (float)mapTexture.height }, // fuente completa
+			{ (float)miniX, (float)miniY, (float)mapSize, (float)mapSize },   // destino reducido
+			{ 0.f, 0.f }, 0.f, WHITE
+		);
+	}
+
+	// Marco del minimapa
+	App->renderer->DrawLineUI(miniX, miniY, miniX + mapSize, miniY, WHITE);
+	App->renderer->DrawLineUI(miniX, miniY, miniX, miniY + mapSize, WHITE);
+	App->renderer->DrawLineUI(miniX + mapSize, miniY, miniX + mapSize, miniY + mapSize, WHITE);
+	App->renderer->DrawLineUI(miniX, miniY + mapSize, miniX + mapSize, miniY + mapSize, WHITE);
+
+	// Dimensiones reales del mapa (world space)
+	float mapWidth = mapMaxX - mapMinX;
+	float mapHeight = mapMaxY - mapMinY;
+
+	if (mapWidth <= 0 || mapHeight <= 0)
+		return;
+
+	float scaleX = (float)mapSize / mapWidth;
+	float scaleY = (float)mapSize / mapHeight;
+
+	// Dibujar coches
+	for (Car* c : cars)
+	{
+		int x, y;
+		c->body->GetPhysicPosition(x, y);
+
+		int px = miniX + (int)((x - mapMinX) * scaleX);
+		int py = miniY + (int)((y - mapMinY) * scaleY);
+
+		// Clamp por seguridad
+		px = std::max(miniX, std::min(px, miniX + mapSize));
+		py = std::max(miniY, std::min(py, miniY + mapSize));
+
+		Color col = c->isHumanControlled ? BLUE : RED;
+		App->renderer->DrawCircleUI(px, py, 4, col);
+	}
+
+	// Texto opcional
+	App->renderer->rDrawText("MINIMAP", miniX, miniY - 18, fontSmall, 2, YELLOW);
+}
+
+
+
+
+
 
 void ModuleGame::PrintEndScreen()
 {
@@ -404,8 +504,62 @@ void ModuleGame::Restart()
 	endFxPlayed = false;
 }
 
+void ModuleGame::DrawPauseMenu()
+{
+	int cx = GetScreenWidth() / 2;
+	int cy = GetScreenHeight() / 2;
+
+	App->renderer->DrawCircleUI(cx, cy, GetScreenHeight() * 2.f, { 0, 0, 0, 150 });
+
+	App->renderer->rDrawTextCentered("PAUSED", cx, cy - 80, fontTitle, 5, YELLOW);
+
+	Color resume = (pauseOption == PauseOption::RESUME) ? YELLOW : GRAY;
+	Color restart = (pauseOption == PauseOption::RESTART) ? YELLOW : GRAY;
+
+	App->renderer->rDrawTextCentered("RESUME", cx, cy - 10, fontSubtitle, 5, resume);
+	App->renderer->rDrawTextCentered("RESTART", cx, cy + 30, fontSubtitle, 5, restart);
+}
+
+void ModuleGame::HandlePauseInput()
+{
+	if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W) ||
+		IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
+	{
+		pauseOption = (pauseOption == PauseOption::RESUME)
+			? PauseOption::RESTART
+			: PauseOption::RESUME;
+	}
+
+	if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE))
+	{
+		if (pauseOption == PauseOption::RESUME)
+		{
+			App->isPaused = false;
+		}
+		else if (pauseOption == PauseOption::RESTART)
+		{
+			App->isPaused = false;
+			Restart();
+		}
+	}
+}
+
+
 update_status ModuleGame::Update(float dt)
 {
+	
+	// --- Toggle pause ---
+	if (IsKeyPressed(KEY_P) && gameStarted && !raceEnded)
+	{
+		App->isPaused = !App->isPaused;
+	}
+	if (App->isPaused)
+	{
+		DrawPauseMenu();
+		HandlePauseInput();
+		return UPDATE_CONTINUE;
+	}
+
 	if (gameStarted)
 	{
 		if (IsKeyPressed(KEY_C)) App->renderer->cameraRotationActive = !App->renderer->cameraRotationActive;
@@ -421,7 +575,8 @@ update_status ModuleGame::Update(float dt)
 			RunTimer();
 		}
 
-		map->Update(dt);
+		if (map)
+			map->Update(dt);
 
 		for (Car* c : cars) c->Update(dt);
 
@@ -447,8 +602,11 @@ update_status ModuleGame::Update(float dt)
 		GetMenuInput();
 		PrintMenu();
 	}
+	if (gameStarted && map)
+		DrawMiniMap();
 
 	return UPDATE_CONTINUE;
+
 }
 
 void ModuleGame::OnCollision(PhysBody* bodyA, PhysBody* bodyB)

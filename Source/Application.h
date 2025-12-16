@@ -22,6 +22,7 @@ public:
 	ModuleGame* scene_intro;
 	int targetFPS = 60;
 	float dt = 0.0f; 
+    bool isPaused = false;
 
 private:
 

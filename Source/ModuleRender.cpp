@@ -16,7 +16,12 @@ ModuleRender::~ModuleRender()
 // Called before render is available
 bool ModuleRender::Init()
 {
-	LOG("Creating Renderer context");
+	
+    Image img = GenImageColor(1, 1, WHITE); // Raylib: imagen 1x1 blanca 
+    whiteTexture = LoadTextureFromImage(img); 
+    UnloadImage(img);  
+
+    LOG("Creating Renderer context");
 	bool ret = true;
 
 	return ret;
@@ -66,7 +71,8 @@ update_status ModuleRender::PostUpdate()
 // Called before quitting
 bool ModuleRender::CleanUp()
 {
-	return true;
+    UnloadTexture(whiteTexture); 
+    return true;
 }
 
 void ModuleRender::SetCameraTarget(PhysicEntity* target)

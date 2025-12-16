@@ -38,7 +38,6 @@ bool ModulePhysics::Start()
 
 update_status ModulePhysics::PreUpdate()
 {
-	world->Step(App->dt, 8, 3); 
 
 	for (b2Contact* c = world->GetContactList(); c; c = c->GetNext())
 	{

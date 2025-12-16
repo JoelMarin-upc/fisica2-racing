@@ -91,11 +91,15 @@ update_status Application::Update()
 	static double accumulator = 0.0;
 	const float physicsStep = 1.0f / 60.0f; // 60 Hz fixed physics step
 	accumulator += dt;
-	while (accumulator >= physicsStep)
+	if (!isPaused)
 	{
-		physics->Step(physicsStep);
-		accumulator -= physicsStep;
+		while (accumulator >= physicsStep)
+		{
+			physics->Step(physicsStep);
+			accumulator -= physicsStep;
+		}
 	}
+
 
 	for (auto it = list_modules.begin(); it != list_modules.end() && ret == UPDATE_CONTINUE; ++it)
 	{

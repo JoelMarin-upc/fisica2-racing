@@ -52,6 +52,10 @@ private:
 	void PrintInfo();
 	void PrintEndScreen();
 	void Restart();
+	void HandlePauseInput();
+	void DrawPauseMenu();
+	void DrawMiniMap();
+	void CalculateMapBounds();
 
 public:
 	int totalLaps = 3;
@@ -59,6 +63,24 @@ public:
 	bool nitroInput;
 
 	Map* map;
+	Texture2D mapTexture;  
+
+	void LoadMap(int mapNumber)
+	{
+		map = MapLoader::LoadMap(mapNumber, App, this);
+		mapTexture = LoadTexture(mapNumber == 1 ? "Assets/Maps/River/MapaRacing1.png" : "Assets/Maps/Road/road.png");
+	}
+
+	enum class PauseOption
+	{
+		RESUME,
+		RESTART
+	};
+
+	PauseOption pauseOption = PauseOption::RESUME;
+
+
+
 
 private:
 	Timer countdownTimer;
@@ -75,6 +97,9 @@ private:
 	bool raceActive = false;
 	bool countdownStarted = false;
 	bool endFxPlayed = false;
+
+	float mapMinX, mapMinY;
+	float mapMaxX, mapMaxY;
 
 	std::vector<Car*> cars;
 	Car* car; // should be in cars list

@@ -38,6 +38,7 @@ public:
 public: 
 	Camera2D camera = { 0 };
 	bool cameraRotationActive = false;
+	Texture2D whiteTexture; 
 
 private:
 
