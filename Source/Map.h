@@ -4,36 +4,44 @@
 #include "Chain.h"
 #include "Checkpoint.h"
 #include "SlowZone.h"
+#include "Booster.h"
 #include "Finishline.h"
 #include "PhysicEntity.h"
 #include "ModulePhysics.h"
 #include "Transform2D.h"
+#include "ModuleRender.h"
 
 class Map : public Chain
 {
 public:
-	Map(Application* app, int _x, int _y, float _angle, int* _points, unsigned int _size, Module* _listener, Texture2D _texture)
-		: Chain(app->physics, app->renderer, _x, _y, _points, _size, _listener, _texture, CIRCUIT, _angle, false)
+	Map(Application* app, int _x, int _y, float _angle, int _totalCars, std::string _carsBasePath, int* _boundsIn, unsigned int _boundsInSize, int* _boundsOut, unsigned int _boundsOutSize, int* _navIn, unsigned int _navInSize, int* _navOut, unsigned int _navOutSize, Module* _listener, Texture2D _texture)
+		: Chain(app->physics, app->renderer, _x, _y, 0, 0, _listener, _texture, CIRCUIT, _angle, false)
 	{
-
+		x = _x;
+		y = _y;
+		angle = _angle;
+		totalCars = _totalCars;
+		carsBasePath = _carsBasePath;
+		boundsIn = new Chain(app->physics, app->renderer, _x, _y, _boundsIn, _boundsInSize, _listener, _texture, CIRCUIT, _angle, false, 0.f, true);
+		boundsOut = new Chain(app->physics, app->renderer, _x, _y, _boundsOut, _boundsOutSize, _listener, _texture, CIRCUIT, _angle, false, 0.f, false);
+		navigationLayerIn = new Chain(app->physics, app->renderer, _x, _y, _navIn, _navInSize, _listener, _texture, CIRCUIT, _angle, false, 0.f, false, true);
+		navigationLayerOut = new Chain(app->physics, app->renderer, _x, _y, _navOut, _navOutSize, _listener, _texture, CIRCUIT, _angle, false, 0.f, true, true);
 	}
 
 	void Update(float dt) override
 	{
-		int x, y;
-		body->GetPhysicPosition(x, y);
 		render->rDrawTexturePro(texture, Rectangle{ 0, 0, (float)texture.width, (float)texture.height },
 			Rectangle{ (float)x + texture.width / 2, (float)y + texture.height / 2, (float)texture.width, (float)texture.height },
-			Vector2{ (float)texture.width / 2.0f, (float)texture.height / 2.0f }, body->GetRotation() * RAD2DEG, WHITE);
+			Vector2{ (float)texture.width / 2.0f, (float)texture.height / 2.0f }, angle, WHITE);
 		
 		for (PhysicEntity* obstacle : obstacles) obstacle->Update(dt);
 	}
 
-	void OnCollision(PhysicEntity* other) {
+	void OnCollision(PhysicEntity* other, bool isSensor) {
 
 	}
 
-	void OnCollisionEnd(PhysicEntity* other) {
+	void OnCollisionEnd(PhysicEntity* other, bool isSensor) {
 
 	}
 
@@ -55,8 +63,12 @@ public:
 		checkpoints.push_back(c);
 	}
 
-	void addSlowZone(BoxSensor* z) {
+	void addSlowZone(SlowZone* z) {
 		slowZones.push_back(z);
+	}
+
+	void addBooster(Booster* z) {
+		boosters.push_back(z);
 	}
 
 	void addFinishLine(Finishline* f) {
@@ -67,6 +79,13 @@ public:
 	Checkpoint* getCheckPoint(int checkpointNumber) {
 		for (auto& c : checkpoints) if (c->order == checkpointNumber) return c;
 		return nullptr;
+	}
+
+	void AddBounds() {
+	}
+
+	void AddNavigationLayer() {
+
 	}
 
 	~Map() {
@@ -88,16 +107,42 @@ public:
 			z = nullptr;
 		}
 		slowZones.clear();
+		for (auto& b : boosters)
+		{
+			delete b;
+			b = nullptr;
+		}
+		boosters.clear();
 		delete finishline;
 		finishline = nullptr;
+		delete boundsIn;
+		boundsIn = nullptr;
+		delete boundsOut;
+		boundsOut = nullptr;
+		delete navigationLayerIn;
+		navigationLayerIn = nullptr;
+		delete navigationLayerOut;
+		navigationLayerOut = nullptr;
 		auto pbody = body->body;
 		physics->DestroyBody(pbody);
 	}
 
+	int x, y;
+	float angle;
+
 	std::vector<Transform2D> playerStartPositions;
 	std::vector<PhysicEntity*> obstacles;
 	std::vector<Checkpoint*> checkpoints;
-	std::vector<BoxSensor*> slowZones;
+	std::vector<SlowZone*> slowZones;
+	std::vector<Booster*> boosters;
 	Finishline* finishline;
+
+	int totalCars;
+	std::string carsBasePath;
+
+	Chain* boundsIn;
+	Chain* boundsOut;
+	Chain* navigationLayerIn;
+	Chain* navigationLayerOut;
 	
 };

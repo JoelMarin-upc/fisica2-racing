@@ -8,6 +8,7 @@
 
 #include "raylib.h"
 #include <vector>
+#include <map>
 
 #include "Car.h"
 #include "Finishline.h"
@@ -41,20 +42,23 @@ private:
 	void PerformCountdown();
 	void StartRace();
 	void GetInput();
-	void AdjustCamera();
 	void CalculatePositions();
 	void CreateMouseJoint();
 	void DestroyMouseJoint();
 	void UpdateMouseJoint();
 	void RunTimer();
+	void GetMenuInput();
+	void PrintMenu();
 	void PrintInfo();
 	void PrintEndScreen();
 	void Restart();
 
 public:
-	const int totalLaps = 3;
+	int totalLaps = 3;
 	Vector2* movementInput;
 	bool nitroInput;
+
+	Map* map;
 
 private:
 	Timer countdownTimer;
@@ -63,26 +67,44 @@ private:
 	Timer lapTimer;
 	double lapTime = 0;
 	double bestLapTime = 0;
-	double bestLap = 0;
+	int bestLap = 0;
 	double raceTime = 0;
 
+	bool gameStarted = false;
 	bool raceEnded = false;
 	bool raceActive = false;
 	bool countdownStarted = false;
+	bool endFxPlayed = false;
 
-	const int totalCars = 4;
-
-	//std::vector<PhysicEntity*> entities;
 	std::vector<Car*> cars;
 	Car* car; // should be in cars list
-	Map* map;
 
 	b2MouseJoint* mouseJoint = nullptr;
 
+	std::map<int, Texture2D> positionTex;
+	Texture2D menuBack;
+
+	Font fontMainTitle;
 	Font fontTitle;
 	Font fontSubtitle;
 	Font fontText;
 	Font fontSmall;
 	const char* fontPath = "Assets/ScienceGothic_Condensed-Black.ttf";
+
+	int menuOption = 1;
+	int mapNumber = 1;
+	int difficulty = 3;
+
+	int startFX;
+	int countdownFX;
+	int winFX;
+	int looseFX;
+
+	int sprintFX;
+	int runFX;
+	int crashFX;
+
+	int music;
+
 	
 };

@@ -46,6 +46,7 @@ Application::~Application()
 bool Application::Init()
 {
 	bool ret = true;
+	SetTargetFPS(60);
 
 	// Call Init() in all modules
 	for (auto it = list_modules.begin(); it != list_modules.end() && ret; ++it)
@@ -79,7 +80,7 @@ update_status Application::Update()
 		SetTargetFPS(targetFPS); // raylib caps FPS automatically
 		LOG("Target FPS switched to %d", targetFPS);
 	}
-
+	
 	// --- Delta time ---
 	static double lastTime = GetTime(); // seconds
 	double currentTime = GetTime();

@@ -2,22 +2,16 @@
 
 #include "Module.h"
 #include "ModulePhysics.h"
-#include "ModuleRender.h"
+//#include "ModuleRender.h"
 #include "p2Point.h"
+
+class ModuleRender;
 
 class PhysicEntity
 {
 protected:
 
-	PhysicEntity(PhysBody* _body, ModulePhysics* _physics, ModuleRender* _render, Module* _listener, EntityType type)
-		: body(_body)
-		, physics(_physics)
-		, render(_render)
-		, listener(_listener)
-		, type(type)
-	{
-		body->listener = listener;
-	}
+	PhysicEntity(PhysBody* _body, ModulePhysics* _physics, ModuleRender* _render, Module* _listener, EntityType type);
 
 public:
 	virtual ~PhysicEntity() {
@@ -25,8 +19,8 @@ public:
 		physics->DestroyBody(pbody);
 	}
 	virtual void Update(float dt) = 0;
-	virtual void OnCollision(PhysicEntity* other) = 0;
-	virtual void OnCollisionEnd(PhysicEntity* other) = 0;
+	virtual void OnCollision(PhysicEntity* other, bool isSensor) = 0;
+	virtual void OnCollisionEnd(PhysicEntity* other, bool isSensor) = 0;
 	virtual int RayHit(vec2<int> ray, vec2<int> mouse, vec2<float>& normal)
 	{
 		return 0;

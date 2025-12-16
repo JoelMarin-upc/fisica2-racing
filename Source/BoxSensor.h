@@ -12,16 +12,21 @@ public:
 		body->type = type;
 	}
 
+	~BoxSensor() {
+		auto pbody = body->body;
+		physics->DestroyBody(pbody);
+	}
+
 	void Update(float dt) override
 	{
 
 	}
 
-	void OnCollision(PhysicEntity* other) {
+	void OnCollision(PhysicEntity* other, bool isSensor) {
 
 	}
 
-	void OnCollisionEnd(PhysicEntity* other) {
+	void OnCollisionEnd(PhysicEntity* other, bool isSensor) {
 
 	}
 

@@ -3,13 +3,14 @@
 #include "Application.h"
 #include "ModuleAudio.h"
 #include "Box.h"
+#include "Animation.h"
 
 class ModuleGame;
 
 class Car : public Box
 {
 public:
-	Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman);
+	Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman, int _sprintFXId, int _runFXId, int _crashFXId, std::string animationsPath, Vector2 colliderSize = { 0.f, 0.f }, int _difficulty = 1);
 
 	~Car();
 
@@ -19,9 +20,9 @@ public:
 
 	void Update(float dt) override;
 
-	void OnCollision(PhysicEntity* other);
+	void OnCollision(PhysicEntity* other, bool isSensor);
 
-	void OnCollisionEnd(PhysicEntity* other);
+	void OnCollisionEnd(PhysicEntity* other, bool isSensor);
 
 private:
 	void GetInput();
@@ -32,22 +33,35 @@ private:
 
 	void Move(float dt);
 
+	void PlayRunAudio();
+
 	void CheckNitro();
 
 	void SetSpeedScale(float scale = 1);
 
+	void RunBoostTimer();
+
+	void StartBoost(double scale, double time);
+
 public:
 	int carNum;
+
 	int currentPosition;
 	int currentLap;
 	int currentCheckpointNum;
 	int distanceToLastCheckpoint;
+	
 	bool isHumanControlled;
+	
 	int availableNitros;
 
+	double engineTemperature;
+	double maxEngineTemperature;
+	bool isOverHeated;
+
 private:
-	const float engineForce = 10.f;
-	const float steerStrength = 6.f;
+	const float engineForce = 5.f;
+	const float steerStrength = 2.5f;
 	const float nitroMultiplier = 2.f;
 	
 	Vector2* targetDirection;
@@ -63,4 +77,19 @@ private:
 	bool nitroInput;
 
 	double speedScale = 1;
+	int sprintFX;
+	int runFX;
+	int crashFX;
+
+	Timer boostTimer;
+	double boostTime = -0.1f;
+
+	Timer runFXTimer;
+	const double runFXSeconds = 3.f;
+
+	const float warmingVelocityThreshold = 9;
+
+	int difficulty = 1;
+
+	AnimationSet anims;
 };

@@ -24,6 +24,7 @@ enum EntityType {
 	CHECKPOINT,
 	FINISHLINE,
 	SLOWZONE,
+	BOOSTER,
 	OBSTACLE,
 	CIRCUIT
 };
@@ -56,6 +57,23 @@ public:
 	EntityType type;
 };
 
+class RayCastClosestCallback : public b2RayCastCallback
+{
+public:
+	bool hit = false;
+	b2Vec2 normal;
+	float fraction = 0.0f;
+
+	float ReportFixture(b2Fixture* fixture, const b2Vec2& point,
+		const b2Vec2& normal, float fraction) override
+	{
+		hit = true;
+		this->normal = normal;
+		this->fraction = fraction;
+		return fraction;
+	}
+};
+
 // Module --------------------------------------
 class ModulePhysics : public Module, public b2ContactListener // TODO
 {
@@ -70,10 +88,10 @@ public:
 	update_status PostUpdate();
 	bool CleanUp();
 
-	PhysBody* CreateCircle(int x, int y, int radius, float angle = 0.f, bool dynamic = true, float restitution = 0.f);
-	PhysBody* CreateRectangle(int x, int y, int width, int height, float angle = 0.f, bool dynamic = true, float restitution = 0.f);
+	PhysBody* CreateCircle(int x, int y, int radius, float angle = 0.f, bool dynamic = true, float restitution = 0.f, float mass = 4000.f);
+	PhysBody* CreateRectangle(int x, int y, int width, int height, float angle = 0.f, bool dynamic = true, float restitution = 0.f, float mass = 4000.f);
 	PhysBody* CreateRectangleSensor(int x, int y, int width, int height, float angle = 0.f, bool dynamic = true);
-	PhysBody* CreateChain(int x, int y, int* points, unsigned int size, float angle = 0.f, bool dynamic = true, float restitution = 0.f, bool reverse = false);
+	PhysBody* CreateChain(int x, int y, int* points, unsigned int size, float angle = 0.f, bool dynamic = true, float restitution = 0.f, bool reverse = false, bool isSensor = false);
 	b2MouseJoint* CreateMouseJoint(b2Body* body, b2Vec2 target);
 
 	float GetDistance(b2Body* bodyA, b2Body* bodyB);

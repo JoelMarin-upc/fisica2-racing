@@ -57,7 +57,7 @@ update_status ModulePhysics::PreUpdate()
 	return UPDATE_CONTINUE;
 }
 
-PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, float angle, bool dynamic, float restitution)
+PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, float angle, bool dynamic, float restitution, float mass)
 {
 	b2BodyDef body;
 	body.type = dynamic ? b2_dynamicBody : b2_staticBody;
@@ -72,7 +72,8 @@ PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, float angle, boo
 	shape.m_radius = PIXEL_TO_METERS(radius);
 	b2FixtureDef fixture;
 	fixture.shape = &shape;
-	fixture.density = 5.0f;
+	float area = PI * radius * radius;
+	fixture.density = mass / area;
 	fixture.restitution = restitution;
 
 	b->CreateFixture(&fixture);
@@ -87,7 +88,7 @@ PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, float angle, boo
 	return pbody;
 }
 
-PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height, float angle, bool dynamic, float restitution)
+PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height, float angle, bool dynamic, float restitution, float mass)
 {
 	b2BodyDef body;
 	body.type = dynamic ? b2_dynamicBody : b2_staticBody;
@@ -103,7 +104,8 @@ PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height, fl
 
 	b2FixtureDef fixture;
 	fixture.shape = &box;
-	fixture.density = 1.0f;
+	float area = PI * width * height;
+	fixture.density = mass / area;
 	fixture.restitution = restitution;
 
 	b->CreateFixture(&fixture);
@@ -151,8 +153,14 @@ PhysBody* ModulePhysics::CreateRectangleSensor(int x, int y, int width, int heig
 	return pbody;
 }
 
-PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, unsigned int size, float angle, bool dynamic, float restitution, bool reverse)
+PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, unsigned int size, float angle, bool dynamic, float restitution, bool reverse, bool isSensor)
 {
+	if (size == 0)
+	{
+		auto b = new PhysBody();
+		b->body = nullptr;
+		return b;
+	}
 	b2BodyDef body;
 	body.type = dynamic ? b2_dynamicBody : b2_staticBody;
 	body.bullet = dynamic;
@@ -177,6 +185,7 @@ PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, unsigned int siz
 	b2FixtureDef fixture;
 	fixture.shape = &shape;
 	fixture.restitution = restitution;
+	fixture.isSensor = isSensor;
 
 	b->CreateFixture(&fixture);
 
@@ -441,38 +450,59 @@ bool PhysBody::Contains(int x, int y) const
 	return false;
 }
 
-int PhysBody::RayCast(int x1, int y1, int x2, int y2, float& normal_x, float& normal_y) const
+//int PhysBody::RayCast(int x1, int y1, int x2, int y2, float& normal_x, float& normal_y, float maxFraction) const
+//{
+//	int ret = -1;
+//
+//	b2RayCastInput input;
+//	b2RayCastOutput output;
+//
+//	input.p1.Set(PIXEL_TO_METERS(x1), PIXEL_TO_METERS(y1));
+//	input.p2.Set(PIXEL_TO_METERS(x2), PIXEL_TO_METERS(y2));
+//	input.maxFraction = maxFraction;
+//
+//	const b2Fixture* fixture = body->GetFixtureList();
+//
+//	while (fixture != NULL)
+//	{
+//		if (fixture->GetShape()->RayCast(&output, input, body->GetTransform(), 0) == true)
+//		{
+//			float fx = (float)(x2 - x1);
+//			float fy = (float)(y2 - y1);
+//			float dist = sqrtf((fx * fx) + (fy * fy));
+//
+//			normal_x = output.normal.x;
+//			normal_y = output.normal.y;
+//
+//			return (int)(output.fraction * dist);
+//		}
+//		fixture = fixture->GetNext();
+//	}
+//
+//	return ret;
+//}
+
+int PhysBody::RayCast(int x1, int y1, int x2, int y2,
+	float& normal_x, float& normal_y) const
 {
-	int ret = -1;
+	RayCastClosestCallback callback;
 
-	b2RayCastInput input;
-	b2RayCastOutput output;
+	b2Vec2 p1(PIXEL_TO_METERS(x1), PIXEL_TO_METERS(y1));
+	b2Vec2 p2(PIXEL_TO_METERS(x2), PIXEL_TO_METERS(y2));
 
-	input.p1.Set(PIXEL_TO_METERS(x1), PIXEL_TO_METERS(y1));
-	input.p2.Set(PIXEL_TO_METERS(x2), PIXEL_TO_METERS(y2));
-	input.maxFraction = 1.0f;
+	body->GetWorld()->RayCast(&callback, p1, p2);
 
-	const b2Fixture* fixture = body->GetFixtureList();
+	if (!callback.hit)
+		return -1;
 
-	while (fixture != NULL)
-	{
-		if (fixture->GetShape()->RayCast(&output, input, body->GetTransform(), 0) == true)
-		{
-			// do we want the normal ?
+	normal_x = callback.normal.x;
+	normal_y = callback.normal.y;
 
-			float fx = (float)(x2 - x1);
-			float fy = (float)(y2 - y1);
-			float dist = sqrtf((fx * fx) + (fy * fy));
+	b2Vec2 diff = p2 - p1;
+	float totalLen = diff.Length();
+	float hitDist = callback.fraction * totalLen;
 
-			normal_x = output.normal.x;
-			normal_y = output.normal.y;
-
-			return (int)(output.fraction * dist);
-		}
-		fixture = fixture->GetNext();
-	}
-
-	return ret;
+	return METERS_TO_PIXELS(hitDist);
 }
 
 void PhysBody::ApplyImpulse(float xNewtonSec, float yNewtonSec)

@@ -25,18 +25,23 @@ bool ModuleRender::Init()
 // PreUpdate: clear buffer
 update_status ModuleRender::PreUpdate()
 {
+    ClearBackground(background);
+
+    AdjustCamera();
+
+    // NOTE: This function setups render batching system for
+    // maximum performance, all consecutive Draw() calls are
+    // not processed until EndDrawing() is called
+    BeginDrawing();
+    if (cameraTarget) BeginMode2D(camera);
+
 	return UPDATE_CONTINUE;
 }
 
 // Update: debug camera
 update_status ModuleRender::Update()
 {
-    ClearBackground(background);
-
-    // NOTE: This function setups render batching system for
-    // maximum performance, all consecutive Draw() calls are
-    // not processed until EndDrawing() is called
-    BeginDrawing();
+    
 
 	return UPDATE_CONTINUE;
 }
@@ -45,9 +50,15 @@ update_status ModuleRender::Update()
 update_status ModuleRender::PostUpdate()
 {
     // Draw everything in our batch!
-    DrawFPS(10, 10);
+
+    if (cameraTarget) EndMode2D();
+
+    for (auto& f : uiCalls) f();
+    uiCalls.clear();
 
     EndDrawing();
+
+    DrawFPS(10, 10);
 
 	return UPDATE_CONTINUE;
 }
@@ -56,6 +67,50 @@ update_status ModuleRender::PostUpdate()
 bool ModuleRender::CleanUp()
 {
 	return true;
+}
+
+void ModuleRender::SetCameraTarget(PhysicEntity* target)
+{
+    cameraTarget = target;
+    if (!cameraTarget) return;
+    camera = { 0 };
+    int x, y;
+    cameraTarget->body->GetPhysicPosition(x, y);
+    Vector2 pos = Vector2();
+    pos.x = x;
+    pos.y = y;
+    camera.target = pos;
+    Vector2 off = Vector2();
+    off.x = GetScreenWidth() / 2.f;
+    off.y = GetScreenHeight() / 2.f;
+    camera.offset = off;
+    camera.rotation = 0.f;
+    camera.zoom = 1.f;
+}
+
+static float LerpAngle(float from, float to, float interpolation)
+{
+    float delta = fmodf(to - from + 180.0f, 360.0f) - 180.0f;
+    return from + delta * interpolation;
+}
+
+void ModuleRender::AdjustCamera()
+{
+    if (!cameraTarget) return;
+    int x, y;
+    cameraTarget->body->GetPhysicPosition(x, y);
+    camera.target = { (float)x, (float)y };
+    if (cameraRotationActive) {
+        float targetRot = cameraTarget->body->GetRotation() * RAD2DEG;
+
+        float smooth = 0.05f;
+
+        cameraRotation = LerpAngle(cameraRotation, targetRot, smooth);
+        camera.rotation = -cameraRotation;
+    }
+    else {
+        camera.rotation = 0.f;
+    }
 }
 
 void ModuleRender::SetBackgroundColor(Color color)
@@ -74,13 +129,14 @@ bool ModuleRender::Draw(Texture2D texture, int x, int y, const Rectangle* sectio
 
     if (section != NULL) rect = *section;
 
-    position.x = (float)(x-pivot_x) * scale + camera.x;
-    position.y = (float)(y-pivot_y) * scale + camera.y;
+    /*position.x = (float)(x-pivot_x) * scale;
+    position.y = (float)(y-pivot_y) * scale;*/
 
-	rect.width *= scale;
-	rect.height *= scale;
+	/*rect.width *= scale;
+	rect.height *= scale;*/
+    Vector2 worldPos = { (float)x - pivot_x, (float)y - pivot_y };
 
-    DrawTextureRec(texture, rect, position, WHITE);
+    DrawTextureRec(texture, rect, worldPos, WHITE);
 
 	return ret;
 }
@@ -89,14 +145,29 @@ bool ModuleRender::rDrawTexturePro(Texture2D texture, Rectangle source, Rectangl
 {
     bool ret = true;
 
-    dest.x += camera.x;
-    dest.y += camera.y;
     DrawTexturePro(texture, source, dest, origin, rotation, color);
 
     return ret;
 }
 
-bool ModuleRender::DrawText(const char * text, int x, int y, Font font, int spacing, Color tint) const
+void ModuleRender::DrawTextureUI(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color color)
+{
+    uiCalls.push_back([=]() { rDrawTexturePro(texture, source, dest, origin, rotation, color); });
+}
+
+void ModuleRender::rDrawText(const char * text, int x, int y, Font font, int spacing, Color tint)
+{
+    std::string textCopy = text;
+    uiCalls.push_back([=]() { DrawText(textCopy.c_str(), x, y, font, spacing, tint); });
+}
+
+void ModuleRender::rDrawTextCentered(const char* text, int centerX, int centerY, Font font, int spacing, Color tint)
+{
+    std::string textCopy = text;
+    uiCalls.push_back([=]() { DrawTextCentered(textCopy.c_str(), centerX, centerY, font, spacing, tint); });
+}
+
+bool ModuleRender::DrawText(const char* text, int x, int y, Font font, int spacing, Color tint) const
 {
     bool ret = true;
 
@@ -120,16 +191,26 @@ bool ModuleRender::DrawTextCentered(const char* text, int centerX, int centerY, 
     return ret;
 }
 
+void ModuleRender::DrawCircleUI(int x, int y, float radius, Color color)
+{
+    uiCalls.push_back([=]() { rDrawCircle(x, y, radius, color); });
+}
+
 bool ModuleRender::rDrawCircle(int x, int y, float radius, Color color) const
 {
     bool ret = true;
-    DrawCircle(x + camera.x, y + camera.y, radius, color);
+    DrawCircle(x, y, radius, color);
     return ret;
+}
+
+void ModuleRender::DrawLineUI(int x1, int y1, int x2, int y2, Color color)
+{
+    uiCalls.push_back([=]() { rDrawLine(x1, y1, x2, y2, color); });
 }
 
 bool ModuleRender::rDrawLine(int x1, int y1, int x2, int y2, Color color) const
 {
     bool ret = true;
-    DrawLine(x1 + camera.x, y1 + camera.y, x2 + camera.x, y2 + camera.y, color);
+    DrawLine(x1, y1, x2, y2, color);
     return ret;
 }
