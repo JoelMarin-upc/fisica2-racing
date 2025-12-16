@@ -71,7 +71,7 @@ bool ModuleAudio::PlayMusic(const char* path, float fade_time)
 }
 
 // Load WAV
-unsigned int ModuleAudio::LoadFx(const char* path)
+unsigned int ModuleAudio::LoadFx(const char* path, double volume)
 {
 	if(IsEnabled() == false)
 		return 0;
@@ -79,6 +79,11 @@ unsigned int ModuleAudio::LoadFx(const char* path)
 	unsigned int ret = 0;
 
 	Sound sound = LoadSound(path);
+
+	if (volume > 1.f) volume = 1.f;
+	if (volume < 0.f) volume = 0.f;
+
+	SetSoundVolume(sound, volume);
 
 	if(sound.stream.buffer == NULL)
 	{

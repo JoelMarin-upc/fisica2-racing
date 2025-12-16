@@ -8,6 +8,7 @@
 
 #include "raylib.h"
 #include <vector>
+#include <map>
 
 #include "Car.h"
 #include "Finishline.h"
@@ -66,22 +67,24 @@ private:
 	Timer lapTimer;
 	double lapTime = 0;
 	double bestLapTime = 0;
-	double bestLap = 0;
+	int bestLap = 0;
 	double raceTime = 0;
 
 	bool gameStarted = false;
 	bool raceEnded = false;
 	bool raceActive = false;
 	bool countdownStarted = false;
+	bool endFxPlayed = false;
 
-	//const int totalCars = 9;
-
-	//std::vector<PhysicEntity*> entities;
 	std::vector<Car*> cars;
 	Car* car; // should be in cars list
 
 	b2MouseJoint* mouseJoint = nullptr;
 
+	std::map<int, Texture2D> positionTex;
+	Texture2D menuBack;
+
+	Font fontMainTitle;
 	Font fontTitle;
 	Font fontSubtitle;
 	Font fontText;
@@ -96,6 +99,10 @@ private:
 	int countdownFX;
 	int winFX;
 	int looseFX;
+	int runFX;
+	int crashFX;
+
+	int sprintFX;
 	int runFX;
 	int crashFX;
 

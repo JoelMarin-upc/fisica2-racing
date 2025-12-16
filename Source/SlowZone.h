@@ -14,11 +14,11 @@ public:
 
 	}
 
-	void OnCollision(PhysicEntity* other) {
+	void OnCollision(PhysicEntity* other, bool isSensor) {
 
 	}
 
-	void OnCollisionEnd(PhysicEntity* other) {
+	void OnCollisionEnd(PhysicEntity* other, bool isSensor) {
 
 	}
 

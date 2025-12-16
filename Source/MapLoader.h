@@ -17,7 +17,8 @@ public:
 	int width = 0, height = 0;
 	std::vector<Checkpoint*> checkpoints;
 	std::vector<PhysicEntity*> obstacles;
-	std::vector<SlowZone*> slowZones;
+    std::vector<SlowZone*> slowZones;
+    std::vector<Booster*> booster;
 	std::vector<std::pair<Transform2D, int>> startPositions;
 	Finishline* finishline = nullptr;
 };
@@ -705,7 +706,8 @@ public:
 		for (auto& p : data.startPositions) map->addStartPosition(p.first);
 		for (auto& c : data.checkpoints) map->addCheckPoint(c);
 		for (auto& o : data.obstacles) map->addObstacle(o);
-		for (auto& z : data.slowZones) map->addSlowZone(z);
+        for (auto& z : data.slowZones) map->addSlowZone(z);
+        for (auto& b : data.booster) map->addBooster(b);
 		map->addFinishLine(data.finishline);
 		return map;
 	}
@@ -756,6 +758,21 @@ public:
 					SlowZone* z = new SlowZone(app, newX, newY, width, height, rot, listener, scale);
 					data.slowZones.push_back(z);
 				}
+                else if (name == "Boosters")
+                {
+                    float scale = 0;
+                    float time = 0;
+
+                    for (pugi::xml_node propNode = objectNode.child("properties").child("property"); propNode != NULL; propNode = propNode.next_sibling("property")) {
+                        std::string prop = propNode.attribute("name").as_string();
+                        float val = propNode.attribute("value").as_float();
+                        if (prop == "scale") scale = val;
+                        if (prop == "time") time = val;
+                    }
+
+                    Booster* b = new Booster(app, newX, newY, width, height, rot, listener, scale, time);
+                    data.booster.push_back(b);
+                }
 				else if (name == "Obstacles")
 				{
 					std::string type = "";

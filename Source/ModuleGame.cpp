@@ -22,6 +22,7 @@ bool ModuleGame::Start()
 	LOG("Loading Intro assets");
 	bool ret = true;
 
+	fontMainTitle = LoadFontEx(fontPath, 80, nullptr, 0);
 	fontTitle = LoadFontEx(fontPath, 60, nullptr, 0);
 	fontSubtitle = LoadFontEx(fontPath, 50, nullptr, 0);
 	fontText = LoadFontEx(fontPath, 30, nullptr, 0);
@@ -32,10 +33,24 @@ bool ModuleGame::Start()
 	startFX = App->audio->LoadFx("Assets/Sounds/FX/start.wav");
 	looseFX = App->audio->LoadFx("Assets/Sounds/FX/loose.wav");
 	winFX = App->audio->LoadFx("Assets/Sounds/FX/win.wav");
-	runFX = App->audio->LoadFx("Assets/Sounds/FX/run.wav");
-	crashFX = App->audio->LoadFx("Assets/Sounds/FX/bounce.wav");
+
+	sprintFX = App->audio->LoadFx("Assets/Sounds/FX/sprint.wav");
+	runFX = App->audio->LoadFx("Assets/Sounds/FX/sprint.wav", .4f);
+	crashFX = App->audio->LoadFx("Assets/Sounds/FX/sprint.wav", .6f);
 
 	App->audio->PlayMusic("Assets/Sounds/Music/GlooGloo.wav");
+
+	positionTex[1] = LoadTexture("Assets/UI/1.png");
+	positionTex[2] = LoadTexture("Assets/UI/2.png");
+	positionTex[3] = LoadTexture("Assets/UI/3.png");
+	positionTex[4] = LoadTexture("Assets/UI/4.png");
+	positionTex[5] = LoadTexture("Assets/UI/5.png");
+	positionTex[6] = LoadTexture("Assets/UI/6.png");
+	positionTex[7] = LoadTexture("Assets/UI/7.png");
+	positionTex[8] = LoadTexture("Assets/UI/8.png");
+	positionTex[9] = LoadTexture("Assets/UI/9.png");
+	
+	menuBack = LoadTexture("Assets/UI/menu_background.png");
 
 	return ret;
 }
@@ -58,12 +73,16 @@ void ModuleGame::AddCars()
 	for (int i = 0; i < map->totalCars - 1; i++)
 	{
 		Transform2D t = map->playerStartPositions[i];
-		const std::string tex = map->carsBasePath + "car" + std::to_string(i + 1) + ".png";
-		cars.push_back(new Car(App, t.position.x, t.position.y, t.rotation, this, LoadTexture(tex.c_str()), i + 1, false, difficulty));
+		int num = GetRandomValue(1, 8);
+		const std::string tex = map->carsBasePath + "Car" + std::to_string(num) + ".png";
+		const std::string tmx = map->carsBasePath + "Car" + std::to_string(num) + ".tsx";
+		cars.push_back(new Car(App, t.position.x, t.position.y, t.rotation, this, LoadTexture(tex.c_str()), i + 1, false, sprintFX, runFX, crashFX, tmx, { 15.f, 33.f }, difficulty));
 	}
+	int num = GetRandomValue(1, 8);
 	Transform2D playerTransform = map->playerStartPositions[map->totalCars-1];
-	const std::string playerTex = map->carsBasePath + "carPlayer.png";
-	car = new Car(App, playerTransform.position.x, playerTransform.position.y, playerTransform.rotation, this, LoadTexture(playerTex.c_str()), map->totalCars, true);
+	const std::string playerTex = map->carsBasePath + "Car" + std::to_string(num) + ".png";
+	const std::string playerAnims = map->carsBasePath + "Car" + std::to_string(num) + ".tsx";
+	car = new Car(App, playerTransform.position.x, playerTransform.position.y, playerTransform.rotation, this, LoadTexture(playerTex.c_str()), map->totalCars, true, sprintFX, runFX, crashFX, playerAnims, { 15.f, 33.f });
 	cars.push_back(car);
 }
 
@@ -106,7 +125,7 @@ void ModuleGame::GetInput()
 	nitroInput = false;
 	if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) movementInput->x = 2;
 	if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) movementInput->x = -2;
-	if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) movementInput->y = -1.3;
+	if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) movementInput->y = -1;
 	if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) movementInput->y = 1;
 	if (IsKeyPressed(KEY_SPACE)) nitroInput = true;
 }
@@ -218,7 +237,7 @@ void ModuleGame::GetMenuInput()
 			difficulty--;
 			if (difficulty < 1) difficulty = 3;
 		}
-		if (menuOption == 4)
+		if (menuOption == 3)
 		{
 			totalLaps--;
 			if (totalLaps < 1) totalLaps = 5;
@@ -257,7 +276,7 @@ void ModuleGame::GetMenuInput()
 void ModuleGame::PrintMenu()
 {
 	Color selected = RED;
-	Color unselected = BLUE;
+	Color unselected = YELLOW;
 	
 	std::string mapName;
 	switch (mapNumber)
@@ -292,6 +311,10 @@ void ModuleGame::PrintMenu()
 	int screenCenterX = GetScreenWidth() / 2;
 	int screenCenterY = GetScreenHeight() / 2;
 
+	App->renderer->rDrawTextCentered("TITLE OF THE GAME", screenCenterX, screenCenterY - 160, fontMainTitle, 5, YELLOW);
+
+	App->renderer->rDrawTexturePro(menuBack, { 0.f, 0.f, (float)menuBack.width, (float)menuBack.height }, { 0.f, 0.f, (float)menuBack.width, (float)menuBack.height }, { 0.f, 0.f }, 0.f, WHITE);
+
 	App->renderer->rDrawTextCentered(TextFormat("Map: < %s >", mapName.c_str()), screenCenterX, screenCenterY - 45, fontText, 5, menuOption == 1 ? selected : unselected);
 	App->renderer->rDrawTextCentered(TextFormat("Difficulty: < %s >", diffName.c_str()), screenCenterX, screenCenterY - 15, fontText, 5, menuOption == 2 ? selected : unselected);
 	App->renderer->rDrawTextCentered(TextFormat("Laps: < %i >", totalLaps), screenCenterX, screenCenterY + 15, fontText, 5, menuOption == 3 ? selected : unselected);
@@ -300,9 +323,14 @@ void ModuleGame::PrintMenu()
 
 void ModuleGame::PrintInfo()
 {
+	Texture2D positionT = positionTex[car->currentPosition];
+	App->renderer->DrawTextureUI(positionT, { 0.f, 0.f, (float)positionT.width, (float)positionT.height }, 
+								 { (float)GetScreenWidth() - positionT.width - 10, 10.f, (float)positionT.width, (float)positionT.height },
+								 Vector2{ 0.f, 0.f }, 0.f, WHITE);
+
 	//App->renderer->DrawText(TextFormat("Last checkpoint: %d", car->currentCheckpointNum), 10, 30, fontText, 5, RED);
-	App->renderer->rDrawText(TextFormat("Laps: %d/%d", car->currentLap, totalLaps), 10, 50, fontText, 5, RED);
-	App->renderer->rDrawText(TextFormat("Position: %d/%d", car->currentPosition, map->totalCars), 10, 70, fontText, 5, RED);
+	//App->renderer->rDrawText(TextFormat("Position: %d/%d", car->currentPosition, map->totalCars), 10, 50, fontText, 5, RED);
+	App->renderer->rDrawText(TextFormat("Laps: %d/%d", car->currentLap, totalLaps), 10, 70, fontText, 5, RED);
 	App->renderer->rDrawText(TextFormat("Lap time: %02.02f s", lapTime), 10, 90, fontText, 5, RED);
 	App->renderer->rDrawText(TextFormat("Total time: %02.02f s", raceTime), 10, 110, fontText, 5, RED);
 	App->renderer->rDrawText(TextFormat("Avaliable nitros: %d", car->availableNitros), 10, 130, fontText, 5, RED);
@@ -318,28 +346,42 @@ void ModuleGame::PrintInfo()
 
 void ModuleGame::PrintEndScreen()
 {
+
 	int centerX = GetScreenWidth() / 2;
 	int centerY = GetScreenHeight() / 2;
-
+	
+	App->renderer->DrawCircleUI(centerX, centerY, GetScreenHeight() * 2.f, {150, 150, 150, 100});
+	
 	if (car->currentPosition == 1) {
-		App->renderer->rDrawTextCentered("Well played. Another Game?", centerX, centerY + 50, fontSubtitle, 5, YELLOW);
-		App->audio->PlayFx(winFX);
+		App->renderer->rDrawTextCentered("Well played. Another Game?", centerX, centerY - 130, fontSubtitle, 5, YELLOW);
+		if (!endFxPlayed) {
+			endFxPlayed = true;
+			App->audio->PlayFx(winFX);
+		}
 	}
 	if (car->currentPosition >= 2) {
-		App->renderer->rDrawTextCentered("More luck next time...", centerX, centerY + 50, fontSubtitle, 5, YELLOW);
-		App->audio->PlayFx(looseFX);
+		App->renderer->rDrawTextCentered("More luck next time...", centerX, centerY - 130, fontSubtitle, 5, YELLOW);
+		if (!endFxPlayed) {
+			endFxPlayed = true;
+			App->audio->PlayFx(looseFX);
+		}
 	}
+
+	//App->renderer->rDrawTextCentered(TextFormat("Position: %d", car->currentPosition), centerX, centerY - 50, fontTitle, 5, YELLOW);
+	App->renderer->rDrawTextCentered("Your position", centerX, centerY - 90, fontText, 5, YELLOW);
 	
-	App->renderer->rDrawTextCentered(TextFormat("Position: %d", car->currentPosition), centerX, centerY - 50, fontTitle, 5, YELLOW);
-	App->renderer->rDrawTextCentered(TextFormat("Race time: %02.02f s", raceTime), centerX, centerY, fontSubtitle, 5, YELLOW);
-	App->renderer->rDrawTextCentered(TextFormat("Best lap time: %02.02f s", bestLapTime), centerX, centerY + 30, fontSubtitle, 5, YELLOW);
-	App->renderer->rDrawTextCentered("Press [R] to restart", centerX, centerY + 100, fontSubtitle, 5, YELLOW);
+	Texture2D positionT = positionTex[car->currentPosition];
+	App->renderer->DrawTextureUI(positionT, { 0.f, 0.f, (float)positionT.width, (float)positionT.height },
+		{ (float)centerX, (float)centerY - 35, (float)positionT.width, (float)positionT.height },
+		Vector2{ (float)positionT.width / 2.f, (float)positionT.height / 2.f }, 0.f, WHITE);
+
+	App->renderer->rDrawTextCentered(TextFormat("Race time: %02.02f s", raceTime), centerX, centerY + 20, fontSubtitle, 5, YELLOW);
+	App->renderer->rDrawTextCentered(TextFormat("Best lap time (Lap %d): %02.02f s", bestLap, bestLapTime), centerX, centerY + 50, fontSubtitle, 5, YELLOW);
+	App->renderer->rDrawTextCentered("Press [R] to restart", centerX, centerY + 120, fontSubtitle, 5, YELLOW);
 }
 
 void ModuleGame::Restart()
-{
-	if (mouseJoint) DestroyMouseJoint();
-	
+{	
 	App->renderer->SetCameraTarget(nullptr);
 
 	for (auto& c : cars) {
@@ -359,6 +401,7 @@ void ModuleGame::Restart()
 	raceEnded = false;
 	raceActive = false;
 	countdownStarted = false;
+	endFxPlayed = false;
 }
 
 update_status ModuleGame::Update(float dt)
@@ -366,10 +409,11 @@ update_status ModuleGame::Update(float dt)
 	if (gameStarted)
 	{
 		if (IsKeyPressed(KEY_C)) App->renderer->cameraRotationActive = !App->renderer->cameraRotationActive;
-		if (IsKeyPressed(KEY_F1)) {
+		if (IsKeyPressed(KEY_F1) && gameStarted && !raceEnded) {
 			if (mouseJoint) DestroyMouseJoint();
 			else CreateMouseJoint();
 		}
+		if (mouseJoint && raceEnded) DestroyMouseJoint();
 
 		if (raceActive && !raceEnded)
 		{
@@ -384,7 +428,11 @@ update_status ModuleGame::Update(float dt)
 		UpdateMouseJoint();
 
 		if (raceEnded) {
+			int centerX = GetScreenWidth() / 2;
+			int centerY = GetScreenHeight() / 2;
+
 			PrintEndScreen();
+			
 			if (IsKeyPressed(KEY_R)) Restart();
 		}
 		else
@@ -400,14 +448,14 @@ update_status ModuleGame::Update(float dt)
 		PrintMenu();
 	}
 
-	//for (PhysicEntity* entity : entities) entity->Update(dt);
-
 	return UPDATE_CONTINUE;
 }
 
 void ModuleGame::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 {
 	if (!gameStarted) return;
+
+	bool isSensor = false;
 
 	PhysicEntity* entityA = nullptr;
 	PhysicEntity* entityB = nullptr;
@@ -419,6 +467,28 @@ void ModuleGame::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 
 	if (map->body == bodyA) entityA = map;
 	if (map->body == bodyB) entityB = map;
+	
+	if (map->navigationLayerIn->body == bodyA)
+	{
+		entityA = map;
+		isSensor = true;
+	}
+	if (map->navigationLayerIn->body == bodyB)
+	{
+		entityB = map;
+		isSensor = true;
+	}
+
+	if (map->navigationLayerOut->body == bodyA)
+	{
+		entityA = map;
+		isSensor = true;
+	}
+	if (map->navigationLayerOut->body == bodyB)
+	{
+		entityB = map;
+		isSensor = true;
+	}
 
 	if (map->boundsIn->body == bodyA) entityA = map;
 	if (map->boundsIn->body == bodyB) entityB = map;
@@ -426,18 +496,28 @@ void ModuleGame::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 	if (map->boundsOut->body == bodyA) entityA = map;
 	if (map->boundsOut->body == bodyB) entityB = map;
 
-	if (map->navigationLayerIn->body == bodyA) entityA = map;
-	if (map->navigationLayerIn->body == bodyB) entityB = map;
-
-	if (map->navigationLayerOut->body == bodyA) entityA = map;
-	if (map->navigationLayerOut->body == bodyB) entityB = map;
-
-	if (map->finishline->body == bodyA) entityA = map->finishline;
-	if (map->finishline->body == bodyB) entityB = map->finishline;
+	if (map->finishline->body == bodyA)
+	{
+		entityA = map->finishline;
+		isSensor = true;
+	}
+	if (map->finishline->body == bodyB) 
+	{
+		entityB = map->finishline;
+		isSensor = true;
+	}
 
 	for (auto& c : map->checkpoints) {
-		if (c->body == bodyA) entityA = c;
-		if (c->body == bodyB) entityB = c;
+		if (c->body == bodyA)
+		{
+			entityA = c;
+			isSensor = true;
+		}
+		if (c->body == bodyB) 
+		{
+			entityB = c;
+			isSensor = true;
+		}
 	}
 
 	for (auto& o : map->obstacles) {
@@ -446,12 +526,33 @@ void ModuleGame::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 	}
 
 	for (auto& z : map->slowZones) {
-		if (z->body == bodyA) entityA = z;
-		if (z->body == bodyB) entityB = z;
+		if (z->body == bodyA) 
+		{
+			entityA = z;
+			isSensor = true;
+		}
+		if (z->body == bodyB) 
+		{
+			entityB = z;
+			isSensor = true;
+		}
+	}
+
+	for (auto& b : map->boosters) {
+		if (b->body == bodyA)
+		{
+			entityA = b;
+			isSensor = true;
+		}
+		if (b->body == bodyB)
+		{
+			entityB = b;
+			isSensor = true;
+		}
 	}
 
 	if (entityA/* && entityB*/) {
-		entityA->OnCollision(entityB);
+		entityA->OnCollision(entityB, isSensor);
 		//entityB->OnCollision(entityA);
 	}
 }
@@ -460,6 +561,8 @@ void ModuleGame::OnCollisionEnd(PhysBody* bodyA, PhysBody* bodyB)
 {
 	if (!gameStarted) return;
 
+	bool isSensor = false;
+
 	PhysicEntity* entityA = nullptr;
 	PhysicEntity* entityB = nullptr;
 
@@ -471,24 +574,56 @@ void ModuleGame::OnCollisionEnd(PhysBody* bodyA, PhysBody* bodyB)
 	if (map->body == bodyA) entityA = map;
 	if (map->body == bodyB) entityB = map;
 
+	if (map->navigationLayerIn->body == bodyA)
+	{
+		entityA = map;
+		isSensor = true;
+	}
+	if (map->navigationLayerIn->body == bodyB)
+	{
+		entityB = map;
+		isSensor = true;
+	}
+
+	if (map->navigationLayerOut->body == bodyA)
+	{
+		entityA = map;
+		isSensor = true;
+	}
+	if (map->navigationLayerOut->body == bodyB)
+	{
+		entityB = map;
+		isSensor = true;
+	}
+
 	if (map->boundsIn->body == bodyA) entityA = map;
 	if (map->boundsIn->body == bodyB) entityB = map;
 
 	if (map->boundsOut->body == bodyA) entityA = map;
 	if (map->boundsOut->body == bodyB) entityB = map;
 
-	if (map->navigationLayerIn->body == bodyA) entityA = map;
-	if (map->navigationLayerIn->body == bodyB) entityB = map;
-
-	if (map->navigationLayerOut->body == bodyA) entityA = map;
-	if (map->navigationLayerOut->body == bodyB) entityB = map;
-
-	if (map->finishline->body == bodyA) entityA = map->finishline;
-	if (map->finishline->body == bodyB) entityB = map->finishline;
+	if (map->finishline->body == bodyA)
+	{
+		entityA = map->finishline;
+		isSensor = true;
+	}
+	if (map->finishline->body == bodyB)
+	{
+		entityB = map->finishline;
+		isSensor = true;
+	}
 
 	for (auto& c : map->checkpoints) {
-		if (c->body == bodyA) entityA = c;
-		if (c->body == bodyB) entityB = c;
+		if (c->body == bodyA)
+		{
+			entityA = c;
+			isSensor = true;
+		}
+		if (c->body == bodyB)
+		{
+			entityB = c;
+			isSensor = true;
+		}
 	}
 
 	for (auto& o : map->obstacles) {
@@ -497,12 +632,33 @@ void ModuleGame::OnCollisionEnd(PhysBody* bodyA, PhysBody* bodyB)
 	}
 
 	for (auto& z : map->slowZones) {
-		if (z->body == bodyA) entityA = z;
-		if (z->body == bodyB) entityB = z;
+		if (z->body == bodyA)
+		{
+			entityA = z;
+			isSensor = true;
+		}
+		if (z->body == bodyB)
+		{
+			entityB = z;
+			isSensor = true;
+		}
+	}
+
+	for (auto& b : map->boosters) {
+		if (b->body == bodyA)
+		{
+			entityA = b;
+			isSensor = true;
+		}
+		if (b->body == bodyB)
+		{
+			entityB = b;
+			isSensor = true;
+		}
 	}
 
 	if (entityA/* && entityB*/) {
-		entityA->OnCollisionEnd(entityB);
+		entityA->OnCollisionEnd(entityB, isSensor);
 		//entityB->OnCollisionEnd(entityA);
 	}
 }

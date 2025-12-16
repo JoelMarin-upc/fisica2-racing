@@ -4,6 +4,7 @@
 #include "Chain.h"
 #include "Checkpoint.h"
 #include "SlowZone.h"
+#include "Booster.h"
 #include "Finishline.h"
 #include "PhysicEntity.h"
 #include "ModulePhysics.h"
@@ -36,11 +37,11 @@ public:
 		for (PhysicEntity* obstacle : obstacles) obstacle->Update(dt);
 	}
 
-	void OnCollision(PhysicEntity* other) {
+	void OnCollision(PhysicEntity* other, bool isSensor) {
 
 	}
 
-	void OnCollisionEnd(PhysicEntity* other) {
+	void OnCollisionEnd(PhysicEntity* other, bool isSensor) {
 
 	}
 
@@ -62,8 +63,12 @@ public:
 		checkpoints.push_back(c);
 	}
 
-	void addSlowZone(BoxSensor* z) {
+	void addSlowZone(SlowZone* z) {
 		slowZones.push_back(z);
+	}
+
+	void addBooster(Booster* z) {
+		boosters.push_back(z);
 	}
 
 	void addFinishLine(Finishline* f) {
@@ -102,6 +107,12 @@ public:
 			z = nullptr;
 		}
 		slowZones.clear();
+		for (auto& b : boosters)
+		{
+			delete b;
+			b = nullptr;
+		}
+		boosters.clear();
 		delete finishline;
 		finishline = nullptr;
 		delete boundsIn;
@@ -122,7 +133,8 @@ public:
 	std::vector<Transform2D> playerStartPositions;
 	std::vector<PhysicEntity*> obstacles;
 	std::vector<Checkpoint*> checkpoints;
-	std::vector<BoxSensor*> slowZones;
+	std::vector<SlowZone*> slowZones;
+	std::vector<Booster*> boosters;
 	Finishline* finishline;
 
 	int totalCars;

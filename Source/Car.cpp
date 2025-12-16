@@ -1,8 +1,8 @@
 #include "ModuleGame.h"
 #include "ModuleRender.h"
 
-Car::Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman, int _difficulty)
-	: Box(app->physics, app->renderer, _x, _y, _listener, _texture, CAR, angle),
+Car::Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman, int _sprintFXId, int _runFXId, int _crashFXId, std::string animationsPath, Vector2 colliderSize, int _difficulty)
+	: Box(app->physics, app->renderer, _x, _y, _listener, _texture, CAR, angle, true, 0.f, colliderSize),
 	carNum(carNum), isHumanControlled(isHuman), currentPosition(carNum), targetDirection(new Vector2{ 0, 0 }), currentLap(0), nitroInput(false), nitroActive(false), active(false), game(app->scene_intro), audio(app->audio), currentCheckpointNum(0), difficulty(_difficulty)
 {
 	availableNitros = maxAvailableNitros;
@@ -10,7 +10,15 @@ Car::Car(Application* app, int _x, int _y, float angle, Module* _listener, Textu
 	body->SetAngularDamping(2.0f);
 
 	//sounds
-	sprintFX = audio->LoadFx("Assets/Sounds/FX/sprint.wav");
+    sprintFX = _sprintFXId;
+    runFX = _runFXId;
+    crashFX = _crashFXId;
+
+    runFXTimer = Timer();
+
+    std::unordered_map<int, std::string> aliases = { {0,"move"} };
+    anims.LoadFromTSX(animationsPath.c_str(), aliases);
+    anims.SetCurrent("move");
 }
 
 Car::~Car()
@@ -183,6 +191,15 @@ void Car::Move(float dt)
 	body->ApplyForce(force.x, force.y);
 }
 
+void Car::PlayRunAudio()
+{
+    if (std::abs(targetDirection->y) < 1) return;
+    if (runFXTimer.ReadSec() > runFXSeconds) {
+        audio->PlayFx(runFX);
+        runFXTimer.Start();
+    }
+}
+
 void Car::CheckNitro()
 {
 
@@ -206,6 +223,22 @@ void Car::SetSpeedScale(float scale)
 	speedScale = scale;
 }
 
+void Car::StartBoost(double scale, double time)
+{
+    SetSpeedScale(scale);
+    boostTime = time;
+    boostTimer.Start();
+}
+
+void Car::RunBoostTimer()
+{
+    if (boostTime < 0.f) return;
+    boostTime -= boostTimer.ReadSec();
+    if (boostTime < 0.f) {
+        SetSpeedScale();
+    }
+}
+
 void Car::Enable()
 {
 	active = true;
@@ -223,16 +256,31 @@ void Car::Update(float dt)
 		GetTargetDirection();
 		CheckNitro();
 		Move(dt);
+        if (isHumanControlled) PlayRunAudio();
+        RunBoostTimer();
 	}
 
 	int x, y;
-	body->GetPhysicPosition(x, y);
-	render->rDrawTexturePro(texture, Rectangle{ 0, 0, (float)texture.width, (float)texture.height },
-		Rectangle{ (float)x, (float)y, (float)texture.width, (float)texture.height },
-		Vector2{ (float)texture.width / 2.0f, (float)texture.height / 2.0f }, body->GetRotation() * RAD2DEG, WHITE);
+    body->GetPhysicPosition(x, y);
+    anims.Update(dt);
+    const Rectangle& animFrame = anims.GetCurrentFrame();
+
+    Rectangle source = animFrame;
+
+    Rectangle dest = {
+        x,
+        y,
+        animFrame.width,
+        animFrame.height
+    };
+
+    render->rDrawTexturePro(texture, source, dest, { animFrame.width / 2.f, animFrame.height / 2.f }, body->GetRotation() * RAD2DEG, WHITE);
+    /*render->rDrawTexturePro(texture, Rectangle{ 0, 0, (float)texture.width, (float)texture.height },
+        Rectangle{ (float)x, (float)y, (float)texture.width, (float)texture.height },
+        Vector2{ (float)texture.width / 2.0f, (float)texture.height / 2.0f }, body->GetRotation() * RAD2DEG, WHITE);*/
 }
 
-void Car::OnCollision(PhysicEntity* other)
+void Car::OnCollision(PhysicEntity* other, bool isSensor)
 {
 	if (other->type == CHECKPOINT) {
 		currentCheckpointNum = dynamic_cast<Checkpoint*>(other)->order;
@@ -240,19 +288,29 @@ void Car::OnCollision(PhysicEntity* other)
 	if (other->type == FINISHLINE) {
 		if (currentLap != 0 && dynamic_cast<Finishline*>(other)->requiredCheckpoint != currentCheckpointNum) return;
 		if (currentLap + 1 > game->totalLaps && isHumanControlled) game->EndRace();
-		game->MarkLap(currentLap);
+		if (isHumanControlled) game->MarkLap(currentLap);
 		currentLap++;
 		currentCheckpointNum = 0;
 	}
 	if (other->type == SLOWZONE) {
 		double scale = dynamic_cast<SlowZone*>(other)->slowScale;
-		SetSpeedScale(scale);
+        if (boostTime < 0.f) SetSpeedScale(scale);
+        else SetSpeedScale();
 	}
+    if (other->type == BOOSTER) {
+        auto booster = dynamic_cast<Booster*>(other);
+        double scale = booster->boostScale;
+        double time = booster->boostTime;
+        StartBoost(scale, time);
+    }
+    if ((other->type == CIRCUIT || other->type == OBSTACLE || other->type == CAR) && !isSensor) {
+        if (isHumanControlled) audio->PlayFx(crashFX);
+    }
 }
 
-void Car::OnCollisionEnd(PhysicEntity* other)
+void Car::OnCollisionEnd(PhysicEntity* other, bool isSensor)
 {
 	if (other->type == SLOWZONE) {
-		SetSpeedScale();
+        if (boostTime < 0.f) SetSpeedScale();
 	}
 }
