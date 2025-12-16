@@ -230,7 +230,7 @@ void ModuleGame::GetMenuInput()
 		if (menuOption == 1)
 		{
 			mapNumber--;
-			if (mapNumber < 1) mapNumber = 2;
+			if (mapNumber < 1) mapNumber = 3;
 		}
 		if (menuOption == 2)
 		{
@@ -248,7 +248,7 @@ void ModuleGame::GetMenuInput()
 		if (menuOption == 1)
 		{
 			mapNumber++;
-			if (mapNumber > 2) mapNumber = 1;
+			if (mapNumber > 3) mapNumber = 1;
 		}
 		if (menuOption == 2)
 		{
@@ -285,6 +285,9 @@ void ModuleGame::PrintMenu()
 		mapName = "River";
 		break;
 	case 2:
+		mapName = "Sea Floor";
+		break;
+	case 3:
 		mapName = "Road";
 		break;
 	default:

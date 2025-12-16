@@ -14,7 +14,7 @@
 class Map : public Chain
 {
 public:
-	Map(Application* app, int _x, int _y, float _angle, int _totalCars, std::string _carsBasePath, int* _boundsIn, unsigned int _boundsInSize, int* _boundsOut, unsigned int _boundsOutSize, int* _navIn, unsigned int _navInSize, int* _navOut, unsigned int _navOutSize, Module* _listener, Texture2D _texture)
+	Map(Application* app, int _x, int _y, float _angle, int _totalCars, std::string _carsBasePath, int* _boundsIn, unsigned int _boundsInSize, bool _boundsInReverse, int* _boundsOut, unsigned int _boundsOutSize, bool _boundsOutReverse, int* _navIn, unsigned int _navInSize, bool _navInReverse, int* _navOut, unsigned int _navOutSize, bool _navOutReverse, Module* _listener, Texture2D _texture)
 		: Chain(app->physics, app->renderer, _x, _y, 0, 0, _listener, _texture, CIRCUIT, _angle, false)
 	{
 		x = _x;
@@ -22,10 +22,10 @@ public:
 		angle = _angle;
 		totalCars = _totalCars;
 		carsBasePath = _carsBasePath;
-		boundsIn = new Chain(app->physics, app->renderer, _x, _y, _boundsIn, _boundsInSize, _listener, _texture, CIRCUIT, _angle, false, 0.f, true);
-		boundsOut = new Chain(app->physics, app->renderer, _x, _y, _boundsOut, _boundsOutSize, _listener, _texture, CIRCUIT, _angle, false, 0.f, false);
-		navigationLayerIn = new Chain(app->physics, app->renderer, _x, _y, _navIn, _navInSize, _listener, _texture, CIRCUIT, _angle, false, 0.f, false, true);
-		navigationLayerOut = new Chain(app->physics, app->renderer, _x, _y, _navOut, _navOutSize, _listener, _texture, CIRCUIT, _angle, false, 0.f, true, true);
+		boundsIn = new Chain(app->physics, app->renderer, _x, _y, _boundsIn, _boundsInSize, _listener, _texture, CIRCUIT, _angle, false, 0.f, _boundsInReverse);
+		boundsOut = new Chain(app->physics, app->renderer, _x, _y, _boundsOut, _boundsOutSize, _listener, _texture, CIRCUIT, _angle, false, 0.f, _boundsOutReverse);
+		navigationLayerIn = new Chain(app->physics, app->renderer, _x, _y, _navIn, _navInSize, _listener, _texture, CIRCUIT, _angle, false, 0.f, _navInReverse, true);
+		navigationLayerOut = new Chain(app->physics, app->renderer, _x, _y, _navOut, _navOutSize, _listener, _texture, CIRCUIT, _angle, false, 0.f, _navOutReverse, true);
 	}
 
 	void Update(float dt) override
