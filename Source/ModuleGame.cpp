@@ -374,7 +374,7 @@ void ModuleGame::PrintMenu()
     
 	App->renderer->rDrawTexturePro(menuBack, { 0.f, 0.f, (float)menuBack.width, (float)menuBack.height }, { 0.f, 0.f, (float)menuBack.width, (float)menuBack.height }, { 0.f, 0.f }, 0.f, WHITE);
 
-	App->renderer->rDrawTextCentered("TITLE OF THE GAME", screenCenterX, screenCenterY - 180, fontMainTitle, 5, YELLOW);
+	App->renderer->rDrawTextCentered("HYDROSPRINT", screenCenterX, screenCenterY - 180, fontMainTitle, 5, YELLOW);
 
 	App->renderer->rDrawTextCentered(TextFormat("Map: < %s >", mapName.c_str()), screenCenterX, screenCenterY - 75, fontText, 5, menuOption == 1 ? selected : unselected);
 	App->renderer->rDrawTextCentered(TextFormat("Difficulty: < %s >", diffName.c_str()), screenCenterX, screenCenterY - 45, fontText, 5, menuOption == 2 ? selected : unselected);
