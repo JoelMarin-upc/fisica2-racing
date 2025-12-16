@@ -35,8 +35,8 @@ bool ModuleGame::Start()
 	winFX = App->audio->LoadFx("Assets/Sounds/FX/win.wav");
 
 	sprintFX = App->audio->LoadFx("Assets/Sounds/FX/sprint.wav");
-	runFX = App->audio->LoadFx("Assets/Sounds/FX/sprint.wav", .4f);
-	crashFX = App->audio->LoadFx("Assets/Sounds/FX/sprint.wav", .6f);
+	runFX = App->audio->LoadFx("Assets/Sounds/FX/run.wav", .4f);
+	crashFX = App->audio->LoadFx("Assets/Sounds/FX/bounce.wav", .6f);
 
 	App->audio->PlayMusic("Assets/Sounds/Music/GlooGloo.wav");
 
@@ -125,7 +125,7 @@ void ModuleGame::GetInput()
 	nitroInput = false;
 	if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) movementInput->x = 2;
 	if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) movementInput->x = -2;
-	if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) movementInput->y = -1;
+	if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) movementInput->y = -1.3;
 	if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) movementInput->y = 1;
 	if (IsKeyPressed(KEY_SPACE)) nitroInput = true;
 }
