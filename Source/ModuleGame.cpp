@@ -33,12 +33,10 @@ bool ModuleGame::Start()
 	startFX = App->audio->LoadFx("Assets/Sounds/FX/start.wav");
 	looseFX = App->audio->LoadFx("Assets/Sounds/FX/loose.wav");
 	winFX = App->audio->LoadFx("Assets/Sounds/FX/win.wav");
-
 	sprintFX = App->audio->LoadFx("Assets/Sounds/FX/sprint.wav");
 	runFX = App->audio->LoadFx("Assets/Sounds/FX/run.wav", .4f);
 	crashFX = App->audio->LoadFx("Assets/Sounds/FX/bounce.wav", .6f);
 	carCrashFX = App->audio->LoadFx("Assets/Sounds/FX/squish.wav", .6f);
-
 	music = App->audio->LoadFx("Assets/Sounds/Music/GlooGloo.wav");
 
 	positionTex[1] = LoadTexture("Assets/UI/1.png");

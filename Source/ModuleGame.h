@@ -104,9 +104,7 @@ private:
 	int runFX;
 	int crashFX;
 	int carCrashFX;
-
 	int sprintFX;
-
 	int music;
 
 	
