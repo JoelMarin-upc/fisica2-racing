@@ -101,6 +101,7 @@ private:
 	int looseFX;
 	int runFX;
 	int crashFX;
+	int carCrashFX;
 
 	int sprintFX;
 

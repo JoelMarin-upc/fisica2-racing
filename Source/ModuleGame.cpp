@@ -37,6 +37,7 @@ bool ModuleGame::Start()
 	sprintFX = App->audio->LoadFx("Assets/Sounds/FX/sprint.wav");
 	runFX = App->audio->LoadFx("Assets/Sounds/FX/run.wav", .4f);
 	crashFX = App->audio->LoadFx("Assets/Sounds/FX/bounce.wav", .6f);
+	carCrashFX = App->audio->LoadFx("Assets/Sounds/FX/squish.wav", .6f);
 
 	App->audio->PlayMusic("Assets/Sounds/Music/GlooGloo.wav");
 
@@ -76,13 +77,13 @@ void ModuleGame::AddCars()
 		int num = GetRandomValue(1, 8);
 		const std::string tex = map->carsBasePath + "Car" + std::to_string(num) + ".png";
 		const std::string tmx = map->carsBasePath + "Car" + std::to_string(num) + ".tsx";
-		cars.push_back(new Car(App, t.position.x, t.position.y, t.rotation, this, LoadTexture(tex.c_str()), i + 1, false, sprintFX, runFX, crashFX, tmx, { 15.f, 33.f }, difficulty));
+		cars.push_back(new Car(App, t.position.x, t.position.y, t.rotation, this, LoadTexture(tex.c_str()), i + 1, false, sprintFX, runFX, crashFX, carCrashFX, tmx, { 15.f, 33.f }, difficulty));
 	}
 	int num = GetRandomValue(1, 8);
 	Transform2D playerTransform = map->playerStartPositions[map->totalCars-1];
 	const std::string playerTex = map->carsBasePath + "Car" + std::to_string(num) + ".png";
 	const std::string playerAnims = map->carsBasePath + "Car" + std::to_string(num) + ".tsx";
-	car = new Car(App, playerTransform.position.x, playerTransform.position.y, playerTransform.rotation, this, LoadTexture(playerTex.c_str()), map->totalCars, true, sprintFX, runFX, crashFX, playerAnims, { 15.f, 33.f });
+	car = new Car(App, playerTransform.position.x, playerTransform.position.y, playerTransform.rotation, this, LoadTexture(playerTex.c_str()), map->totalCars, true, sprintFX, runFX, crashFX, carCrashFX, playerAnims, { 15.f, 33.f });
 	cars.push_back(car);
 }
 
@@ -126,7 +127,7 @@ void ModuleGame::GetInput()
 	if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) movementInput->x = 2;
 	if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) movementInput->x = -2;
 	if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) movementInput->y = -1.3;
-	if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) movementInput->y = 1;
+	if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) movementInput->y = 1.7;
 	if (IsKeyPressed(KEY_SPACE)) nitroInput = true;
 }
 

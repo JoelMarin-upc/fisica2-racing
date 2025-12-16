@@ -1,7 +1,7 @@
 #include "ModuleGame.h"
 #include "ModuleRender.h"
 
-Car::Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman, int _sprintFXId, int _runFXId, int _crashFXId, std::string animationsPath, Vector2 colliderSize, int _difficulty)
+Car::Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman, int _sprintFXId, int _runFXId, int _crashFXId, int _carCrashFX, std::string animationsPath, Vector2 colliderSize, int _difficulty)
 	: Box(app->physics, app->renderer, _x, _y, _listener, _texture, CAR, angle, true, 0.f, colliderSize),
 	carNum(carNum), isHumanControlled(isHuman), currentPosition(carNum), targetDirection(new Vector2{ 0, 0 }), currentLap(0), nitroInput(false), nitroActive(false), active(false), game(app->scene_intro), audio(app->audio), currentCheckpointNum(0), difficulty(_difficulty)
 {
@@ -13,6 +13,7 @@ Car::Car(Application* app, int _x, int _y, float angle, Module* _listener, Textu
     sprintFX = _sprintFXId;
     runFX = _runFXId;
     crashFX = _crashFXId;
+    carCrashFX = _carCrashFX;
 
     runFXTimer = Timer();
 
@@ -303,8 +304,11 @@ void Car::OnCollision(PhysicEntity* other, bool isSensor)
         double time = booster->boostTime;
         StartBoost(scale, time);
     }
-    if ((other->type == CIRCUIT || other->type == OBSTACLE || other->type == CAR) && !isSensor) {
+    if ((other->type == CIRCUIT || other->type == OBSTACLE) && !isSensor) {
         if (isHumanControlled) audio->PlayFx(crashFX);
+    }
+    if ((other->type == CAR) && !isSensor) {
+        if(isHumanControlled) audio->PlayFx(carCrashFX);
     }
 }
 
