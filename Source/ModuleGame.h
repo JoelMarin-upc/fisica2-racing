@@ -102,10 +102,11 @@ private:
 	int countdownFX;
 	int winFX;
 	int looseFX;
-
-	int sprintFX;
 	int runFX;
 	int crashFX;
+	int carCrashFX;
+
+	int sprintFX;
 
 	int music;
 

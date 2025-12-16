@@ -10,7 +10,7 @@ class ModuleGame;
 class Car : public Box
 {
 public:
-	Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman, int _sprintFXId, int _runFXId, int _crashFXId, std::string animationsPath, Vector2 colliderSize = { 0.f, 0.f }, int _difficulty = 1);
+	Car(Application* app, int _x, int _y, float angle, Module* _listener, Texture2D _texture, int carNum, bool isHuman, int _sprintFXId, int _runFXId, int _crashFXId, int _carCrashFX, std::string animationsPath, Vector2 colliderSize = { 0.f, 0.f }, int _difficulty = 1);
 
 	~Car();
 
@@ -80,6 +80,7 @@ private:
 	int sprintFX;
 	int runFX;
 	int crashFX;
+	int carCrashFX;
 
 	Timer boostTimer;
 	double boostTime = -0.1f;
