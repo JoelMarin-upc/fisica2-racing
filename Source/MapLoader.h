@@ -7,7 +7,8 @@
 #include "PhysicEntity.h"
 #include "Transform2D.h"
 #include "Map.h"
-#include "Circle.h"
+#include "BoxObstacle.h"
+#include "CircleObstacle.h"
 #include "pugixml.hpp"
 #include <algorithm>
 
@@ -31,20 +32,23 @@ public:
         std::string carsBasePath = "";
         int* boundsIn = nullptr;
 		unsigned int boundsInSize = 0;
-        bool boundsInReverse;
+        bool boundsInReverse = false;
 		int* boundsOut = nullptr;
 		unsigned int boundsOutSize = 0;
-        bool boundsOutReverse;
+        bool boundsOutReverse = false;
 		int* navigationLayerIn = nullptr;
 		unsigned int navigationLayerInSize = 0;
-        bool navInReverse;
+        bool navInReverse = false;
 		int* navigationLayerOut = nullptr;
 		unsigned int navigationLayerOutSize = 0;
-        bool navOutReverse;
+        bool navOutReverse = false;
 		const char* mapImg = nullptr;
 		const char* mapTmx = nullptr;
 		const char* boxTex = nullptr;
 		const char* circleTex = nullptr;
+        const char* boxAnims = "";
+        const char* circleAnims = "";
+
 		if (mapNumber == 1)
 		{
             int bIn[260] = {
@@ -552,6 +556,8 @@ public:
 			mapTmx = "Assets/Maps/River/Map1.tmx";
 			boxTex = "Assets/Maps/River/boxObstacle.png";
 			circleTex = "Assets/Maps/River/circleObstacle.png";
+            boxAnims = "Assets/Maps/River/boxObstacle.tsx";
+            circleAnims = "Assets/Maps/River/circleObstacle.tsx";
 		}
         else if (mapNumber == 2) 
         {
@@ -1140,6 +1146,8 @@ public:
             mapTmx = "Assets/Maps/Sea Floor/Map2.tmx";
             boxTex = "Assets/Maps/Sea Floor/boxObstacle.png";
             circleTex = "Assets/Maps/Sea Floor/circleObstacle.png";
+            boxAnims = "Assets/Maps/Sea Floor/boxObstacle.tsx";
+            circleAnims = "Assets/Maps/Sea Floor/circleObstacle.tsx";
         }
 		else if (mapNumber == 3) 
 		{
@@ -1296,7 +1304,7 @@ public:
 		}
 
 		Map* map = new Map(app, 0, 0, 0, totalCars, carsBasePath, boundsIn, boundsInSize, boundsInReverse, boundsOut, boundsOutSize, boundsOutReverse, navigationLayerIn, navigationLayerInSize, navInReverse, navigationLayerOut, navigationLayerOutSize, navOutReverse, listener, LoadTexture(mapImg));
-		MapData data = GetMapData(mapTmx, app, listener, boxTex, circleTex);
+		MapData data = GetMapData(mapTmx, app, listener, boxTex, circleTex, boxAnims, circleAnims);
 
 		std::sort(data.startPositions.begin(), data.startPositions.end(),
 			[](const std::pair<Transform2D, int>& a, const std::pair<Transform2D, int>& b) {
@@ -1312,7 +1320,7 @@ public:
 		return map;
 	}
 
-	static MapData GetMapData(const char* mapPath, Application* app, Module* listener, const char* boxTex, const char* circleTex) {
+	static MapData GetMapData(const char* mapPath, Application* app, Module* listener, const char* boxTex, const char* circleTex, const char* boxAnims, const char* circleAnims) {
 		MapData data;
 
 		pugi::xml_document mapFileXML;
@@ -1386,8 +1394,8 @@ public:
 					}
 					
 					PhysicEntity* o = nullptr;
-					if (type == "box") o = new Box(app->physics, app->renderer, newX, newY, listener, LoadTexture(boxTex), EntityType::OBSTACLE, rot, false, restitution);
-					else if (type == "circle") o = new Circle(app->physics, app->renderer, newX, newY, listener, LoadTexture(circleTex), EntityType::OBSTACLE, rot, false, restitution);
+					if (type == "box") o = new BoxObstacle(app->physics, app->renderer, newX, newY, listener, LoadTexture(boxTex), EntityType::OBSTACLE, rot, false, restitution, boxAnims);
+					else if (type == "circle") o = new CircleObstacle(app->physics, app->renderer, newX, newY, listener, LoadTexture(circleTex), EntityType::OBSTACLE, rot, false, restitution, circleAnims);
 					
 					if (o) data.obstacles.push_back(o);
 				}

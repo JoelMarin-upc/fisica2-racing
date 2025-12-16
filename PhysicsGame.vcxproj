@@ -193,6 +193,8 @@
     <ClInclude Include="Source/p2Point.h" />
     <ClInclude Include="Source\Animation.h" />
     <ClInclude Include="Source\Booster.h" />
+    <ClInclude Include="Source\BoxObstacle.h" />
+    <ClInclude Include="Source\CircleObstacle.h" />
     <ClInclude Include="Source\MapLoader.h" />
     <ClInclude Include="Source\ModuleGame.h" />
     <ClInclude Include="Source\SlowZone.h" />

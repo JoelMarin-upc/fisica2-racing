@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="109">
+<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="121">
  <imagelayer id="2" name="Background">
   <image source="MapaRacing1.png" width="2048" height="2048"/>
  </imagelayer>
@@ -33,6 +33,43 @@
     <property name="scale" type="float" value="5"/>
     <property name="time" type="float" value="1"/>
    </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="8" name="Obstacles">
+  <object id="111" x="126" y="122" width="36" height="36">
+   <properties>
+    <property name="restitution" type="float" value="1"/>
+    <property name="type" value="circle"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="112" x="1084" y="564" width="36" height="36">
+   <properties>
+    <property name="restitution" type="float" value="1"/>
+    <property name="type" value="circle"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="116" x="1097.33" y="734" width="36" height="36">
+   <properties>
+    <property name="restitution" type="float" value="1"/>
+    <property name="type" value="circle"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="119" x="1507.33" y="1439.33" width="36" height="36">
+   <properties>
+    <property name="restitution" type="float" value="1"/>
+    <property name="type" value="circle"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="120" x="1124.67" y="1922" width="36" height="36">
+   <properties>
+    <property name="restitution" type="float" value="1"/>
+    <property name="type" value="circle"/>
+   </properties>
+   <ellipse/>
   </object>
  </objectgroup>
  <objectgroup id="3" name="StartPositions">
@@ -239,6 +276,16 @@
    </properties>
   </object>
   <object id="100" x="1274.5" y="1066.69" width="107.124" height="53.7882" rotation="317.227">
+   <properties>
+    <property name="scale" type="float" value="0.3"/>
+   </properties>
+  </object>
+  <object id="109" x="643.701" y="740.446" width="94.5367" height="67.667" rotation="310.496">
+   <properties>
+    <property name="scale" type="float" value="0.3"/>
+   </properties>
+  </object>
+  <object id="110" x="740.588" y="667.331" width="94.5367" height="67.667" rotation="48.9088">
    <properties>
     <property name="scale" type="float" value="0.3"/>
    </properties>

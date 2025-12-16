@@ -82,6 +82,7 @@ private:
 	b2MouseJoint* mouseJoint = nullptr;
 
 	std::map<int, Texture2D> positionTex;
+	std::map<int, Texture2D> carsTex;
 	Texture2D menuBack;
 
 	Font fontMainTitle;
@@ -94,6 +95,7 @@ private:
 	int menuOption = 1;
 	int mapNumber = 1;
 	int difficulty = 3;
+	int selectedCar = 1;
 
 	int startFX;
 	int countdownFX;

@@ -111,6 +111,12 @@
     <ClInclude Include="Source\Animation.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="Source\BoxObstacle.h">
+      <Filter>Headers\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\CircleObstacle.h">
+      <Filter>Headers\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers">
