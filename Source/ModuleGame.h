@@ -48,6 +48,7 @@ private:
 	void UpdateMouseJoint();
 	void RunTimer();
 	void GetMenuInput();
+	void GetCarIcons();
 	void PrintMenu();
 	void PrintInfo();
 	void PrintEndScreen();

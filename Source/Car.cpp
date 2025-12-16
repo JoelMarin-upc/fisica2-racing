@@ -17,9 +17,14 @@ Car::Car(Application* app, int _x, int _y, float angle, Module* _listener, Textu
 
     runFXTimer = Timer();
 
-    std::unordered_map<int, std::string> aliases = { {0,"move"} };
-    anims.LoadFromTSX(animationsPath.c_str(), aliases);
-    anims.SetCurrent("move");
+    hasAnims = animationsPath != "";
+
+    if (hasAnims)
+    {
+        std::unordered_map<int, std::string> aliases = { {0,"move"} };
+        anims.LoadFromTSX(animationsPath.c_str(), aliases);
+        anims.SetCurrent("move");
+    }
 }
 
 Car::~Car()
@@ -263,22 +268,28 @@ void Car::Update(float dt)
 
 	int x, y;
     body->GetPhysicPosition(x, y);
-    anims.Update(dt);
-    const Rectangle& animFrame = anims.GetCurrentFrame();
+    if (hasAnims)
+    {
+        anims.Update(dt);
+        const Rectangle& animFrame = anims.GetCurrentFrame();
 
-    Rectangle source = animFrame;
+        Rectangle source = animFrame;
 
-    Rectangle dest = {
-        x,
-        y,
-        animFrame.width,
-        animFrame.height
-    };
+        Rectangle dest = {
+            x,
+            y,
+            animFrame.width,
+            animFrame.height
+        };
 
-    render->rDrawTexturePro(texture, source, dest, { animFrame.width / 2.f, animFrame.height / 2.f }, body->GetRotation() * RAD2DEG, WHITE);
-    /*render->rDrawTexturePro(texture, Rectangle{ 0, 0, (float)texture.width, (float)texture.height },
-        Rectangle{ (float)x, (float)y, (float)texture.width, (float)texture.height },
-        Vector2{ (float)texture.width / 2.0f, (float)texture.height / 2.0f }, body->GetRotation() * RAD2DEG, WHITE);*/
+        render->rDrawTexturePro(texture, source, dest, { animFrame.width / 2.f, animFrame.height / 2.f }, body->GetRotation() * RAD2DEG, WHITE);
+    }
+    else 
+    {
+        render->rDrawTexturePro(texture, Rectangle{ 0, 0, (float)texture.width, (float)texture.height },
+            Rectangle{ (float)x, (float)y, (float)texture.width, (float)texture.height },
+            Vector2{ (float)texture.width / 2.0f, (float)texture.height / 2.0f }, body->GetRotation() * RAD2DEG, WHITE);
+    }
 }
 
 void Car::OnCollision(PhysicEntity* other, bool isSensor)

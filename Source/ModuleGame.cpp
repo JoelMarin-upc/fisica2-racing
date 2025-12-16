@@ -51,6 +51,8 @@ bool ModuleGame::Start()
 	positionTex[8] = LoadTexture("Assets/UI/8.png");
 	positionTex[9] = LoadTexture("Assets/UI/9.png");
 	
+	GetCarIcons();
+
 	menuBack = LoadTexture("Assets/UI/menu_background.png");
 
 	return ret;
@@ -75,15 +77,27 @@ void ModuleGame::AddCars()
 	{
 		Transform2D t = map->playerStartPositions[i];
 		int num = GetRandomValue(1, 8);
-		const std::string tex = map->carsBasePath + "Car" + std::to_string(num) + ".png";
-		const std::string tmx = map->carsBasePath + "Car" + std::to_string(num) + ".tsx";
-		cars.push_back(new Car(App, t.position.x, t.position.y, t.rotation, this, LoadTexture(tex.c_str()), i + 1, false, sprintFX, runFX, crashFX, carCrashFX, tmx, { 15.f, 33.f }, difficulty));
+		std::string tex = map->carsBasePath + "car" + std::to_string(num) + ".png";
+		std::string tmx = map->carsBasePath + "Car" + std::to_string(num) + ".tsx";
+		Vector2 colsize = { 15.f, 33.f };
+		if (!FileExists(tmx.c_str()))
+		{
+			tmx = "";
+			colsize = { 0.f, 0.f };
+		}
+		cars.push_back(new Car(App, t.position.x, t.position.y, t.rotation, this, LoadTexture(tex.c_str()), i + 1, false, sprintFX, runFX, crashFX, carCrashFX, tmx, colsize, difficulty));
 	}
 	int num = GetRandomValue(1, 8);
 	Transform2D playerTransform = map->playerStartPositions[map->totalCars-1];
-	const std::string playerTex = map->carsBasePath + "Car" + std::to_string(num) + ".png";
-	const std::string playerAnims = map->carsBasePath + "Car" + std::to_string(num) + ".tsx";
-	car = new Car(App, playerTransform.position.x, playerTransform.position.y, playerTransform.rotation, this, LoadTexture(playerTex.c_str()), map->totalCars, true, sprintFX, runFX, crashFX, carCrashFX, playerAnims, { 15.f, 33.f });
+	std::string playerTex = map->carsBasePath + "car" + std::to_string(selectedCar) + ".png";
+	std::string playerAnims = map->carsBasePath + "Car" + std::to_string(selectedCar) + ".tsx";
+	Vector2 colsize = { 15.f, 33.f };
+	if (!FileExists(playerAnims.c_str()))
+	{
+		playerAnims = "";
+		colsize = { 0.f, 0.f };
+	}
+	car = new Car(App, playerTransform.position.x, playerTransform.position.y, playerTransform.rotation, this, LoadTexture(playerTex.c_str()), map->totalCars, true, sprintFX, runFX, crashFX, carCrashFX, playerAnims, colsize);
 	cars.push_back(car);
 }
 
@@ -219,19 +233,20 @@ void ModuleGame::GetMenuInput()
 	if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
 	{
 		menuOption++;
-		if (menuOption > 4) menuOption = 1;
+		if (menuOption > 5) menuOption = 1;
 	}
 	if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
 	{
 		menuOption--;
-		if (menuOption < 1) menuOption = 4;
+		if (menuOption < 1) menuOption = 5;
 	}
 	if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A))
 	{
 		if (menuOption == 1)
 		{
 			mapNumber--;
-			if (mapNumber < 1) mapNumber = 2;
+			if (mapNumber < 1) mapNumber = 3;
+			GetCarIcons();
 		}
 		if (menuOption == 2)
 		{
@@ -243,13 +258,19 @@ void ModuleGame::GetMenuInput()
 			totalLaps--;
 			if (totalLaps < 1) totalLaps = 5;
 		}
+		if (menuOption == 4)
+		{
+			selectedCar--;
+			if (selectedCar < 1) selectedCar = 8;
+		}
 	}
 	if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D))
 	{
 		if (menuOption == 1)
 		{
 			mapNumber++;
-			if (mapNumber > 2) mapNumber = 1;
+			if (mapNumber > 3) mapNumber = 1;
+			GetCarIcons();
 		}
 		if (menuOption == 2)
 		{
@@ -261,10 +282,15 @@ void ModuleGame::GetMenuInput()
 			totalLaps++;
 			if (totalLaps > 5) totalLaps = 1;
 		}
+		if (menuOption == 4)
+		{
+			selectedCar++;
+			if (selectedCar > 8) selectedCar = 1;
+		}
 	}
 	if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE))
 	{
-		if (menuOption == 4)
+		if (menuOption == 5)
 		{
 			gameStarted = true;
 			LoadMap();
@@ -272,6 +298,35 @@ void ModuleGame::GetMenuInput()
 			App->renderer->SetCameraTarget(car);
 		}
 	}
+}
+
+void ModuleGame::GetCarIcons()
+{
+	std::string mapName;
+	switch (mapNumber)
+	{
+	case 1:
+		mapName = "River";
+		break;
+	case 2:
+		mapName = "Sea Floor";
+		break;
+	case 3:
+		mapName = "Road";
+		break;
+	default:
+		mapName = "None";
+		break;
+	}
+	std::string basePath = "Assets/Maps/" + mapName + "/Cars/Icon";
+	carsTex[1] = LoadTexture((basePath + "/1.png").c_str());
+	carsTex[2] = LoadTexture((basePath + "/2.png").c_str());
+	carsTex[3] = LoadTexture((basePath + "/3.png").c_str());
+	carsTex[4] = LoadTexture((basePath + "/4.png").c_str());
+	carsTex[5] = LoadTexture((basePath + "/5.png").c_str());
+	carsTex[6] = LoadTexture((basePath + "/6.png").c_str());
+	carsTex[7] = LoadTexture((basePath + "/7.png").c_str());
+	carsTex[8] = LoadTexture((basePath + "/8.png").c_str());
 }
 
 void ModuleGame::PrintMenu()
@@ -286,6 +341,9 @@ void ModuleGame::PrintMenu()
 		mapName = "River";
 		break;
 	case 2:
+		mapName = "Sea Floor";
+		break;
+	case 3:
 		mapName = "Road";
 		break;
 	default:
@@ -308,18 +366,22 @@ void ModuleGame::PrintMenu()
 		diffName = "None";
 		break;
 	}
-	
+
+	Texture2D carTex = carsTex[selectedCar];
+
 	int screenCenterX = GetScreenWidth() / 2;
 	int screenCenterY = GetScreenHeight() / 2;
-
-	App->renderer->rDrawTextCentered("TITLE OF THE GAME", screenCenterX, screenCenterY - 160, fontMainTitle, 5, YELLOW);
-
+    
 	App->renderer->rDrawTexturePro(menuBack, { 0.f, 0.f, (float)menuBack.width, (float)menuBack.height }, { 0.f, 0.f, (float)menuBack.width, (float)menuBack.height }, { 0.f, 0.f }, 0.f, WHITE);
 
-	App->renderer->rDrawTextCentered(TextFormat("Map: < %s >", mapName.c_str()), screenCenterX, screenCenterY - 45, fontText, 5, menuOption == 1 ? selected : unselected);
-	App->renderer->rDrawTextCentered(TextFormat("Difficulty: < %s >", diffName.c_str()), screenCenterX, screenCenterY - 15, fontText, 5, menuOption == 2 ? selected : unselected);
-	App->renderer->rDrawTextCentered(TextFormat("Laps: < %i >", totalLaps), screenCenterX, screenCenterY + 15, fontText, 5, menuOption == 3 ? selected : unselected);
-	App->renderer->rDrawTextCentered("Start game", screenCenterX, screenCenterY + 45, fontSubtitle, 5, menuOption == 4 ? selected : unselected);
+	App->renderer->rDrawTextCentered("HYDROSPRINT", screenCenterX, screenCenterY - 180, fontMainTitle, 5, YELLOW);
+
+	App->renderer->rDrawTextCentered(TextFormat("Map: < %s >", mapName.c_str()), screenCenterX, screenCenterY - 75, fontText, 5, menuOption == 1 ? selected : unselected);
+	App->renderer->rDrawTextCentered(TextFormat("Difficulty: < %s >", diffName.c_str()), screenCenterX, screenCenterY - 45, fontText, 5, menuOption == 2 ? selected : unselected);
+	App->renderer->rDrawTextCentered(TextFormat("Laps: < %i >", totalLaps), screenCenterX, screenCenterY - 15, fontText, 5, menuOption == 3 ? selected : unselected);
+	App->renderer->rDrawTextCentered(TextFormat("< Vehicle %i >", selectedCar), screenCenterX, screenCenterY + 15, fontText, 5, menuOption == 4 ? selected : unselected);
+	App->renderer->rDrawTexturePro(carTex, { 0.f, 0.f, (float)carTex.width, (float)carTex.height }, { (float)screenCenterX, (float)screenCenterY + 60, (float)carTex.width, (float)carTex.height }, { (float)carTex.width / 2.f, (float)carTex.height / 2.f }, 0.f, WHITE);
+	App->renderer->rDrawTextCentered("Start game", screenCenterX, screenCenterY + 120, fontSubtitle, 5, menuOption == 5 ? selected : unselected);
 }
 
 void ModuleGame::PrintInfo()
