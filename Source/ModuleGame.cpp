@@ -51,6 +51,8 @@ bool ModuleGame::Start()
 	positionTex[8] = LoadTexture("Assets/UI/8.png");
 	positionTex[9] = LoadTexture("Assets/UI/9.png");
 	
+	GetCarIcons();
+
 	menuBack = LoadTexture("Assets/UI/menu_background.png");
 
 	return ret;
@@ -231,12 +233,12 @@ void ModuleGame::GetMenuInput()
 	if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
 	{
 		menuOption++;
-		if (menuOption > 4) menuOption = 1;
+		if (menuOption > 5) menuOption = 1;
 	}
 	if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
 	{
 		menuOption--;
-		if (menuOption < 1) menuOption = 4;
+		if (menuOption < 1) menuOption = 5;
 	}
 	if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A))
 	{
@@ -255,6 +257,11 @@ void ModuleGame::GetMenuInput()
 		{
 			totalLaps--;
 			if (totalLaps < 1) totalLaps = 5;
+		}
+		if (menuOption == 4)
+		{
+			selectedCar--;
+			if (selectedCar < 1) selectedCar = 8;
 		}
 	}
 	if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D))
@@ -275,10 +282,15 @@ void ModuleGame::GetMenuInput()
 			totalLaps++;
 			if (totalLaps > 5) totalLaps = 1;
 		}
+		if (menuOption == 4)
+		{
+			selectedCar++;
+			if (selectedCar > 8) selectedCar = 1;
+		}
 	}
 	if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE))
 	{
-		if (menuOption == 4)
+		if (menuOption == 5)
 		{
 			gameStarted = true;
 			LoadMap();
@@ -329,6 +341,9 @@ void ModuleGame::PrintMenu()
 		mapName = "River";
 		break;
 	case 2:
+		mapName = "Sea Floor";
+		break;
+	case 3:
 		mapName = "Road";
 		break;
 	default:
